@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Catégorie de groupes -->
+        <record id="module_category_it_park" model="ir.module.category">
+            <field name="name">Parc Informatique</field>
+            <field name="description">Gère les accès au module de gestion de parc informatique</field>
+            <field name="sequence">20</field>
+        </record>
+        
+        <!-- Groupe utilisateur -->
+        <record id="group_it_park_user" model="res.groups">
+            <field name="name">Utilisateur</field>
+            <field name="category_id" ref="module_category_it_park"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <!-- Groupe technicien -->
+        <record id="group_it_park_technician" model="res.groups">
+            <field name="name">Technicien</field>
+            <field name="category_id" ref="module_category_it_park"/>
+            <field name="implied_ids" eval="[(4, ref('group_it_park_user'))]"/>
+        </record>
+        
+        <!-- Groupe responsable -->
+        <record id="group_it_park_manager" model="res.groups">
+            <field name="name">Responsable</field>
+            <field name="category_id" ref="module_category_it_park"/>
+            <field name="implied_ids" eval="[(4, ref('group_it_park_technician'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+    </data>
+</odoo> 

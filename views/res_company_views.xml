@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vue simplifiée pour créer une entreprise -->
+    <record id="view_company_form_simplified" model="ir.ui.view">
+        <field name="name">res.company.form.simplified</field>
+        <field name="model">res.company</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="logo" widget="image" class="oe_avatar mb-4"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom de la société" required="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" invisible="1"/>
+                            <field name="currency_id" options="{'no_create': True}" groups="base.group_multi_currency"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
+                            <field name="website" widget="url"/>
+                        </group>
+                        <group>
+                            <field name="street" placeholder="Rue..."/>
+                            <field name="street2" placeholder="Complément..."/>
+                            <field name="city" placeholder="Ville"/>
+                            <field name="zip" placeholder="Code postal"/>
+                            <field name="state_id" placeholder="État/Province" options="{'no_open': True}"/>
+                            <field name="country_id" placeholder="Pays" options="{'no_open': True}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action pour créer une nouvelle société -->
+    <record id="action_create_company" model="ir.actions.act_window">
+        <field name="name">Nouvelle société</field>
+        <field name="res_model">res.company</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_company_form_simplified"/>
+        <field name="help" type="html">
+            <p>
+                Créer une nouvelle société dans le système.
+            </p>
+        </field>
+    </record>
+
+    <!-- Étendre la vue formulaire de la société pour ajouter les paramètres IT Park -->
+    <record id="view_company_form_inherit_it_park" model="ir.ui.view">
+        <field name="name">res.company.form.inherit.it.park</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <!-- Temporairement commenté pour debug
+<page string="Paramètres IT Park" name="it_park_settings">
+                    <group>
+                        <group string="Général">
+                            <field name="it_manager_id"/>
+                            <field name="default_service_product_id"/>
+                            <field name="next_equipment_number"/>
+                            <field name="next_sn_number"/>
+                        </group>
+                        <group string="Facturation">
+                            <field name="use_contract_billing"/>
+                            <field name="contract_billing_product_id" invisible="not use_contract_billing"/>
+                            <field name="contract_journal_id" invisible="not use_contract_billing"/>
+                            <field name="use_intervention_billing"/>
+                            <field name="intervention_billing_product_id" invisible="not use_intervention_billing"/>
+                            <label for="default_hourly_rate" invisible="not use_intervention_billing"/>
+                            <div class="o_row" invisible="not use_intervention_billing">
+                                <field name="default_hourly_rate"/>
+                                <span>/ heure</span>
+                            </div>
+                        </group>
+                    </group>
+                    <group string="Intégration Helpdesk">
+                        <field name="use_helpdesk_for_incidents"/>
+                        <field name="default_helpdesk_team_id" invisible="not use_helpdesk_for_incidents" required="use_helpdesk_for_incidents"/>
+                        <button name="action_configure_helpdesk" string="Configurer l'intégration Helpdesk" type="object" class="btn-primary" invisible="not use_helpdesk_for_incidents"/>
+                    </group>
+                    <group string="Notifications">
+                        <field name="notify_on_incident_creation"/>
+                        <field name="notify_on_equipment_expiration"/>
+                        <field name="notify_on_license_expiration"/>
+                        <field name="notify_on_maintenance_due"/>
+                        <field name="notify_days_before_expiration"/>
+                    </group>
+                </page>
+-->
+<page string="Paramètres IT Park" name="it_park_settings">
+    <p>Configuration temporairement indisponible</p>
+</page>
+            </notebook>
+        </field>
+    </record>
+</odoo> 

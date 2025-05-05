@@ -1,0 +1,174 @@
+/* Fichier CSS direct pour forcer les styles */
+
+/* Styles généraux */
+body {
+    background-color: #f8f9fa !important;
+}
+
+/* Navbar */
+.o_portal_navbar {
+    background-color: #e6f7ff !important;
+    border-bottom: 5px solid #0066cc !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Boutons */
+.btn-primary {
+    background-color: #0066cc !important;
+    border-color: #0055aa !important;
+    box-shadow: 0 4px 8px rgba(0, 102, 204, 0.3) !important;
+    border-radius: 30px !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-primary:hover {
+    background-color: #0055aa !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Cards */
+.card {
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.3s ease !important;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+    transform: translateY(-5px) !important;
+}
+
+.card-header {
+    background-color: #f0f8ff !important;
+    border-bottom: 1px solid #e6f7ff !important;
+    padding: 1.25rem !important;
+}
+
+/* Tableaux */
+.table {
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05) !important;
+}
+
+.table thead th {
+    background-color: #0066cc !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px !important;
+}
+
+.table tbody tr:hover {
+    background-color: #e6f7ff !important;
+}
+
+/* Badges */
+.badge {
+    padding: 6px 10px !important;
+    font-weight: 500 !important;
+}
+
+.badge-pill {
+    border-radius: 50px !important;
+}
+
+/* Animations */
+.btn-pulse {
+    animation: pulse 0.5s !important;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 102, 204, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 102, 204, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 102, 204, 0);
+    }
+}
+
+/* Classes d'animation */
+.animate-fadeInUp {
+    animation: fadeInUp 0.5s ease-out forwards !important;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Délais d'animation */
+.delay-1 { animation-delay: 0.1s !important; }
+.delay-2 { animation-delay: 0.2s !important; }
+.delay-3 { animation-delay: 0.3s !important; }
+.delay-4 { animation-delay: 0.4s !important; }
+
+/* Statistiques */
+.stat-card {
+    border-radius: 10px !important;
+    padding: 1.5rem !important;
+    background-color: white !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    position: relative !important;
+}
+
+.stat-number {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    color: #0066cc !important;
+}
+
+.stat-label {
+    font-size: 0.875rem !important;
+    color: #6c757d !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+}
+
+.stat-icon {
+    position: absolute !important;
+    right: 1.5rem !important;
+    top: 1.5rem !important;
+    font-size: 2.5rem !important;
+    color: rgba(0, 102, 204, 0.1) !important;
+}
+
+/* Priorités des tickets */
+.priority-0 { border-left: 5px solid #17a2b8 !important; }
+.priority-1 { border-left: 5px solid #28a745 !important; }
+.priority-2 { border-left: 5px solid #fd7e14 !important; }
+.priority-3 { border-left: 5px solid #dc3545 !important; }
+
+/* État des tickets */
+.badge-new, .bg-info { background-color: #17a2b8 !important; }
+.badge-assigned, .bg-primary { background-color: #0066cc !important; }
+.badge-in-progress, .bg-warning { background-color: #fd7e14 !important; }
+.badge-waiting, .bg-secondary { background-color: #6c757d !important; }
+.badge-resolved, .bg-success { background-color: #28a745 !important; }
+.badge-closed, .bg-dark { background-color: #343a40 !important; }
+
+/* Bouton de retour en haut */
+#back-to-top {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 999 !important;
+    width: 40px !important;
+    height: 40px !important;
+    text-align: center !important;
+    line-height: 40px !important;
+    background-color: #0066cc !important;
+    color: white !important;
+    border-radius: 50% !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+    display: none !important;
+} 

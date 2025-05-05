@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Types de rapporteurs -->
+    <record id="view_it_reporter_type_form" model="ir.ui.view">
+        <field name="name">it.reporter.type.form</field>
+        <field name="model">it.reporter.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_it_reporter_type_tree" model="ir.ui.view">
+        <field name="name">it.reporter.type.tree</field>
+        <field name="model">it.reporter.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="action_it_reporter_type" model="ir.actions.act_window">
+        <field name="name">Types de rapporteurs</field>
+        <field name="res_model">it.reporter.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Rapporteurs -->
+    <record id="view_it_reporter_form" model="ir.ui.view">
+        <field name="name">it.reporter.form</field>
+        <field name="model">it.reporter</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="type_id"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="display_name" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_it_reporter_tree" model="ir.ui.view">
+        <field name="name">it.reporter.tree</field>
+        <field name="model">it.reporter</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="display_name"/>
+                <field name="type_id"/>
+                <field name="partner_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="view_it_reporter_search" model="ir.ui.view">
+        <field name="name">it.reporter.search</field>
+        <field name="model">it.reporter</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="type_id"/>
+                <filter string="Actifs" name="active" domain="[('active', '=', True)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Type" name="group_by_type" context="{'group_by': 'type_id'}"/>
+                    <filter string="Contact" name="group_by_partner" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <record id="action_it_reporter" model="ir.actions.act_window">
+        <field name="name">Rapporteurs d'incidents</field>
+        <field name="res_model">it.reporter</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+    </record>
+
+    <!-- Menus -->
+    <!-- Menu pour les types de rapporteurs -->
+    <menuitem id="menu_it_reporter_type"
+              name="Types de rapporteurs"
+              parent="menu_it_config"
+              sequence="21"
+              action="action_it_reporter_type"/>
+
+    <!-- Menu pour la configuration des rapporteurs -->
+    <menuitem id="menu_reporter_config"
+              name="Rapporteurs d'incidents"
+              parent="menu_it_config"
+              action="action_it_reporter"
+              sequence="60"/>
+
+    <!-- Données de démonstration pour les types de rapporteurs -->
+    <record id="reporter_type_employee" model="it.reporter.type">
+        <field name="name">Employé</field>
+        <field name="code">EMP</field>
+    </record>
+
+    <record id="reporter_type_admin" model="it.reporter.type">
+        <field name="name">Administrateur système</field>
+        <field name="code">ADM</field>
+    </record>
+
+    <record id="reporter_type_tech" model="it.reporter.type">
+        <field name="name">Technicien</field>
+        <field name="code">TECH</field>
+    </record>
+
+    <record id="reporter_type_user" model="it.reporter.type">
+        <field name="name">Utilisateur autorisé</field>
+        <field name="code">USER</field>
+    </record>
+</odoo> 

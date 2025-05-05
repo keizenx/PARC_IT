@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Formulaire de création d'incident corrigé -->
+    <template id="it_support_new_incident" name="New Support Ticket">
+        <t t-call="website.layout">
+            <div class="container mt32 mb32">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="text-center mb32">Créer un nouveau ticket</h1>
+                        
+                        <form action="/it-support/submit-incident" method="post" class="o_website_form" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label" for="title">Titre</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" name="name" id="title" required="1" placeholder="Décrivez brièvement le problème"/>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label" for="description">Description détaillée</label>
+                                <div class="col-md-9">
+                                    <textarea class="form-control" name="description" id="description" rows="5" required="1" placeholder="Décrivez en détail le problème rencontré..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label" for="priority">Priorité</label>
+                                <div class="col-md-9">
+                                    <select class="form-control" name="priority_id" id="priority">
+                                        <option value="">-- Sélectionnez une priorité --</option>
+                                        <t t-foreach="priorities" t-as="priority">
+                                            <option t-att-value="priority.id"><t t-esc="priority.name"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label" for="type">Type d'incident</label>
+                                <div class="col-md-9">
+                                    <select class="form-control" name="type_id" id="type">
+                                        <option value="">-- Sélectionnez un type --</option>
+                                        <t t-foreach="incident_types" t-as="type">
+                                            <option t-att-value="type.id"><t t-esc="type.name"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label" for="attachment">Pièce jointe</label>
+                                <div class="col-md-9">
+                                    <input type="file" class="form-control" name="attachment" id="attachment" />
+                                    <small class="form-text text-muted">Vous pouvez joindre une capture d'écran ou un document explicatif</small>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <div class="offset-md-3 col-md-9">
+                                    <button type="submit" class="btn btn-primary">Soumettre le ticket</button>
+                                    <a href="/it-support" class="btn btn-secondary">Annuler</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo> 

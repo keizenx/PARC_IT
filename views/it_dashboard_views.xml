@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action pour le tableau de bord -->
+    <record id="action_it_dashboard" model="ir.actions.act_window">
+        <field name="name">Tableau de bord IT</field>
+        <field name="res_model">it.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+    
+    <!-- Vue formulaire pour le tableau de bord -->
+    <record id="view_it_dashboard_form" model="ir.ui.view">
+        <field name="name">it.dashboard.form</field>
+        <field name="model">it.dashboard</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_refresh_data" string="Rafraîchir" type="object" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <field name="name" invisible="1"/>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="oe_title">
+                                <h1>Tableau de bord du Parc IT</h1>
+                                <h5 class="text-muted">Suivi en temps réel de l'infrastructure et des performances</h5>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="date_from" class="fw-bold mb-1">Date de début</label>
+                                    <field name="date_from" class="w-100"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="date_to" class="fw-bold mb-1">Date de fin</label>
+                                    <field name="date_to" class="w-100"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section Équipements -->
+                    <div class="o_dashboard_section">
+                        <h2 class="text-primary">
+                            <i class="fa fa-desktop me-2"></i>Équipements
+                        </h2>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="o_dashboard_card bg-white">
+                                    <h3 class="text-center">Équipements totaux</h3>
+                                    <div class="text-center">
+                                        <span class="o_value h1"><field name="total_equipment"/></span>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <button name="%(action_it_equipment)d" type="action" 
+                                                class="btn btn-primary btn-sm">
+                                            Voir tous les équipements
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="o_dashboard_card bg-white">
+                                    <h3 class="text-center">Équipements actifs</h3>
+                                    <div class="text-center">
+                                        <span class="o_value h1 text-success"><field name="active_equipment"/></span>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <button name="%(action_it_equipment)d" type="action" 
+                                                class="btn btn-success btn-sm"
+                                                context="{'search_default_state_installed': 1}">
+                                            Voir les équipements actifs
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="o_dashboard_card bg-white">
+                                    <h3 class="text-center">En maintenance</h3>
+                                    <div class="text-center">
+                                        <span class="o_value h1 text-warning"><field name="maintenance_equipment"/></span>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <button name="%(action_it_equipment)d" type="action" 
+                                                class="btn btn-warning btn-sm"
+                                                context="{'search_default_state_maintenance': 1}">
+                                            Voir les équipements en maintenance
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="o_dashboard_card bg-white">
+                                    <h3 class="text-center">Fin de vie</h3>
+                                    <div class="text-center">
+                                        <span class="o_value h1 text-danger"><field name="eol_equipment"/></span>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <button name="%(action_it_equipment)d" type="action" 
+                                                class="btn btn-danger btn-sm"
+                                                context="{'search_default_state_end_of_life': 1}">
+                                            Voir les équipements en fin de vie
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section Incidents -->
+                    <div class="o_dashboard_section">
+                        <h2 class="text-primary">
+                            <i class="fa fa-exclamation-triangle me-2"></i>Incidents
+                        </h2>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="o_dashboard_card bg-white">
+                                    <h3 class="text-center">Nouveaux</h3>
+                                    <div class="text-center">
+                                        <span class="o_value h1 text-info"><field name="new_incidents"/></span>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <button name="%(action_it_incident)d" type="action" 
+                                                class="btn btn-info btn-sm"
+                                                context="{'search_default_state_new': 1}">
+                                            Voir les nouveaux incidents
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="o_dashboard_card bg-white">
+                                    <h3 class="text-center">En cours</h3>
+                                    <div class="text-center">
+                                        <span class="o_value h1 text-warning"><field name="in_progress_incidents"/></span>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <button name="%(action_it_incident)d" type="action" 
+                                                class="btn btn-warning btn-sm"
+                                                context="{'search_default_state_in_progress': 1}">
+                                            Voir les incidents en cours
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="o_dashboard_card bg-white">
+                                    <h3 class="text-center">Résolus</h3>
+                                    <div class="text-center">
+                                        <span class="o_value h1 text-success"><field name="resolved_incidents"/></span>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <button name="%(action_it_incident)d" type="action" 
+                                                class="btn btn-success btn-sm"
+                                                context="{'search_default_state_resolved': 1}">
+                                            Voir les incidents résolus
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="o_dashboard_card bg-white">
+                                    <h3 class="text-center">Temps moyen (h)</h3>
+                                    <div class="text-center">
+                                        <span class="o_value h1"><field name="avg_resolution_time" widget="float_time"/></span>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <button name="%(action_it_incident)d" type="action" 
+                                                class="btn btn-primary btn-sm">
+                                            Voir tous les incidents
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section Licences -->
+                    <div class="o_dashboard_section">
+                        <h2 class="text-primary">
+                            <i class="fa fa-key me-2"></i>Licences
+                        </h2>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="o_dashboard_card bg-white">
+                                    <h3 class="text-center">Licences totales</h3>
+                                    <div class="text-center">
+                                        <span class="o_value h1"><field name="total_licenses"/></span>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <button name="%(action_it_license)d" type="action" 
+                                                class="btn btn-primary btn-sm">
+                                            Voir toutes les licences
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="o_dashboard_card bg-white">
+                                    <h3 class="text-center">Licences actives</h3>
+                                    <div class="text-center">
+                                        <span class="o_value h1 text-success"><field name="active_licenses"/></span>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <button name="%(action_it_license)d" type="action" 
+                                                class="btn btn-success btn-sm"
+                                                context="{'search_default_state_active': 1}">
+                                            Voir les licences actives
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="o_dashboard_card bg-white">
+                                    <h3 class="text-center">Expirant bientôt</h3>
+                                    <div class="text-center">
+                                        <span class="o_value h1 text-warning"><field name="expiring_soon_licenses"/></span>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <button name="%(action_it_license)d" type="action" 
+                                                class="btn btn-warning btn-sm"
+                                                context="{'search_default_expiring_soon': 1}">
+                                            Voir les licences expirant bientôt
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="o_dashboard_card bg-white">
+                                    <h3 class="text-center">Licences expirées</h3>
+                                    <div class="text-center">
+                                        <span class="o_value h1 text-danger"><field name="expired_licenses"/></span>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <button name="%(action_it_license)d" type="action" 
+                                                class="btn btn-danger btn-sm"
+                                                context="{'search_default_state_expired': 1}">
+                                            Voir les licences expirées
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section Graphiques (remplacée par une vue simple) -->
+                    <div class="o_dashboard_section">
+                        <h2 class="text-primary">
+                            <i class="fa fa-chart-bar me-2"></i>Statistiques
+                        </h2>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-info" role="alert">
+                                    <i class="fa fa-info-circle me-2"></i> Les graphiques ont été temporairement désactivés pour 
+                                    la compatibilité avec Odoo 18. Ils seront réactivés dans une prochaine mise à jour.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Action créer un enregistrement par défaut -->
+    <record id="create_default_dashboard" model="ir.actions.server">
+        <field name="name">Créer tableau de bord par défaut</field>
+        <field name="model_id" ref="model_it_dashboard"/>
+        <field name="state">code</field>
+        <field name="code">
+# Vérifier si un dashboard existe déjà
+dashboard = env['it.dashboard'].search([], limit=1)
+if not dashboard:
+    env['it.dashboard'].create({'name': 'Dashboard principal'})
+        </field>
+    </record>
+    
+    <!-- Exécuter l'action au démarrage -->
+    <function model="ir.actions.server" name="run" eval="[ref('it__park.create_default_dashboard')]"/>
+
+    <!-- Menu du tableau de bord -->
+    <!-- Ce menu est placé ici pour s'assurer que l'action est chargée avant le menu -->
+    <menuitem id="menu_it_park_dashboard" 
+              name="Tableau de bord"
+              parent="menu_it_park_root"
+              action="action_it_dashboard"
+              sequence="1"/>
+</odoo> 

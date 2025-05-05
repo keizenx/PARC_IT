@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vue formulaire pour les types d'incidents -->
+    <record id="view_it_incident_type_form" model="ir.ui.view">
+        <field name="name">it.incident.type.form</field>
+        <field name="model">it.incident.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code" required="1"/>
+                        <field name="sequence"/>
+                        <field name="description"/>
+                        <field name="color" widget="color_picker"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo> 

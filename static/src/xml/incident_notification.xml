@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="it__park.IncidentCounter" owl="1">
+        <div class="o_incident_counter" t-on-click="openList">
+            <span class="badge rounded-pill text-bg-danger" t-if="state.count > 0">
+                <t t-esc="state.count"/>
+            </span>
+        </div>
+    </t>
+
+    <t t-name="it__park.IncidentNotification" owl="1">
+        <div class="o_incident_notification p-2">
+            <div class="notification-header d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0">
+                    <i class="fa fa-bell me-2"></i>
+                    <t t-esc="title"/>
+                </h5>
+                <button class="btn btn-sm btn-link p-0" t-on-click="close">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="notification-body mb-2">
+                <p t-if="props.message" class="mb-1" t-esc="props.message"/>
+                <div t-if="props.incident" class="incident-info d-flex flex-column">
+                    <small><strong>Client:</strong> <t t-esc="props.incident.client_name"/></small>
+                    <small><strong>Priorité:</strong> <t t-esc="props.incident.priority_name"/></small>
+                    <small><strong>Date:</strong> <t t-esc="formatDate(props.incident.date_reported)"/></small>
+                </div>
+            </div>
+            <div class="notification-footer d-flex justify-content-end">
+                <button class="btn btn-sm btn-primary" t-on-click="openIncident">
+                    Voir le ticket
+                </button>
+            </div>
+        </div>
+    </t>
+</templates> 

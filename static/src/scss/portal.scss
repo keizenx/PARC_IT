@@ -1,0 +1,174 @@
+/**
+ * Styles pour le portail client IT Park
+ */
+
+// Variables
+$it-primary: #3498db;
+$it-secondary: #2c3e50;
+$it-success: #27ae60;
+$it-warning: #f39c12;
+$it-danger: #e74c3c;
+$it-info: #00b9e4;
+$it-bg-light: #f8f9fa;
+$it-card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+// Styles généraux du portail
+.it_park_portal {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    
+    h1, h2, h3, h4, h5, h6 {
+        color: $it-secondary;
+        font-weight: 600;
+    }
+
+    .portal-header {
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 1rem;
+    }
+    
+    .portal-title {
+        font-size: 1.75rem;
+        color: $it-primary;
+    }
+    
+    .portal-subtitle {
+        font-size: 1.25rem;
+        color: $it-secondary;
+        margin-bottom: 1.5rem;
+    }
+}
+
+// Cartes d'éléments (tickets, équipements, contrats)
+.it-item-card {
+    border-radius: 8px;
+    border: 1px solid #e6e6e6;
+    box-shadow: $it-card-shadow;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    background-color: white;
+    
+    &:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .card-header {
+        background-color: $it-bg-light;
+        border-bottom: 1px solid #e6e6e6;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .card-footer {
+        background-color: $it-bg-light;
+        border-top: 1px solid #e6e6e6;
+    }
+}
+
+// Badges d'état
+.badge {
+    &.badge-new {
+        background-color: $it-info;
+        color: white;
+    }
+    
+    &.badge-in-progress {
+        background-color: $it-primary;
+        color: white;
+    }
+    
+    &.badge-waiting {
+        background-color: $it-warning;
+        color: white;
+    }
+    
+    &.badge-resolved {
+        background-color: $it-success;
+        color: white;
+    }
+    
+    &.badge-closed {
+        background-color: $it-secondary;
+        color: white;
+    }
+}
+
+// Filtres
+.it-filters {
+    margin-bottom: 1.5rem;
+    
+    .filter-status {
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        
+        &.active {
+            font-weight: bold;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.5);
+        }
+    }
+}
+
+// Indicateurs de priorité
+.priority-indicator {
+    display: inline-flex;
+    align-items: center;
+    
+    .priority-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 5px;
+        
+        &.priority-low {
+            background-color: #a8d5ba;
+        }
+        
+        &.priority-medium {
+            background-color: #f8dba4;
+        }
+        
+        &.priority-high {
+            background-color: #f5b7b1;
+        }
+        
+        &.priority-critical {
+            background-color: #e74c3c;
+        }
+    }
+}
+
+// Boutons d'action
+.btn-it-primary {
+    background-color: $it-primary;
+    border-color: $it-primary;
+    color: white;
+    
+    &:hover {
+        background-color: darken($it-primary, 10%);
+        border-color: darken($it-primary, 10%);
+        color: white;
+    }
+}
+
+// Responsive
+@media (max-width: 767.98px) {
+    .it-item-card {
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            
+            .badge {
+                margin-top: 0.5rem;
+            }
+        }
+    }
+    
+    .it-filters {
+        .filter-status {
+            margin-bottom: 0.75rem;
+        }
+    }
+} 

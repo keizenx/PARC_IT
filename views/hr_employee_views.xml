@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Remplacer complètement la vue employé standard pour les techniciens IT -->
+    <record id="view_employee_form_inherit_it_park" model="ir.ui.view">
+        <field name="name">it.employee.form.inherit.it.park</field>
+        <field name="model">it.employee</field>
+        <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title mb-0">
+                            <h1 class="d-flex">
+                                <field name="name" placeholder="Nom du technicien" required="1"/>
+                            </h1>
+                            <field name="job_title" placeholder="Fonction"/>
+                        </div>
+                        <group>
+                            <group string="DÉPARTEMENT">
+                                <field name="it_technician" invisible="1" default="1"/>
+                                <field name="is_it_technician" invisible="1" default="1"/>
+                                <field name="department_id"/>
+                            </group>
+                            <group string="SOCIÉTÉ">
+                                <field name="company_id" string="Société" options="{'no_create': False, 'no_open': True, 'no_quick_create': True}" context="{'create_action': 'it__park.action_create_company'}"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="TÉLÉPHONE PROFESSIONNEL">
+                                <field name="work_phone" widget="phone"/>
+                            </group>
+                            <group string="TÉLÉPHONE PORTABLE PROFESSIONNEL">
+                                <field name="mobile_phone" widget="phone"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="ADRESSE E-MAIL PROFESSIONNELLE">
+                                <field name="work_email" widget="email"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Compétences IT" name="skills">
+                                <field name="category_ids" widget="many2many_tags" options="{'color_field': 'color'}" string="Compétences techniques"/>
+                            </page>
+                            <page string="Notes" name="notes">
+                                <field name="notes" placeholder="Notes sur ce technicien..."/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vue liste spécifique pour les techniciens IT -->
+    <record id="view_it_technician_tree" model="ir.ui.view">
+        <field name="name">it.technician.tree</field>
+        <field name="model">it.employee</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="job_title"/>
+                <field name="department_id"/>
+                <field name="work_phone"/>
+                <field name="work_email"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Vue formulaire spécifique pour les techniciens IT -->
+    <record id="view_it_technician_form" model="ir.ui.view">
+        <field name="name">it.technician.form</field>
+        <field name="model">it.employee</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title mb-0">
+                        <h1 class="d-flex">
+                            <field name="name" placeholder="Nom du technicien" required="1"/>
+                        </h1>
+                        <field name="job_title" placeholder="Fonction"/>
+                    </div>
+                    <group>
+                        <group string="DÉPARTEMENT">
+                            <field name="it_technician" invisible="1" default="1"/>
+                            <field name="is_it_technician" invisible="1" default="1"/>
+                            <field name="department_id"/>
+                        </group>
+                        <group string="SOCIÉTÉ">
+                            <field name="company_id" string="Société" options="{'no_create': False, 'no_open': True, 'no_quick_create': True}" context="{'create_action': 'it__park.action_create_company'}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="TÉLÉPHONE PROFESSIONNEL">
+                            <field name="work_phone" widget="phone"/>
+                        </group>
+                        <group string="TÉLÉPHONE PORTABLE PROFESSIONNEL">
+                            <field name="mobile_phone" widget="phone"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="ADRESSE E-MAIL PROFESSIONNELLE">
+                            <field name="work_email" widget="email"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Compétences IT" name="skills">
+                            <field name="category_ids" widget="many2many_tags" options="{'color_field': 'color'}" string="Compétences techniques"/>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Notes sur ce technicien..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vue recherche spécifique pour les techniciens IT -->
+    <record id="view_it_technician_search" model="ir.ui.view">
+        <field name="name">it.technician.search</field>
+        <field name="model">it.employee</field>
+        <field name="arch" type="xml">
+            <search string="Recherche de techniciens IT">
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="job_title"/>
+                <field name="work_email"/>
+                <field name="work_phone"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Département" name="department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Action pour afficher seulement les techniciens IT -->
+    <record id="action_it_technicians" model="ir.actions.act_window">
+        <field name="name">Techniciens IT</field>
+        <field name="res_model">it.employee</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('it_technician', '=', True)]</field>
+        <field name="context">{'default_it_technician': True}</field>
+        <field name="view_ids" eval="[(5, 0, 0), 
+                                     (0, 0, {'view_mode': 'list', 'view_id': ref('view_it_technician_tree')}),
+                                     (0, 0, {'view_mode': 'form', 'view_id': ref('view_it_technician_form')})]"/>
+        <field name="search_view_id" ref="view_it_technician_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Ajouter un nouveau technicien IT
+            </p>
+            <p>
+                Gérez vos techniciens IT qui pourront être assignés aux interventions et incidents.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action spécifique pour créer un nouveau technicien IT depuis le formulaire d'incident -->
+    <record id="action_create_it_technician" model="ir.actions.act_window">
+        <field name="name">Nouveau technicien IT</field>
+        <field name="res_model">it.employee</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'default_it_technician': True, 'form_view_ref': 'it__park.view_it_technician_form'}</field>
+        <field name="view_id" ref="view_it_technician_form"/>
+        <field name="help" type="html">
+            <p>
+                Créer un nouveau technicien IT qui pourra être assigné aux interventions et incidents.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Menu pour les techniciens IT -->
+    <menuitem id="menu_it_park_technician"
+              name="Techniciens"
+              parent="menu_it_contacts"
+              action="action_it_technicians"
+              sequence="10"/>
+</odoo> 

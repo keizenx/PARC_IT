@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template existant (à garder en cas de références ailleurs) -->
+    <record id="it_park_homepage" model="ir.ui.view">
+        <field name="name">IT Park Homepage</field>
+        <field name="type">qweb</field>
+        <field name="key">it__park.it_park_homepage</field>
+        <field name="arch" type="xml">
+            <t t-name="it__park.it_park_homepage">
+                <t t-call="website.layout">
+                    <div class="container-fluid">
+                        <!-- Banner Section -->
+                        <section class="s_cover bg-primary text-white py-5">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <h1 class="display-4 mb-4">Gestion de parc informatique efficace</h1>
+                                        <p class="lead mb-5">Solution complète pour gérer vos équipements, licences et interventions techniques</p>
+                                        <p>Nous vous offrons une plateforme centralisée pour gérer l'ensemble de votre infrastructure informatique.</p>
+                                        <div class="mt-5">
+                                            <a href="/my/assets" class="btn btn-light btn-lg me-3">Découvrir nos services</a>
+                                            <a href="/my/tickets/add" class="btn btn-outline-light btn-lg">Créer un ticket support</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- Services Section -->
+                        <section class="py-5 bg-light">
+                            <div class="container">
+                                <h2 class="text-center mb-5">Nos services informatiques</h2>
+                                <p class="text-center mb-5">Une solution complète pour la gestion de votre infrastructure IT</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card h-100 border-0 shadow-sm">
+                                            <div class="card-body p-4">
+                                                <div class="text-center mb-4">
+                                                    <span class="fa fa-laptop fa-3x text-primary"></span>
+                                                </div>
+                                                <h4 class="text-center">Parc informatique</h4>
+                                                <p class="text-muted">Suivi complet de tous vos équipements et périphériques avec historique, attribution et état.</p>
+                                                <div class="text-center mt-4">
+                                                    <a href="/my/assets" class="btn btn-sm btn-outline-primary">Voir mes équipements</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card h-100 border-0 shadow-sm">
+                                            <div class="card-body p-4">
+                                                <div class="text-center mb-4">
+                                                    <span class="fa fa-headset fa-3x text-primary"></span>
+                                                </div>
+                                                <h4 class="text-center">Support IT</h4>
+                                                <p class="text-muted">Support technique via un système de tickets permettant de suivre toutes vos demandes.</p>
+                                                <div class="text-center mt-4">
+                                                    <a href="/my/tickets" class="btn btn-sm btn-outline-primary">Mes tickets</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card h-100 border-0 shadow-sm">
+                                            <div class="card-body p-4">
+                                                <div class="text-center mb-4">
+                                                    <span class="fa fa-file-contract fa-3x text-primary"></span>
+                                                </div>
+                                                <h4 class="text-center">Contrats</h4>
+                                                <p class="text-muted">Gestion des contrats de maintenance et des accords de niveau de service (SLA).</p>
+                                                <div class="text-center mt-4">
+                                                    <a href="/my/contracts" class="btn btn-sm btn-outline-primary">Voir mes contrats</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- Call to Action -->
+                        <section class="bg-primary text-white py-5">
+                            <div class="container">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h3 class="mb-3">Besoin d'assistance technique ?</h3>
+                                        <p class="mb-md-0">Créez un ticket de support et notre équipe vous répondra dans les plus brefs délais.</p>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <a href="/my/tickets/add" class="btn btn-light btn-lg">Créer un ticket</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </t>
+            </t>
+        </field>
+    </record>
+    
+    <!-- Nouveau template simplifié -->
+    <template id="it_park_homepage_simple">
+        <t t-call="website.layout">
+            <div class="container py-5">
+                <div class="jumbotron bg-light p-5 rounded">
+                    <h1 class="display-4"><t t-esc="page_title"/></h1>
+                    <p class="lead"><t t-esc="page_subtitle"/></p>
+                    <hr class="my-4"/>
+                    <p>Notre plateforme de gestion de parc informatique vous permet de suivre vos équipements, gérer vos tickets et consulter vos contrats de maintenance.</p>
+                    <div class="mt-4">
+                        <a href="/my/tickets" class="btn btn-primary btn-lg me-2">Mes tickets</a>
+                        <a href="/my/assets" class="btn btn-secondary btn-lg">Mes équipements</a>
+                    </div>
+                </div>
+                
+                <div class="row mt-5">
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body text-center">
+                                <i class="fa fa-laptop fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">Parc informatique</h5>
+                                <p class="card-text">Suivi complet de tous vos équipements et périphériques.</p>
+                                <a href="/my/assets" class="btn btn-sm btn-outline-primary">Voir mes équipements</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body text-center">
+                                <i class="fa fa-headset fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">Support IT</h5>
+                                <p class="card-text">Support technique via un système de tickets pour vos demandes.</p>
+                                <a href="/my/tickets" class="btn btn-sm btn-outline-primary">Mes tickets</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body text-center">
+                                <i class="fa fa-file-contract fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">Contrats</h5>
+                                <p class="card-text">Gestion des contrats de maintenance et des SLA.</p>
+                                <a href="/my/contracts" class="btn btn-sm btn-outline-primary">Voir mes contrats</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Page web associée au template -->
+    <record id="it_park_homepage_page" model="website.page">
+        <field name="url">/it-park</field>
+        <field name="website_published">True</field>
+        <field name="view_id" ref="it_park_homepage"/>
+        <field name="name">IT Park Homepage</field>
+    </record>
+    
+    <!-- Menu pour accéder à la page d'accueil -->
+    <record id="menu_it_park" model="website.menu">
+        <field name="name">Parc Informatique</field>
+        <field name="url">/it-park</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" type="int">50</field>
+    </record>
+
+</odoo> 

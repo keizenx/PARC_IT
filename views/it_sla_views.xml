@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vue arborescente pour les politiques SLA -->
+    <record id="view_it_sla_policy_tree" model="ir.ui.view">
+        <field name="name">it.sla.policy.tree</field>
+        <field name="model">it.sla.policy</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="sla_type"/>
+                <field name="time_days"/>
+                <field name="time_hours"/>
+                <field name="time_minutes"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Vue formulaire pour les politiques SLA -->
+    <record id="view_it_sla_policy_form" model="ir.ui.view">
+        <field name="name">it.sla.policy.form</field>
+        <field name="model">it.sla.policy</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="Nom de la politique SLA..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sla_type" widget="radio"/>
+                            <field name="priority" widget="priority"/>
+                        </group>
+                        <group>
+                            <label for="time_days" string="Délai cible"/>
+                            <div class="o_row">
+                                <field name="time_days"/> jours
+                                <field name="time_hours"/> heures
+                                <field name="time_minutes"/> minutes
+                            </div>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Règles d'application" name="application_rules">
+                            <group>
+                                <group string="Conditions de déclenchement">
+                                    <field name="incident_type_ids" widget="many2many_tags" placeholder="Tous les types"/>
+                                    <field name="incident_category_ids" widget="many2many_tags" placeholder="Toutes les catégories"/>
+                                    <field name="incident_priority_ids" widget="many2many_tags" placeholder="Toutes les priorités"/>
+                                    <field name="team_ids" widget="many2many_tags" placeholder="Toutes les équipes"/>
+                                </group>
+                                <group string="Options de notification">
+                                    <field name="notify_on_breach"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Description" name="description">
+                            <field name="description" placeholder="Description..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vue recherche pour les politiques SLA -->
+    <record id="view_it_sla_policy_search" model="ir.ui.view">
+        <field name="name">it.sla.policy.search</field>
+        <field name="model">it.sla.policy</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="sla_type"/>
+                <field name="priority"/>
+                <separator/>
+                <filter string="Temps de réponse" name="response" domain="[('sla_type', '=', 'response')]"/>
+                <filter string="Temps de résolution" name="resolution" domain="[('sla_type', '=', 'resolution')]"/>
+                <separator/>
+                <filter string="Inactifs" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Type" name="group_by_type" context="{'group_by': 'sla_type'}"/>
+                    <filter string="Priorité" name="group_by_priority" context="{'group_by': 'priority'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Vue kanban pour les statuts SLA -->
+    <record id="view_it_sla_status_kanban" model="ir.ui.view">
+        <field name="name">it.sla.status.kanban</field>
+        <field name="model">it.sla.status</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name"/>
+                <field name="sla_policy_id"/>
+                <field name="incident_id"/>
+                <field name="deadline"/>
+                <field name="sla_type"/>
+                <field name="status"/>
+                <field name="color"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_global_click oe_kanban_card">
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong><field name="name"/></strong>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <span t-attf-class="badge rounded-pill text-bg-{{status == 'ongoing' ? 'primary' : status == 'reached' ? 'success' : 'danger'}}">
+                                        <field name="status"/>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <strong>Incident:</strong> <field name="incident_id"/>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <field name="deadline" widget="remaining_days"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    
+    <!-- Vue liste pour les statuts SLA -->
+    <record id="view_it_sla_status_tree" model="ir.ui.view">
+        <field name="name">it.sla.status.tree</field>
+        <field name="model">it.sla.status</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="incident_id"/>
+                <field name="sla_type"/>
+                <field name="deadline" widget="remaining_days"/>
+                <field name="reached_date"/>
+                <field name="status" decoration-success="status == 'reached'" decoration-danger="status == 'failed'" decoration-info="status == 'ongoing'"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Vue formulaire pour les statuts SLA -->
+    <record id="view_it_sla_status_form" model="ir.ui.view">
+        <field name="name">it.sla.status.form</field>
+        <field name="model">it.sla.status</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="incident_id"/>
+                            <field name="sla_policy_id"/>
+                            <field name="sla_type"/>
+                        </group>
+                        <group>
+                            <field name="deadline"/>
+                            <field name="reached_date"/>
+                            <field name="status" decoration-success="status == 'reached'" decoration-danger="status == 'failed'" decoration-info="status == 'ongoing'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vue recherche pour les statuts SLA -->
+    <record id="view_it_sla_status_search" model="ir.ui.view">
+        <field name="name">it.sla.status.search</field>
+        <field name="model">it.sla.status</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="incident_id"/>
+                <field name="sla_policy_id"/>
+                <separator/>
+                <filter string="En cours" name="ongoing" domain="[('status', '=', 'ongoing')]"/>
+                <filter string="Atteints" name="reached" domain="[('status', '=', 'reached')]"/>
+                <filter string="Échoués" name="failed" domain="[('status', '=', 'failed')]"/>
+                <separator/>
+                <filter string="Temps de réponse" name="response" domain="[('sla_type', '=', 'response')]"/>
+                <filter string="Temps de résolution" name="resolution" domain="[('sla_type', '=', 'resolution')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Incident" name="group_by_incident" context="{'group_by': 'incident_id'}"/>
+                    <filter string="Politique SLA" name="group_by_policy" context="{'group_by': 'sla_policy_id'}"/>
+                    <filter string="Statut" name="group_by_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Actions pour les menus -->
+    <!-- Action principale pour le menu SLA -->
+    <record id="action_it_sla" model="ir.actions.act_window">
+        <field name="name">Accords de niveau de service</field>
+        <field name="res_model">it.sla.policy</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_it_sla_policy_tree"/>
+        <field name="search_view_id" ref="view_it_sla_policy_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Configurez vos accords de niveau de service
+            </p>
+            <p>
+                Les SLA (Service Level Agreement) définissent les niveaux
+                de service garantis pour vos clients.
+            </p>
+        </field>
+    </record>
+    
+    <record id="action_it_sla_policy" model="ir.actions.act_window">
+        <field name="name">Politiques SLA</field>
+        <field name="res_model">it.sla.policy</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_it_sla_policy_tree"/>
+        <field name="search_view_id" ref="view_it_sla_policy_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre première politique SLA
+            </p>
+            <p>
+                Les politiques SLA (Service Level Agreement) vous permettent de définir
+                des délais cibles pour la réponse et la résolution des incidents.
+            </p>
+        </field>
+    </record>
+    
+    <record id="action_it_sla_status" model="ir.actions.act_window">
+        <field name="name">Suivi des SLA</field>
+        <field name="res_model">it.sla.status</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="view_id" ref="view_it_sla_status_tree"/>
+        <field name="search_view_id" ref="view_it_sla_status_search"/>
+        <field name="context">{'search_default_ongoing': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Pas de SLA à suivre pour le moment
+            </p>
+            <p>
+                Le suivi SLA montre les délais de réponse et de résolution pour vos incidents.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Menu item pour les SLA -->
+    <menuitem id="menu_it_sla"
+              name="Accords de niveau de service"
+              parent="menu_it_config"
+              action="action_it_sla"
+              sequence="20"/>
+    
+    <menuitem id="menu_it_sla_policy"
+              name="Politiques SLA"
+              action="action_it_sla_policy"
+              parent="menu_it_sla"
+              sequence="10"/>
+              
+    <menuitem id="menu_it_sla_status"
+              name="Suivi des SLA"
+              action="action_it_sla_status"
+              parent="menu_it_sla"
+              sequence="20"/>
+</odoo> 

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Règle pour les équipements (it.equipment) -->
+        <record id="rule_it_equipment_portal" model="ir.rule">
+            <field name="name">Portail: Accès aux équipements du client</field>
+            <field name="model_id" ref="model_it_equipment"/>
+            <field name="domain_force">[('client_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+        
+        <!-- Règle pour les licences (it.license) -->
+        <record id="rule_it_license_portal" model="ir.rule">
+            <field name="name">Portail: Accès aux licences du client</field>
+            <field name="model_id" ref="model_it_license"/>
+            <field name="domain_force">[('client_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+        
+        <!-- Règle pour les incidents (it.incident) -->
+        <record id="rule_it_incident_portal" model="ir.rule">
+            <field name="name">Portail: Accès aux incidents du client</field>
+            <field name="model_id" ref="model_it_incident"/>
+            <field name="domain_force">[('client_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+        
+        <!-- Règle pour les contrats (it.contract) -->
+        <record id="rule_it_contract_portal" model="ir.rule">
+            <field name="name">Portail: Accès aux contrats du client</field>
+            <field name="model_id" ref="model_it_contract"/>
+            <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+        
+        <!-- Règles pour les modèles de référence -->
+        <record id="rule_it_incident_type_portal" model="ir.rule">
+            <field name="name">Portail: Accès aux types d'incidents</field>
+            <field name="model_id" ref="model_it_incident_type"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+        
+        <record id="rule_it_incident_priority_portal" model="ir.rule">
+            <field name="name">Portail: Accès aux priorités d'incidents</field>
+            <field name="model_id" ref="model_it_incident_priority"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+        
+        <record id="rule_it_incident_category_portal" model="ir.rule">
+            <field name="name">Portail: Accès aux catégories d'incidents</field>
+            <field name="model_id" ref="model_it_incident_category"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+    </data>
+</odoo> 

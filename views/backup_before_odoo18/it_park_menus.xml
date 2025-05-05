@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menu racine pour le module -->
+    <menuitem id="menu_it_park_root"
+              name="Parc IT"
+              web_icon="it__park,static/description/icon.png"
+              sequence="70"/>
+    
+    <!-- Sous-menus principaux -->
+    <menuitem id="menu_it_park_equipment"
+              name="Équipements"
+              parent="menu_it_park_root"
+              sequence="10"/>
+              
+    <menuitem id="menu_it_park_software"
+              name="Logiciels"
+              parent="menu_it_park_root"
+              sequence="20"/>
+              
+    <menuitem id="menu_it_park_contract"
+              name="Contrats"
+              parent="menu_it_park_root"
+              sequence="30"/>
+              
+    <menuitem id="menu_it_park_support"
+              name="Support"
+              parent="menu_it_park_root"
+              sequence="40"/>
+    
+    <menuitem id="menu_it_park_config"
+              name="Configuration"
+              parent="menu_it_park_root"
+              sequence="100"/>
+    
+    <!-- Sous-menus de la section Équipements -->
+    <menuitem id="menu_it_equipment"
+              name="Équipements"
+              parent="menu_it_park_equipment"
+              action="it__park.action_it_equipment"
+              sequence="10"/>
+    
+    <!-- Sous-menus de la section Logiciels -->
+    <menuitem id="menu_it_software"
+              name="Logiciels"
+              parent="menu_it_park_software"
+              action="it__park.action_it_software"
+              sequence="10"/>
+              
+    <menuitem id="menu_it_license"
+              name="Licences"
+              parent="menu_it_park_software"
+              action="it__park.action_it_license"
+              sequence="20"/>
+    
+    <!-- Sous-menus de la section Support -->
+    <menuitem id="menu_it_incident"
+              name="Incidents"
+              parent="menu_it_park_support"
+              action="it__park.action_it_incident"
+              sequence="10"/>
+              
+    <menuitem id="menu_it_intervention"
+              name="Interventions"
+              parent="menu_it_park_support"
+              action="it__park.action_it_intervention"
+              sequence="20"/>
+    
+    <!-- Sous-menus de la section Configuration -->
+    <menuitem id="menu_it_equipment_type"
+              name="Types d'équipements"
+              parent="menu_it_park_config"
+              action="it__park.action_it_equipment_type"
+              sequence="10"/>
+              
+    <menuitem id="menu_it_license_type"
+              name="Types de licences"
+              parent="menu_it_park_config"
+              action="it__park.action_it_license_type"
+              sequence="20"/>
+</odoo> 

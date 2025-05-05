@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Portal layout -->
+    <template id="portal_layout" name="IT Park Portal Layout" inherit_id="portal.portal_breadcrumbs">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'tickets'" class="breadcrumb-item">Tickets</li>
+            <li t-if="page_name == 'equipment'" class="breadcrumb-item">Équipements</li>
+            <li t-if="page_name == 'contracts'" class="breadcrumb-item">Contrats</li>
+        </xpath>
+    </template>
+
+    <!-- Portal My Home : Sections -->
+    <template id="portal_my_home_it" name="IT Park Portal Entries" inherit_id="portal.portal_my_home" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <!-- Tickets Section -->
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Tickets</t>
+                <t t-set="url" t-value="'/my/tickets'"/>
+                <t t-set="placeholder_count" t-value="'ticket_count'"/>
+            </t>
+            <!-- Equipment Section -->
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Équipements</t>
+                <t t-set="url" t-value="'/my/equipment'"/>
+                <t t-set="placeholder_count" t-value="'equipment_count'"/>
+            </t>
+            <!-- Contracts Section -->
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Contrats</t>
+                <t t-set="url" t-value="'/my/contracts'"/>
+                <t t-set="placeholder_count" t-value="'contract_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Portal : Tickets List -->
+    <template id="portal_my_tickets" name="My Tickets">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tickets</t>
+            </t>
+            <t t-if="not tickets">
+                <div class="alert alert-info" role="alert">
+                    Il n'y a pas de tickets à afficher.
+                </div>
+            </t>
+            <t t-if="tickets">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Référence</th>
+                            <th>Sujet</th>
+                            <th>Date</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="tickets" t-as="ticket">
+                            <td><span t-field="ticket.name"/></td>
+                            <td><span t-field="ticket.subject"/></td>
+                            <td><span t-field="ticket.create_date"/></td>
+                            <td><span t-field="ticket.state"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+        </t>
+    </template>
+
+    <!-- Portal : Equipment List -->
+    <template id="portal_my_equipment" name="My Equipment">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Équipements</t>
+            </t>
+            <t t-if="not equipment">
+                <div class="alert alert-info" role="alert">
+                    Il n'y a pas d'équipements à afficher.
+                </div>
+            </t>
+            <t t-if="equipment">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Référence</th>
+                            <th>Type</th>
+                            <th>Marque</th>
+                            <th>Modèle</th>
+                            <th>État</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="equipment" t-as="equip">
+                            <td><span t-field="equip.name"/></td>
+                            <td><span t-field="equip.type_id"/></td>
+                            <td><span t-field="equip.brand"/></td>
+                            <td><span t-field="equip.model"/></td>
+                            <td><span t-field="equip.state"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+        </t>
+    </template>
+
+    <!-- Portal : Contracts List -->
+    <template id="portal_my_contracts" name="My Contracts">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Contrats</t>
+            </t>
+            <t t-if="not contracts">
+                <div class="alert alert-info" role="alert">
+                    Il n'y a pas de contrats à afficher.
+                </div>
+            </t>
+            <t t-if="contracts">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Référence</th>
+                            <th>Type</th>
+                            <th>Date de début</th>
+                            <th>Date de fin</th>
+                            <th>État</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="contracts" t-as="contract">
+                            <td><span t-field="contract.name"/></td>
+                            <td><span t-field="contract.type_id"/></td>
+                            <td><span t-field="contract.date_start"/></td>
+                            <td><span t-field="contract.date_end"/></td>
+                            <td><span t-field="contract.state"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+        </t>
+    </template>
+
+    <!-- Ajout du menu Incidents dans le portail client -->
+    <template id="portal_my_home_it_incidents" name="Portal My Home : IT Incidents" inherit_id="portal.portal_my_home" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Incidents IT</t>
+                <t t-set="url" t-value="'/my/it_incidents'"/>
+                <t t-set="placeholder_count" t-value="'it_incident_count'"/>
+            </t>
+        </xpath>
+    </template>
+    
+    <!-- Intégration du compteur d'incidents dans les compteurs du portail -->
+    <template id="custom_portal_my_counter" name="Portal My Counter : IT Incidents" inherit_id="portal.portal_my_home">
+        <xpath expr="//div[hasclass('o_portal_my_home')]" position="inside">
+            <div class="row mt-4">
+                <div class="col-lg-6">
+                    <a href="/my/it_incidents" class="d-flex flex-nowrap align-items-center">
+                        <span class="fa fa-tasks fa-2x me-2"></span>
+                        <div>
+                            <div class="d-flex">
+                                <h3 class="mb-0 me-2">Incidents IT</h3>
+                                <t t-if="it_incident_count">
+                                    <span class="badge bg-primary ms-2"><t t-esc="it_incident_count"/></span>
+                                </t>
+                            </div>
+                            <div class="text-muted">Gérez vos incidents informatiques</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Ajout d'un bouton "Espace Support IT" dans le menu "My Account" du portail -->
+    <template id="portal_breadcrumbs_it_support" name="IT Support Portal Breadcrumb" inherit_id="portal.portal_breadcrumbs" priority="40">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'tickets' or page_name == 'my_tickets'" class="breadcrumb-item">
+                <a href="/my/tickets">Tickets Support</a>
+            </li>
+            <li t-if="page_name == 'assets' or page_name == 'my_assets'" class="breadcrumb-item">
+                <a href="/my/assets">Parc informatique</a>
+            </li>
+            <li t-if="page_name == 'contracts' or page_name == 'my_contracts'" class="breadcrumb-item">
+                <a href="/my/contracts">Contrats</a>
+            </li>
+            <li t-if="page_name == 'invoices' or page_name == 'my_invoices'" class="breadcrumb-item">
+                <a href="/my/invoices">Factures</a>
+            </li>
+        </xpath>
+    </template>
+
+    <!-- Ce template est obsolète dans Odoo 18 car les assets sont maintenant définis dans __manifest__.py
+         Tout ce code est commenté pour éviter l'erreur "External ID not found in the system: web.assets_frontend"
+    <template id="it_park_custom_assets" inherit_id="web.assets_frontend" name="IT Park Custom Assets">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" type="text/scss" href="/it__park/static/src/scss/it_park_website.scss"/>
+            <link rel="stylesheet" href="/it__park/static/src/css/it_park_override.css"/>
+            <script>
+                // Force le rechargement du CSS en ajoutant un timestamp
+                document.addEventListener('DOMContentLoaded', function() {
+                    var links = document.querySelectorAll('link[rel="stylesheet"]');
+                    links.forEach(function(link) {
+                        if (link.href.indexOf('it_park') > -1) {
+                            link.href = link.href + '?t=' + new Date().getTime();
+                        }
+                    });
+                });
+            </script>
+        </xpath>
+    </template>
+    -->
+
+    <!-- Création d'un template plus simple pour ajouter notre contenu CSS -->
+    <template id="it_park_portal_styles" inherit_id="website.layout" name="IT Park Portal Styles">
+        <xpath expr="//head" position="inside">
+            <style>
+                /* Styles critiques injectés directement */
+                .o_portal_wrap {
+                    background-color: #f8f9fa !important;
+                }
+                
+                header {
+                    background-color: #e6f7ff !important;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+                }
+                
+                header nav {
+                    border-bottom: 5px solid #0066cc !important;
+                }
+                
+                .btn-primary {
+                    background-color: #0066cc !important;
+                    border-color: #0055aa !important;
+                    box-shadow: 0 4px 8px rgba(0, 102, 204, 0.3) !important;
+                    border-radius: 30px !important;
+                }
+                
+                .card {
+                    border-radius: 10px !important;
+                    overflow: hidden !important;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+                }
+                
+                .table {
+                    border-radius: 8px !important;
+                    overflow: hidden !important;
+                    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05) !important;
+                }
+                
+                .table thead th {
+                    background-color: #0066cc !important;
+                    color: white !important;
+                }
+                
+                .animate-fadeInUp {
+                    animation: fadeInUp 0.5s ease-out forwards !important;
+                }
+
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                
+                .stat-card {
+                    border-radius: 10px !important;
+                    padding: 1.5rem !important;
+                    background-color: white !important;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+                    position: relative !important;
+                }
+                
+                .priority-0 { border-left: 5px solid #17a2b8 !important; }
+                .priority-1 { border-left: 5px solid #28a745 !important; }
+                .priority-2 { border-left: 5px solid #fd7e14 !important; }
+                .priority-3 { border-left: 5px solid #dc3545 !important; }
+            </style>
+            
+            <script>
+                // Script pour appliquer les styles dynamiquement après chargement
+                document.addEventListener('DOMContentLoaded', function() {
+                    console.log('IT Park Portal Enhancement script loaded');
+                    
+                    // Ajouter des animations
+                    document.querySelectorAll('header').forEach(el => {
+                        el.classList.add('animate-fadeInUp');
+                    });
+                    
+                    // Ajouter des effets hover sur les cartes
+                    document.querySelectorAll('.card').forEach(card => {
+                        card.addEventListener('mouseenter', function() {
+                            this.style.transform = 'translateY(-5px)';
+                            this.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.1)';
+                        });
+                        
+                        card.addEventListener('mouseleave', function() {
+                            this.style.transform = 'translateY(0)';
+                            this.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.05)';
+                        });
+                    });
+                    
+                    // Ajouter un bouton retour en haut
+                    if (!document.getElementById('back-to-top')) {
+                        var backToTop = document.createElement('button');
+                        backToTop.id = 'back-to-top';
+                        backToTop.innerHTML = '<i class="fa fa-arrow-up"></i>';
+                        backToTop.style.position = 'fixed';
+                        backToTop.style.bottom = '20px';
+                        backToTop.style.right = '20px';
+                        backToTop.style.zIndex = '999';
+                        backToTop.style.width = '40px';
+                        backToTop.style.height = '40px';
+                        backToTop.style.borderRadius = '50%';
+                        backToTop.style.backgroundColor = '#0066cc';
+                        backToTop.style.color = 'white';
+                        backToTop.style.border = 'none';
+                        backToTop.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+                        backToTop.style.display = 'none';
+                        
+                        backToTop.addEventListener('click', function() {
+                            window.scrollTo({top: 0, behavior: 'smooth'});
+                        });
+                        
+                        document.body.appendChild(backToTop);
+                        
+                        window.addEventListener('scroll', function() {
+                            if (window.scrollY > 300) {
+                                backToTop.style.display = 'block';
+                            } else {
+                                backToTop.style.display = 'none';
+                            }
+                        });
+                    }
+                });
+            </script>
+        </xpath>
+    </template>
+
+</odoo> 

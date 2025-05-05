@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action pour voir l'incident IT -->
+    <record id="action_view_related_it_incident" model="ir.actions.act_window">
+        <field name="name">Incident IT</field>
+        <field name="res_model">it.incident</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <!-- Étend la vue ticket helpdesk pour ajouter les champs IT Park -->
+    <record id="view_helpdesk_ticket_form_inherit_it_park" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form.inherit.it.park</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="it_incident_id" options="{'no_create': True}" invisible="not it_incident_id"/>
+                <field name="equipment_id" readonly="1" invisible="not equipment_id"/>
+            </field>
+            <div class="oe_button_box" position="inside">
+                <button 
+                    name="%(action_view_related_it_incident)d"
+                    type="action"
+                    class="oe_stat_button"
+                    icon="fa-wrench"
+                    invisible="not it_incident_id"
+                    context="{'default_id': it_incident_id}">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Incident IT</span>
+                    </div>
+                </button>
+            </div>
+            <notebook position="inside">
+                <page string="SLA IT" name="it_sla" invisible="not sla_deadline">
+                    <group>
+                        <field name="sla_deadline"/>
+                        <field name="sla_reached_date"/>
+                    </group>
+                    <p class="text-muted" invisible="not it_incident_id">
+                        Le SLA est défini par la politique SLA associée à l'incident IT.
+                    </p>
+                </page>
+            </notebook>
+        </field>
+    </record>
+    
+    <!-- Configuration Helpdesk dans le menu Configuration -->
+    <record id="action_it_helpdesk_config" model="ir.actions.act_window">
+        <field name="name">Configuration Helpdesk</field>
+        <field name="res_model">res.company</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="view_id" ref="base.view_company_form"/>
+    </record>
+    
+    <menuitem id="menu_it_helpdesk_config" 
+              name="Configuration du support"
+              parent="it__park.menu_it_config"
+              action="action_it_helpdesk_config"
+              sequence="60"
+              groups="base.group_system"/>
+</odoo> 

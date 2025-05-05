@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_it_assign_equipment_wizard_form" model="ir.ui.view">
+        <field name="name">it.assign.equipment.wizard.form</field>
+        <field name="model">it.assign.equipment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Assigner un équipement">
+                <sheet>
+                    <group>
+                        <field name="equipment_id" options="{'no_create': True}"/>
+                        <field name="employee_id" options="{'no_create': True}"/>
+                        <field name="partner_id" options="{'no_create': True}"/>
+                        <field name="assignment_date"/>
+                        <field name="notes" placeholder="Notes sur l'assignation..."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_assign" string="Assigner" type="object" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo> 

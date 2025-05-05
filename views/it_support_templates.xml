@@ -1,0 +1,647 @@
+<odoo>
+    <template id="it_support_new_ticket" name="Nouveau ticket IT">
+        <t t-call="website.layout">
+            <t t-call="it__park.portal_menu"/>
+            <div class="container">
+                <h1>Créer un nouveau ticket</h1>
+                <form method="post" action="/it-support/submit-ticket" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="form-group">
+                        <label for="title">Titre</label>
+                        <input type="text" name="title" class="form-control" required="required"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea name="description" class="form-control" rows="5" required="required"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipment_id">Équipement concerné</label>
+                        <select name="equipment_id" id="equipment_select" class="form-control">
+                            <option value="">-- Sélectionnez un équipement --</option>
+                            <t t-foreach="equipment" t-as="eq">
+                                <option t-att-value="eq.id"><t t-esc="eq.name"/></option>
+                            </t>
+                            <option value="other">-- Autre équipement (non listé) --</option>
+                        </select>
+                    </div>
+                    <div id="other_equipment_div" class="form-group d-none">
+                        <label for="other_equipment">Description de l'équipement non listé</label>
+                        <input type="text" name="other_equipment" class="form-control" placeholder="Marque, modèle, numéro de série..."/>
+                    </div>
+                    <div class="form-group">
+                        <label for="priority">Priorité</label>
+                        <select name="priority" class="form-control">
+                            <option value="0">Basse</option>
+                            <option value="1" selected="selected">Normale</option>
+                            <option value="2">Haute</option>
+                            <option value="3">Urgente</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="attachment">Pièce jointe</label>
+                        <input type="file" name="attachment" class="form-control-file"/>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Soumettre</button>
+                </form>
+            </div>
+        </t>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const equipmentSelect = document.getElementById('equipment_select');
+                const otherEquipmentDiv = document.getElementById('other_equipment_div');
+                
+                equipmentSelect.addEventListener('change', function() {
+                    if (this.value === 'other') {
+                        otherEquipmentDiv.classList.remove('d-none');
+                    } else {
+                        otherEquipmentDiv.classList.add('d-none');
+                    }
+                });
+            });
+        </script>
+    </template>
+
+    <template id="portal_menu" name="Menu du portail IT">
+        <div class="o_portal_navbar mb-3">
+            <div class="container">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a t-attf-class="nav-link#{' active' if page_name == 'my_tickets' else ''}" href="/my/tickets">
+                            Mes tickets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a t-attf-class="nav-link#{' active' if page_name == 'my_assets' else ''}" href="/my/assets">
+                            Mon parc
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a t-attf-class="nav-link#{' active' if page_name == 'my_contracts' else ''}" href="/my/contracts">
+                            Mes contrats
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a t-attf-class="nav-link#{' active' if page_name == 'my_invoices' else ''}" href="/my/invoices">
+                            Mes factures
+                        </a>
+                    </li>
+                    <li class="nav-item ml-auto">
+                        <a class="btn btn-primary" href="/it-support/new-ticket">
+                            <i class="fa fa-plus"></i> Nouveau ticket
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <t t-call="it__park.portal_expiry_notifications"/>
+    </template>
+
+    <template id="it_support_ticket_list" name="Liste des tickets IT">
+        <t t-call="website.layout">
+            <t t-call="it__park.portal_menu"/>
+            <div class="container">
+                <h1>Mes tickets</h1>
+                
+                <!-- Filtres et recherche -->
+                <div class="row mb-4">
+                    <div class="col-lg-6">
+                        <div class="btn-group mb-2">
+                            <a href="/my/tickets" t-attf-class="btn btn-sm #{'' if state else 'btn-primary' if not search else 'btn-outline-primary'}">Tous</a>
+                            <a href="/my/tickets?state=new" t-attf-class="btn btn-sm #{'' if state != 'new' else 'btn-danger' if not search else 'btn-outline-danger'}">Nouveaux</a>
+                            <a href="/my/tickets?state=in_progress" t-attf-class="btn btn-sm #{'' if state != 'in_progress' else 'btn-warning' if not search else 'btn-outline-warning'}">En cours</a>
+                            <a href="/my/tickets?state=resolved" t-attf-class="btn btn-sm #{'' if state != 'resolved' else 'btn-success' if not search else 'btn-outline-success'}">Résolus</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <form action="/my/tickets" method="get" class="form-inline justify-content-end">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="Rechercher..." t-att-value="search or ''"/>
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <t t-if="tickets">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Référence</th>
+                                <th>Titre</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="tickets" t-as="ticket">
+                                <tr>
+                                    <td><t t-esc="ticket.reference"/></td>
+                                    <td><t t-esc="ticket.name"/></td>
+                                    <td><t t-esc="ticket.date_reported"/></td>
+                                    <td>
+                                        <span t-attf-class="badge badge-pill #{
+                                            'badge-danger' if ticket.state == 'new' else
+                                            'badge-warning' if ticket.state in ['assigned', 'in_progress'] else
+                                            'badge-success' if ticket.state == 'resolved' else
+                                            'badge-secondary'
+                                        }">
+                                            <t t-esc="ticket.state"/>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a t-att-href="'/my/tickets/%s' % ticket.id" class="btn btn-sm btn-info">Détail</a>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    
+                    <!-- Pagination -->
+                    <t t-if="pager">
+                        <div class="o_portal_pager">
+                            <t t-call="portal.pager"/>
+                        </div>
+                    </t>
+                </t>
+                <t t-else="">
+                    <div class="alert alert-info">
+                        <p class="mb-0">Aucun ticket trouvé.</p>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="it_support_ticket_detail" name="Détail du ticket IT">
+        <t t-call="website.layout">
+            <t t-call="it__park.portal_menu"/>
+            <div class="container">
+                <div class="d-flex align-items-center mb-4">
+                    <h1 class="mb-0">Ticket #<t t-esc="ticket.reference"/></h1>
+                    <span t-attf-class="badge badge-pill ml-3 #{
+                        'badge-danger' if ticket.state == 'new' else
+                        'badge-warning' if ticket.state in ['assigned', 'in_progress'] else
+                        'badge-success' if ticket.state == 'resolved' else
+                        'badge-secondary'
+                    }">
+                        <t t-esc="ticket.state"/>
+                    </span>
+                </div>
+                
+                <t t-if="ticket">
+                    <div class="row">
+                        <!-- Informations du ticket -->
+                        <div class="col-lg-8">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><t t-esc="ticket.name"/></h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Référence :</strong> <t t-esc="ticket.reference"/></p>
+                                            <p><strong>Date de création :</strong> <t t-esc="ticket.date_reported"/></p>
+                                            <p><strong>Priorité :</strong> <t t-esc="ticket.priority"/></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>État :</strong> <t t-esc="ticket.state"/></p>
+                                            <p t-if="ticket.equipment_id"><strong>Équipement :</strong> <t t-esc="ticket.equipment_id.name"/></p>
+                                            <p t-if="ticket.tech_id"><strong>Technicien :</strong> <t t-esc="ticket.tech_id.name"/></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <h6 class="mt-4">Description :</h6>
+                                    <p><t t-esc="ticket.description"/></p>
+                                    
+                                    <!-- Pièces jointes -->
+                                    <t t-if="attachments and attachments.exists()">
+                                        <h6 class="mt-4">Pièces jointes :</h6>
+                                        <ul class="list-group">
+                                            <t t-foreach="attachments" t-as="attachment">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <span><i class="fa fa-paperclip"></i> <t t-esc="attachment.name"/></span>
+                                                    <a t-att-href="'/web/content/%s?download=true' % attachment.id" class="btn btn-sm btn-secondary">
+                                                        <i class="fa fa-download"></i> Télécharger
+                                                    </a>
+                                                </li>
+                                            </t>
+                                        </ul>
+                                    </t>
+                                </div>
+                            </div>
+                            
+                            <!-- Formulaire de commentaire -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Ajouter un commentaire</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form action="/my/tickets/comment" method="post" enctype="multipart/form-data">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="ticket_id" t-att-value="ticket.id"/>
+                                        <div class="form-group">
+                                            <label for="message">Message</label>
+                                            <textarea name="message" class="form-control" rows="3" required="required"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="attachment">Pièce jointe (optionnelle)</label>
+                                            <input type="file" name="attachment" class="form-control-file"/>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Envoyer</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline des interventions et commentaires -->
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Historique du ticket</h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <ul class="timeline">
+                                        <!-- Création du ticket -->
+                                        <li class="timeline-item">
+                                            <div class="timeline-marker bg-primary">
+                                                <i class="fa fa-plus"></i>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <h6 class="mb-0">Création du ticket</h6>
+                                                <small class="text-muted"><t t-esc="ticket.date_reported"/></small>
+                                                <p class="mb-0">Ticket créé par <t t-esc="ticket.reporter_id.name"/></p>
+                                            </div>
+                                        </li>
+                                        
+                                        <!-- Assignation (si applicable) -->
+                                        <t t-if="ticket.tech_id">
+                                            <li class="timeline-item">
+                                                <div class="timeline-marker bg-info">
+                                                    <i class="fa fa-user"></i>
+                                                </div>
+                                                <div class="timeline-content">
+                                                    <h6 class="mb-0">Assignation</h6>
+                                                    <small class="text-muted"><t t-esc="ticket.date_assigned"/></small>
+                                                    <p class="mb-0">Assigné à <t t-esc="ticket.tech_id.name"/></p>
+                                                </div>
+                                            </li>
+                                        </t>
+                                        
+                                        <!-- Messages (commentaires) -->
+                                        <t t-if="ticket.message_ids">
+                                            <t t-foreach="ticket.message_ids" t-as="message">
+                                                <t t-if="message.message_type == 'comment'">
+                                                    <li class="timeline-item">
+                                                        <div class="timeline-marker bg-info">
+                                                            <i class="fa fa-comment"></i>
+                                                        </div>
+                                                        <div class="timeline-content">
+                                                            <h6 class="mb-0">Commentaire de <t t-esc="message.author_id.name"/></h6>
+                                                            <small class="text-muted"><t t-esc="message.date"/></small>
+                                                            <div t-raw="message.body"/>
+                                                        </div>
+                                                    </li>
+                                                </t>
+                                            </t>
+                                        </t>
+                                        
+                                        <!-- Résolution (si applicable) -->
+                                        <t t-if="ticket.state == 'resolved'">
+                                            <li class="timeline-item">
+                                                <div class="timeline-marker bg-success">
+                                                    <i class="fa fa-check"></i>
+                                                </div>
+                                                <div class="timeline-content">
+                                                    <h6 class="mb-0">Résolution</h6>
+                                                    <small class="text-muted"><t t-esc="ticket.date_resolved"/></small>
+                                                    <p class="mb-0"><t t-esc="ticket.resolution_note or 'Ticket résolu'"/></p>
+                                                </div>
+                                            </li>
+                                        </t>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="alert alert-danger">
+                        <p class="mb-0">Ticket introuvable.</p>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="it_support_asset_list" name="Mon parc informatique">
+        <t t-call="website.layout">
+            <t t-call="it__park.portal_menu"/>
+            <div class="container">
+                <h1>Mon parc informatique</h1>
+                
+                <!-- Recherche -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <form action="/my/assets" method="get" class="form-inline justify-content-end">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="Rechercher un équipement..." t-att-value="search or ''"/>
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <t t-if="assets">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Type</th>
+                                <th>État</th>
+                                <th>Garantie</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="assets" t-as="asset">
+                                <tr>
+                                    <td><t t-esc="asset.name"/></td>
+                                    <td><t t-esc="asset.type_id.name"/></td>
+                                    <td>
+                                        <span t-attf-class="badge badge-pill #{
+                                            'badge-success' if asset.state in ['installed', 'active'] else
+                                            'badge-warning' if asset.state == 'maintenance' else
+                                            'badge-danger' if asset.state == 'broken' else
+                                            'badge-secondary'
+                                        }">
+                                            <t t-esc="asset.state"/>
+                                        </span>
+                                    </td>
+                                    <td><t t-esc="asset.warranty_end_date"/></td>
+                                    <td>
+                                        <a t-att-href="'/my/assets/%s' % asset.id" class="btn btn-sm btn-info">Détail</a>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    
+                    <!-- Pagination -->
+                    <t t-if="pager">
+                        <div class="o_portal_pager">
+                            <t t-call="portal.pager"/>
+                        </div>
+                    </t>
+                </t>
+                <t t-else="">
+                    <div class="alert alert-info">
+                        <p class="mb-0">Aucun équipement trouvé.</p>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="it_support_asset_detail" name="Détail équipement IT">
+        <t t-call="website.layout">
+            <t t-call="it__park.portal_menu"/>
+            <div class="container">
+                <h1>Détail de l'équipement</h1>
+                <t t-if="asset">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><t t-esc="asset.name"/></h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Type :</strong> <t t-esc="asset.type_id.name"/></p>
+                            <p><strong>État :</strong> <t t-esc="asset.state"/></p>
+                            <p><strong>Date de garantie :</strong> <t t-esc="asset.warranty_end_date"/></p>
+                            <p><strong>Numéro de série :</strong> <t t-esc="asset.serial_number"/></p>
+                            
+                            <h6 class="mt-4">Historique des interventions :</h6>
+                            <t t-if="asset.intervention_ids">
+                                <ul>
+                                    <t t-foreach="asset.intervention_ids" t-as="intervention">
+                                        <li>
+                                            <t t-esc="intervention.date"/> : <t t-esc="intervention.description"/>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </t>
+                            <t t-else="">
+                                <p>Aucune intervention enregistrée.</p>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+                <t t-else="">
+                    <p>Équipement introuvable.</p>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="it_support_contract_list" name="Mes contrats">
+        <t t-call="website.layout">
+            <t t-call="it__park.portal_menu"/>
+            <div class="container">
+                <h1>Mes contrats</h1>
+                
+                <!-- Recherche -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <form action="/my/contracts" method="get" class="form-inline justify-content-end">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="Rechercher un contrat..." t-att-value="search or ''"/>
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <t t-if="contracts">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Date début</th>
+                                <th>Date fin</th>
+                                <th>Statut</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="contracts" t-as="contract">
+                                <tr>
+                                    <td><t t-esc="contract.name"/></td>
+                                    <td><t t-esc="contract.date_start"/></td>
+                                    <td><t t-esc="contract.date_end"/></td>
+                                    <td>
+                                        <span t-attf-class="badge badge-pill #{
+                                            'badge-success' if contract.state == 'active' else
+                                            'badge-warning' if contract.state == 'to_renew' else
+                                            'badge-danger' if contract.state == 'expired' else
+                                            'badge-secondary'
+                                        }">
+                                            <t t-esc="contract.state"/>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a t-att-href="'/my/contracts/%s' % contract.id" class="btn btn-sm btn-info">Détail</a>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    
+                    <!-- Pagination -->
+                    <t t-if="pager">
+                        <div class="o_portal_pager">
+                            <t t-call="portal.pager"/>
+                        </div>
+                    </t>
+                </t>
+                <t t-else="">
+                    <div class="alert alert-info">
+                        <p class="mb-0">Aucun contrat trouvé.</p>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="it_support_invoice_list" name="Mes factures">
+        <t t-call="website.layout">
+            <t t-call="it__park.portal_menu"/>
+            <div class="container">
+                <h1>Mes factures</h1>
+                
+                <!-- Recherche -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <form action="/my/invoices" method="get" class="form-inline justify-content-end">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="Rechercher une facture..." t-att-value="search or ''"/>
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <t t-if="invoices">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Numéro</th>
+                                <th>Date</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="invoices" t-as="invoice">
+                                <tr>
+                                    <td><t t-esc="invoice.name"/></td>
+                                    <td><t t-esc="invoice.invoice_date"/></td>
+                                    <td><t t-esc="invoice.amount_total"/> €</td>
+                                    <td>
+                                        <span t-attf-class="badge badge-pill #{
+                                            'badge-success' if invoice.payment_state == 'paid' else
+                                            'badge-warning' if invoice.payment_state == 'partial' else
+                                            'badge-danger' if invoice.payment_state == 'not_paid' else
+                                            'badge-secondary'
+                                        }">
+                                            <t t-esc="invoice.payment_state"/>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a t-att-href="'/my/invoices/%s' % invoice.id" class="btn btn-sm btn-info">Voir</a>
+                                        <a t-att-href="'/web/content/%s?download=true' % invoice.id" class="btn btn-sm btn-secondary">PDF</a>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    
+                    <!-- Pagination -->
+                    <t t-if="pager">
+                        <div class="o_portal_pager">
+                            <t t-call="portal.pager"/>
+                        </div>
+                    </t>
+                </t>
+                <t t-else="">
+                    <div class="alert alert-info">
+                        <p class="mb-0">Aucune facture trouvée.</p>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- Widget des notifications d'échéance à inclure dans toutes les pages du portail -->
+    <template id="portal_expiry_notifications" name="Notifications d'échéance">
+        <div t-if="notifications and notifications['count'] > 0" class="container mb-4">
+            <div class="alert alert-warning">
+                <h5><i class="fa fa-bell"></i> Notifications</h5>
+                <ul class="mb-0">
+                    <t t-foreach="notifications['items']" t-as="notif">
+                        <li>
+                            <a t-if="notif.get('link')" t-att-href="notif.get('link')">
+                                <t t-esc="notif.get('message')"/>
+                            </a>
+                            <t t-else="">
+                                <t t-esc="notif.get('message')"/>
+                            </t>
+                        </li>
+                    </t>
+                </ul>
+            </div>
+        </div>
+    </template>
+    
+    <!-- Page de confirmation après soumission d'un ticket -->
+    <template id="it_support_ticket_submitted" name="Ticket soumis avec succès">
+        <t t-call="website.layout">
+            <div class="container py-5">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h1 class="text-success mb-4">
+                            <i class="fa fa-check-circle fa-2x"></i>
+                        </h1>
+                        <h2 class="mb-4">Votre ticket a été créé avec succès!</h2>
+                        <p class="lead mb-4">Référence: <strong><t t-esc="ticket_reference"/></strong></p>
+                        <p>Nous avons bien reçu votre demande et nous la traiterons dans les meilleurs délais.</p>
+                        <p>Vous pouvez suivre l'état de votre ticket dans la section "Mes tickets" de votre espace client.</p>
+                        <div class="mt-5">
+                            <a href="/my/tickets" class="btn btn-primary mr-2">
+                                <i class="fa fa-list"></i> Voir mes tickets
+                            </a>
+                            <a t-attf-href="/my/tickets/#{ticket_id}" class="btn btn-outline-primary">
+                                <i class="fa fa-eye"></i> Détails du ticket
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo> 

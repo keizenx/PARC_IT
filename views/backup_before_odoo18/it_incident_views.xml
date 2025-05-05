@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vues pour les types d'incidents -->
+    <record id="view_it_incident_type_list" model="ir.ui.view">
+        <field name="name">it.incident.type.list</field>
+        <field name="model">it.incident.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="incident_count"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="view_it_incident_type_form" model="ir.ui.view">
+        <field name="name">it.incident.type.form</field>
+        <field name="model">it.incident.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="incident_count"/>
+                    </group>
+                    <group>
+                        <field name="description" nolabel="1" placeholder="Description du type d'incident..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_it_incident_type" model="ir.actions.act_window">
+        <field name="name">Types d'incidents</field>
+        <field name="res_model">it.incident.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer le premier type d'incident
+            </p>
+            <p>
+                Les types d'incidents permettent de classifier les problèmes signalés
+                (ex: Matériel, Logiciel, Réseau, etc.)
+            </p>
+        </field>
+    </record>
+    
+    <!-- Vues pour les priorités d'incidents -->
+    <record id="view_it_incident_priority_list" model="ir.ui.view">
+        <field name="name">it.incident.priority.list</field>
+        <field name="model">it.incident.priority</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+                <field name="incident_count"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="view_it_incident_priority_form" model="ir.ui.view">
+        <field name="name">it.incident.priority.form</field>
+        <field name="model">it.incident.priority</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                        <field name="color" widget="color_picker"/>
+                        <field name="incident_count"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_it_incident_priority" model="ir.actions.act_window">
+        <field name="name">Priorités d'incidents</field>
+        <field name="res_model">it.incident.priority</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer la première priorité d'incident
+            </p>
+            <p>
+                Les priorités d'incidents permettent de classifier l'urgence des problèmes
+                (ex: Basse, Moyenne, Haute, Critique, etc.)
+            </p>
+        </field>
+    </record>
+    
+    <!-- Vue arborescente pour les incidents -->
+    <record id="view_it_incident_tree" model="ir.ui.view">
+        <field name="name">it.incident.tree</field>
+        <field name="model">it.incident</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="priority == 'high'" decoration-warning="priority == 'medium'" decoration-info="priority == 'low'" decoration-success="state == 'resolved'" decoration-muted="state == 'closed'">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="equipment_id"/>
+                <field name="priority"/>
+                <field name="technician_id"/>
+                <field name="report_date"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vue formulaire pour les incidents -->
+    <record id="view_it_incident_form" model="ir.ui.view">
+        <field name="name">it.incident.form</field>
+        <field name="model">it.incident</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" options="{'clickable': '1'}" statusbar_visible="new,in_progress,resolved,closed"/>
+                    <button name="button_assign" string="Assigner" type="object" class="oe_highlight" invisible="state != 'new'"/>
+                    <button name="button_start" string="Commencer" type="object" class="oe_highlight" invisible="state != 'assigned'"/>
+                    <button name="button_resolve" string="Résoudre" type="object" class="oe_highlight" invisible="state != 'in_progress'"/>
+                    <button name="button_close" string="Fermer" type="object" invisible="state != 'resolved'"/>
+                    <button name="button_reopen" string="Réouvrir" type="object" invisible="state != 'closed'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="reference" readonly="1"/>
+                        </h1>
+                        <h2>
+                            <field name="name" placeholder="Titre de l'incident..."/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="client_id"/>
+                            <field name="equipment_id" domain="[('client_id', '=', client_id)]" context="{'default_client_id': client_id}"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="category"/>
+                        </group>
+                        <group>
+                            <field name="technician_id"/>
+                            <field name="report_date"/>
+                            <field name="resolution_date" readonly="1" invisible="resolution_date == False"/>
+                            <field name="time_spent" widget="float_time" sum="Total"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" placeholder="Description détaillée de l'incident..."/>
+                        </page>
+                        <page string="Solution" name="solution">
+                            <field name="resolution" placeholder="Description de la solution appliquée..."/>
+                        </page>
+                        <page string="Interventions" name="interventions">
+                            <field name="intervention_ids">
+                                <list>
+                                    <field name="reference"/>
+                                    <field name="start_datetime"/>
+                                    <field name="end_datetime"/>
+                                    <field name="technician_id"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue recherche pour les incidents -->
+    <record id="view_it_incident_search" model="ir.ui.view">
+        <field name="name">it.incident.search</field>
+        <field name="model">it.incident</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher des incidents">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="equipment_id"/>
+                <field name="technician_id"/>
+                <separator/>
+                <filter string="Mes incidents" name="my_incidents" domain="[('technician_id', '=', uid)]"/>
+                <filter string="Haute priorité" name="high_priority" domain="[('priority', '=', 'high')]"/>
+                <filter string="Nouveaux" name="new" domain="[('state', '=', 'new')]"/>
+                <filter string="Assignés" name="assigned" domain="[('state', '=', 'assigned')]"/>
+                <filter string="En cours" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Résolus" name="resolved" domain="[('state', '=', 'resolved')]"/>
+                <filter string="Fermés" name="closed" domain="[('state', '=', 'closed')]"/>
+                <separator/>
+                <filter string="Matériel" name="hardware" domain="[('category', '=', 'hardware')]"/>
+                <filter string="Logiciel" name="software" domain="[('category', '=', 'software')]"/>
+                <filter string="Réseau" name="network" domain="[('category', '=', 'network')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Client" name="client" context="{'group_by': 'client_id'}"/>
+                    <filter string="Équipement" name="equipment" context="{'group_by': 'equipment_id'}"/>
+                    <filter string="Technicien" name="technician" context="{'group_by': 'technician_id'}"/>
+                    <filter string="Priorité" name="priority" context="{'group_by': 'priority'}"/>
+                    <filter string="Catégorie" name="category" context="{'group_by': 'category'}"/>
+                    <filter string="État" name="state" context="{'group_by': 'state'}"/>
+                    <filter string="Date de signalement" name="report_date" context="{'group_by': 'report_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action pour les incidents -->
+    <record id="action_it_incident" model="ir.actions.act_window">
+        <field name="name">Incidents</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">it.incident</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_new': 1, 'search_default_in_progress': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre premier incident
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu item pour les incidents -->
+    <menuitem id="menu_it_incident"
+              name="Incidents"
+              parent="menu_it_helpdesk"
+              action="it__park.action_it_incident"
+              sequence="10"/>
+
+    <!-- Dashboards -->
+    <record id="action_it_incident_dashboard" model="ir.actions.act_window">
+        <field name="name">Tableau de bord des incidents</field>
+        <field name="res_model">it.incident</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="context">{'search_default_this_month': 1}</field>
+    </record>
+
+    <menuitem id="menu_it_incident_dashboard"
+              name="Statistiques des incidents"
+              parent="menu_it_reporting"
+              action="it__park.action_it_incident_dashboard"
+              sequence="10"/>
+
+    <!-- Catégories d'incidents -->
+    <record id="view_it_incident_category_tree" model="ir.ui.view">
+        <field name="name">it.incident.category.tree</field>
+        <field name="model">it.incident.category</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_it_incident_category_form" model="ir.ui.view">
+        <field name="name">it.incident.category.form</field>
+        <field name="model">it.incident.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_it_incident_category" model="ir.actions.act_window">
+        <field name="name">Catégories d'incidents</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">it.incident.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre première catégorie d'incident
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu items -->
+    <menuitem id="menu_it_operations"
+              name="Opérations"
+              parent="menu_it_park_root"
+              sequence="20"/>
+
+    <menuitem id="menu_it_incident_category"
+              name="Catégories d'incidents"
+              parent="menu_it_configuration"
+              action="it__park.action_it_incident_category"
+              sequence="20"/>
+</odoo> 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vue liste des utilisateurs techniciens IT -->
+    <record id="view_users_it_technician_list" model="ir.ui.view">
+        <field name="name">res.users.it.technician.list</field>
+        <field name="model">res.users</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="login"/>
+                <field name="employee_id"/>
+                <field name="it_technician"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Action pour afficher les utilisateurs techniciens IT -->
+    <record id="action_it_technician_users" model="ir.actions.act_window">
+        <field name="name">Utilisateurs Techniciens IT</field>
+        <field name="res_model">res.users</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('it_technician', '=', True)]</field>
+        <field name="context">{}</field>
+        <field name="view_ids" eval="[(5, 0, 0), 
+                                     (0, 0, {'view_mode': 'list', 'view_id': ref('view_users_it_technician_list')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucun utilisateur technicien IT trouvé
+            </p>
+            <p>
+                Les utilisateurs doivent avoir un employé associé qui est marqué comme technicien IT.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Menu pour accéder à la liste des utilisateurs techniciens IT -->
+    <menuitem id="menu_it_park_users_technicians"
+              name="Utilisateurs techniques"
+              parent="menu_it_config"
+              action="action_it_technician_users"
+              sequence="70"/>
+</odoo> 

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Définitions des actions requises par les menus -->
+    <record id="action_it_software" model="ir.actions.act_window">
+        <field name="name">Logiciels</field>
+        <field name="res_model">it.software</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+    
+    <record id="action_it_license" model="ir.actions.act_window">
+        <field name="name">Licences</field>
+        <field name="res_model">it.license</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    
+    <record id="action_it_contract" model="ir.actions.act_window">
+        <field name="name">Contrats</field>
+        <field name="res_model">it.contract</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    
+    <record id="action_it_tickets_support" model="ir.actions.act_window">
+        <field name="name">Tickets IT</field>
+        <field name="res_model">it.ticket</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_it_ticket', '=', True)]</field>
+        <field name="context">{'default_is_it_ticket': True}</field>
+    </record>
+    
+    <record id="action_it_incidents" model="ir.actions.act_window">
+        <field name="name">Incidents</field>
+        <field name="res_model">it.incident</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    
+    <record id="action_it_interventions" model="ir.actions.act_window">
+        <field name="name">Interventions</field>
+        <field name="res_model">it.intervention</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    
+    <record id="action_it_dashboard" model="ir.actions.act_window">
+        <field name="name">Tableaux de bord</field>
+        <field name="res_model">it.dashboard</field>
+        <field name="view_mode">kanban,form</field>
+    </record>
+    
+    <record id="action_it_clients" model="ir.actions.act_window">
+        <field name="name">Clients IT</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_it_client', '=', True)]</field>
+        <field name="context">{'default_is_it_client': True}</field>
+    </record>
+    
+    <record id="action_it_sites" model="ir.actions.act_window">
+        <field name="name">Sites clients</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('type', '=', 'delivery'), ('parent_id.is_it_client', '=', True)]</field>
+        <field name="context">{'default_type': 'delivery'}</field>
+    </record>
+    
+    <record id="action_it_suppliers" model="ir.actions.act_window">
+        <field name="name">Fournisseurs IT</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_it_supplier', '=', True)]</field>
+        <field name="context">{'default_is_it_supplier': True}</field>
+    </record>
+    
+    <record id="action_it_equipment_type" model="ir.actions.act_window">
+        <field name="name">Types d'équipements</field>
+        <field name="res_model">it.equipment.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    
+    <record id="action_it_software_category" model="ir.actions.act_window">
+        <field name="name">Catégories de logiciels</field>
+        <field name="res_model">it.software.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    
+    <record id="action_it_contract_type" model="ir.actions.act_window">
+        <field name="name">Types de contrats</field>
+        <field name="res_model">it.contract.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    
+    <record id="action_it_incident_type" model="ir.actions.act_window">
+        <field name="name">Types d'incidents</field>
+        <field name="res_model">it.incident.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    
+    <record id="action_it_incident_priority" model="ir.actions.act_window">
+        <field name="name">Priorités d'incidents</field>
+        <field name="res_model">it.incident.priority</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    
+    <record id="action_it_equipment" model="ir.actions.act_window">
+        <field name="name">Équipements</field>
+        <field name="res_model">it.equipment</field>
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+    
+    <!-- Action pour les tickets helpdesk liés aux incidents IT -->
+    <record id="action_helpdesk_tickets_it" model="ir.actions.act_window">
+        <field name="name">Tickets Helpdesk IT</field>
+        <field name="res_model">helpdesk.ticket</field>
+        <field name="view_mode">kanban,tree,form,activity</field>
+        <field name="domain">[('team_id.is_it_team', '=', True)]</field>
+        <field name="context">{'search_default_team_id': True, 'display_it_fields': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer un nouveau ticket de support IT
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu racine du module -->
+    <menuitem id="menu_it_park_root" 
+              name="Parc IT" 
+              web_icon="it__park,static/description/icon.png" 
+              sequence="100"
+              groups="it__park.group_it_park_user"/>
+    
+    <!-- Section Actifs -->
+    <menuitem id="menu_it_assets" 
+              name="Actifs" 
+              parent="menu_it_park_root" 
+              sequence="10"
+              groups="it__park.group_it_park_user"/>
+    
+    <!-- Sous-menus Actifs -->
+    <menuitem id="menu_it_equipment" 
+              name="Équipements" 
+              parent="menu_it_assets" 
+              action="action_it_equipment"
+              sequence="10"/>
+              
+    <menuitem id="menu_it_software" 
+              name="Logiciels" 
+              parent="menu_it_assets" 
+              action="action_it_software"
+              sequence="20"/>
+              
+    <menuitem id="menu_it_licenses" 
+              name="Licences" 
+              parent="menu_it_assets" 
+              action="action_it_license"
+              sequence="30"/>
+              
+    <menuitem id="menu_it_contracts" 
+              name="Contrats" 
+              parent="menu_it_assets" 
+              action="action_it_contract"
+              sequence="40"/>
+              
+    <!-- Section Support -->
+    <menuitem id="menu_it_support" 
+              name="Support IT" 
+              parent="menu_it_park_root" 
+              sequence="20"
+              groups="it__park.group_it_park_user"/>
+    
+    <!-- Sous-menus Support -->
+    <menuitem id="menu_it_tickets"
+              name="Tickets IT"
+              parent="menu_it_support"
+              action="action_it_tickets_support"
+              sequence="10"/>
+    
+    <menuitem id="menu_helpdesk_tickets"
+              name="Tickets Helpdesk"
+              parent="menu_it_support"
+              action="action_helpdesk_tickets_it"
+              sequence="15"/>
+        
+    <menuitem id="menu_it_incidents"
+              name="Incidents"
+              parent="menu_it_support"
+              action="action_it_incidents"
+              sequence="20"/>
+              
+    <menuitem id="menu_it_interventions"
+              name="Interventions"
+              parent="menu_it_support"
+              action="action_it_interventions"
+              sequence="30"/>
+    
+    <!-- Section Configuration -->
+    <menuitem id="menu_it_config" 
+              name="Configuration" 
+              parent="menu_it_park_root" 
+              sequence="100"
+              groups="it__park.group_it_park_manager"/>
+    
+    <!-- Sous-menus Configuration -->
+    <menuitem id="menu_it_equipment_type" 
+              name="Types d'équipements" 
+              parent="menu_it_config" 
+              action="action_it_equipment_type"
+              sequence="10"/>
+              
+    <menuitem id="menu_it_software_category" 
+              name="Catégories de logiciels" 
+              parent="menu_it_config" 
+              action="action_it_software_category"
+              sequence="20"/>
+              
+    <menuitem id="menu_it_contract_type" 
+              name="Types de contrats" 
+              parent="menu_it_config" 
+              action="action_it_contract_type"
+              sequence="30"/>
+              
+    <menuitem id="menu_it_incident_type" 
+              name="Types d'incidents" 
+              parent="menu_it_config" 
+              action="action_it_incident_type"
+              sequence="40"/>
+              
+    <menuitem id="menu_it_incident_priority" 
+              name="Priorités d'incidents" 
+              parent="menu_it_config" 
+              action="action_it_incident_priority"
+              sequence="50"/>
+    
+    <!-- Section Reporting -->
+    <menuitem id="menu_it_reporting" 
+              name="Reporting" 
+              parent="menu_it_park_root" 
+              sequence="90"
+              groups="it__park.group_it_park_user"/>
+    
+    <menuitem id="menu_it_dashboards" 
+              name="Tableaux de bord" 
+              parent="menu_it_reporting" 
+              action="action_it_dashboard"
+              sequence="10"/>
+    
+    <!-- Section Contacts -->
+    <menuitem id="menu_it_contacts" 
+              name="Contacts" 
+              parent="menu_it_park_root" 
+              sequence="80"
+              groups="it__park.group_it_park_user"/>
+              
+    <menuitem id="menu_it_clients" 
+              name="Clients IT" 
+              parent="menu_it_contacts" 
+              action="action_it_clients"
+              sequence="10"/>
+    
+    <menuitem id="menu_it_sites" 
+              name="Sites clients" 
+              parent="menu_it_contacts" 
+              action="action_it_sites"
+              sequence="20"/>
+    
+    <menuitem id="menu_it_suppliers" 
+              name="Fournisseurs IT" 
+              parent="menu_it_contacts" 
+              action="action_it_suppliers"
+              sequence="30"/>
+</odoo> 

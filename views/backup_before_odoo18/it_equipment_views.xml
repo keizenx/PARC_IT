@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vue liste des types d'équipements -->
+    <record id="view_it_equipment_type_list" model="ir.ui.view">
+        <field name="name">it.equipment.type.list</field>
+        <field name="model">it.equipment.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="equipment_count"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Vue formulaire des types d'équipements -->
+    <record id="view_it_equipment_type_form" model="ir.ui.view">
+        <field name="name">it.equipment.type.form</field>
+        <field name="model">it.equipment.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="equipment_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" nolabel="1" placeholder="Description du type d'équipement..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vue recherche des types d'équipements -->
+    <record id="view_it_equipment_type_search" model="ir.ui.view">
+        <field name="name">it.equipment.type.search</field>
+        <field name="model">it.equipment.type</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher un type d'équipement">
+                <field name="name" string="Nom du type"/>
+                <field name="code" string="Code"/>
+                <separator/>
+                <filter string="Avec équipements" name="with_equipment" context="{'search_equipment_not_empty': 1}"/>
+                <filter string="Sans équipements" name="without_equipment" context="{'search_equipment_empty': 1}"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Nom" name="group_by_name" context="{'group_by': 'name'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Action des types d'équipements -->
+    <record id="action_it_equipment_type" model="ir.actions.act_window">
+        <field name="name">Types d'équipements</field>
+        <field name="res_model">it.equipment.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer le premier type d'équipement
+            </p>
+            <p>
+                Les types d'équipement permettent de classifier les équipements informatiques
+                (ex: Ordinateur, Imprimante, Serveur, Téléphone, etc.)
+            </p>
+        </field>
+    </record>
+    
+    <!-- Vue liste des équipements -->
+    <record id="view_it_equipment_list" model="ir.ui.view">
+        <field name="name">it.equipment.list</field>
+        <field name="model">it.equipment</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="type_id"/>
+                <field name="client_id"/>
+                <field name="user_id"/>
+                <field name="state" decoration-success="state == 'installed'" decoration-warning="state == 'maintenance'" decoration-danger="state == 'end_of_life'"/>
+                <field name="purchase_date"/>
+                <field name="warranty_end_date"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Vue formulaire des équipements -->
+    <record id="view_it_equipment_form" model="ir.ui.view">
+        <field name="name">it.equipment.form</field>
+        <field name="model">it.equipment</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_stock,installed,maintenance,end_of_life"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="reference" readonly="1"/>
+                        </h1>
+                        <label for="name" class="oe_edit_only"/>
+                        <h2>
+                            <field name="name" placeholder="Nom de l'équipement..."/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="type_id"/>
+                            <field name="serial_number"/>
+                            <field name="client_id"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="purchase_date"/>
+                            <field name="warranty_end_date"/>
+                            <field name="installation_date"/>
+                            <field name="supplier_id"/>
+                            <field name="purchase_price"/>
+                            <field name="current_value"/>
+                            <field name="depreciation_period"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes" name="notes">
+                            <field name="note" placeholder="Notes sur l'équipement..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vue recherche des équipements -->
+    <record id="view_it_equipment_search" model="ir.ui.view">
+        <field name="name">it.equipment.search</field>
+        <field name="model">it.equipment</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher un équipement">
+                <field name="name" string="Équipement"/>
+                <field name="reference"/>
+                <field name="serial_number"/>
+                <field name="client_id"/>
+                <field name="user_id"/>
+                <field name="type_id"/>
+                <separator/>
+                <filter string="Brouillon" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="En stock" name="in_stock" domain="[('state', '=', 'in_stock')]"/>
+                <filter string="Installé" name="installed" domain="[('state', '=', 'installed')]"/>
+                <filter string="En maintenance" name="maintenance" domain="[('state', '=', 'maintenance')]"/>
+                <filter string="Fin de vie" name="end_of_life" domain="[('state', '=', 'end_of_life')]"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Client" name="group_by_client" context="{'group_by': 'client_id'}"/>
+                    <filter string="Type" name="group_by_type" context="{'group_by': 'type_id'}"/>
+                    <filter string="État" name="group_by_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Action des équipements -->
+    <record id="action_it_equipment" model="ir.actions.act_window">
+        <field name="name">Équipements</field>
+        <field name="res_model">it.equipment</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer le premier équipement
+            </p>
+            <p>
+                Gérez tous les équipements informatiques de vos clients
+            </p>
+        </field>
+    </record>
+</odoo> 

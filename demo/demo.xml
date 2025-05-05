@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Types d'équipement de démonstration -->
+        <record id="equipment_type_laptop" model="it.equipment.type">
+            <field name="name">Ordinateur portable</field>
+            <field name="code">LAPTOP</field>
+            <field name="description">Ordinateurs portables professionnels</field>
+        </record>
+        
+        <record id="equipment_type_desktop" model="it.equipment.type">
+            <field name="name">Ordinateur de bureau</field>
+            <field name="code">DESKTOP</field>
+            <field name="description">Ordinateurs de bureau professionnels</field>
+        </record>
+        
+        <record id="equipment_type_server" model="it.equipment.type">
+            <field name="name">Serveur</field>
+            <field name="code">SERVER</field>
+            <field name="description">Serveurs d'entreprise</field>
+        </record>
+        
+        <record id="equipment_type_printer" model="it.equipment.type">
+            <field name="name">Imprimante</field>
+            <field name="code">PRINT</field>
+            <field name="description">Imprimantes et multifonctions</field>
+        </record>
+        
+        <record id="equipment_type_network" model="it.equipment.type">
+            <field name="name">Équipement réseau</field>
+            <field name="code">NETWORK</field>
+            <field name="description">Routeurs, switches et équipements réseau</field>
+        </record>
+        
+        <!-- Équipement en stock -->
+        <record id="equipment_stock_laptop" model="it.equipment">
+            <field name="name">Dell XPS 15</field>
+            <field name="serial_number">DELLXPS15-001</field>
+            <field name="type_id" ref="equipment_type_laptop"/>
+            <field name="client_id" ref="base.res_partner_12"/>
+            <field name="state">in_stock</field>
+            <field name="purchase_date" eval="(DateTime.today() - relativedelta(months=1)).strftime('%Y-%m-%d')"/>
+            <field name="warranty_end_date" eval="(DateTime.today() + relativedelta(years=3)).strftime('%Y-%m-%d')"/>
+            <field name="purchase_price">1500.00</field>
+            <field name="supplier_id" ref="base.res_partner_12"/>
+            <field name="note">Nouvel ordinateur portable Dell XPS 15 pour le service marketing. En attente de déploiement.</field>
+        </record>
+        
+        <record id="equipment_stock_desktop" model="it.equipment">
+            <field name="name">HP EliteDesk 800 G6</field>
+            <field name="serial_number">HPED8006-001</field>
+            <field name="type_id" ref="equipment_type_desktop"/>
+            <field name="client_id" ref="base.res_partner_12"/>
+            <field name="state">in_stock</field>
+            <field name="purchase_date" eval="(DateTime.today() - relativedelta(months=2)).strftime('%Y-%m-%d')"/>
+            <field name="warranty_end_date" eval="(DateTime.today() + relativedelta(years=2)).strftime('%Y-%m-%d')"/>
+            <field name="purchase_price">900.00</field>
+            <field name="supplier_id" ref="base.res_partner_12"/>
+            <field name="note">Poste de travail pour le service comptabilité. Prêt à être déployé.</field>
+        </record>
+        
+        <!-- Équipement installé -->
+        <record id="equipment_installed_laptop" model="it.equipment">
+            <field name="name">MacBook Pro 16"</field>
+            <field name="serial_number">MBP16-001</field>
+            <field name="type_id" ref="equipment_type_laptop"/>
+            <field name="client_id" ref="base.res_partner_2"/>
+            <field name="user_id" ref="base.partner_demo"/>
+            <field name="state">installed</field>
+            <field name="purchase_date" eval="(DateTime.today() - relativedelta(months=4)).strftime('%Y-%m-%d')"/>
+            <field name="installation_date" eval="(DateTime.today() - relativedelta(months=3)).strftime('%Y-%m-%d')"/>
+            <field name="warranty_end_date" eval="(DateTime.today() + relativedelta(years=2)).strftime('%Y-%m-%d')"/>
+            <field name="purchase_price">2800.00</field>
+            <field name="supplier_id" ref="base.res_partner_1"/>
+            <field name="note">MacBook Pro pour le directeur artistique. Équipé avec la suite Adobe Creative Cloud.</field>
+        </record>
+        
+        <record id="equipment_installed_server" model="it.equipment">
+            <field name="name">Dell PowerEdge R740</field>
+            <field name="serial_number">DPE-R740-001</field>
+            <field name="type_id" ref="equipment_type_server"/>
+            <field name="client_id" ref="base.res_partner_2"/>
+            <field name="state">installed</field>
+            <field name="purchase_date" eval="(DateTime.today() - relativedelta(months=8)).strftime('%Y-%m-%d')"/>
+            <field name="installation_date" eval="(DateTime.today() - relativedelta(months=7)).strftime('%Y-%m-%d')"/>
+            <field name="warranty_end_date" eval="(DateTime.today() + relativedelta(years=4)).strftime('%Y-%m-%d')"/>
+            <field name="purchase_price">5500.00</field>
+            <field name="supplier_id" ref="base.res_partner_1"/>
+            <field name="note">Serveur principal pour l'hébergement de l'ERP et des applications métier. Configuration RAID 10.</field>
+        </record>
+        
+        <!-- Équipement en maintenance -->
+        <record id="equipment_maintenance_printer" model="it.equipment">
+            <field name="name">HP LaserJet Pro MFP</field>
+            <field name="serial_number">HPLJ-MFP-001</field>
+            <field name="type_id" ref="equipment_type_printer"/>
+            <field name="client_id" ref="base.res_partner_3"/>
+            <field name="state">maintenance</field>
+            <field name="purchase_date" eval="(DateTime.today() - relativedelta(years=1)).strftime('%Y-%m-%d')"/>
+            <field name="installation_date" eval="(DateTime.today() - relativedelta(years=1) + relativedelta(days=5)).strftime('%Y-%m-%d')"/>
+            <field name="warranty_end_date" eval="(DateTime.today() + relativedelta(years=1)).strftime('%Y-%m-%d')"/>
+            <field name="purchase_price">750.00</field>
+            <field name="supplier_id" ref="base.res_partner_12"/>
+            <field name="note">Imprimante multifonction du service administratif. En maintenance pour un problème de chargeur de documents.</field>
+        </record>
+        
+        <record id="equipment_maintenance_network" model="it.equipment">
+            <field name="name">Cisco Catalyst 2960</field>
+            <field name="serial_number">CC2960-001</field>
+            <field name="type_id" ref="equipment_type_network"/>
+            <field name="client_id" ref="base.res_partner_3"/>
+            <field name="state">maintenance</field>
+            <field name="purchase_date" eval="(DateTime.today() - relativedelta(years=2, months=3)).strftime('%Y-%m-%d')"/>
+            <field name="installation_date" eval="(DateTime.today() - relativedelta(years=2, months=2)).strftime('%Y-%m-%d')"/>
+            <field name="warranty_end_date" eval="(DateTime.today() + relativedelta(months=9)).strftime('%Y-%m-%d')"/>
+            <field name="purchase_price">1200.00</field>
+            <field name="supplier_id" ref="base.res_partner_1"/>
+            <field name="note">Switch réseau du local technique. En maintenance pour mise à jour du firmware et reconfiguration VLAN.</field>
+        </record>
+        
+        <!-- Équipement en fin de vie -->
+        <record id="equipment_eol_laptop" model="it.equipment">
+            <field name="name">Dell Latitude E6430</field>
+            <field name="serial_number">DLE6430-001</field>
+            <field name="type_id" ref="equipment_type_laptop"/>
+            <field name="client_id" ref="base.res_partner_4"/>
+            <field name="user_id" ref="base.partner_admin"/>
+            <field name="state">end_of_life</field>
+            <field name="purchase_date" eval="(DateTime.today() - relativedelta(years=5, months=6)).strftime('%Y-%m-%d')"/>
+            <field name="installation_date" eval="(DateTime.today() - relativedelta(years=5, months=5)).strftime('%Y-%m-%d')"/>
+            <field name="warranty_end_date" eval="(DateTime.today() - relativedelta(years=2, months=6)).strftime('%Y-%m-%d')"/>
+            <field name="purchase_price">1100.00</field>
+            <field name="supplier_id" ref="base.res_partner_12"/>
+            <field name="note">Ancien ordinateur portable de la direction. Obsolète et à recycler.</field>
+        </record>
+        
+        <record id="equipment_eol_desktop" model="it.equipment">
+            <field name="name">HP Compaq 8200 Elite</field>
+            <field name="serial_number">HC8200E-001</field>
+            <field name="type_id" ref="equipment_type_desktop"/>
+            <field name="client_id" ref="base.res_partner_4"/>
+            <field name="state">end_of_life</field>
+            <field name="purchase_date" eval="(DateTime.today() - relativedelta(years=6, months=2)).strftime('%Y-%m-%d')"/>
+            <field name="installation_date" eval="(DateTime.today() - relativedelta(years=6, months=1)).strftime('%Y-%m-%d')"/>
+            <field name="warranty_end_date" eval="(DateTime.today() - relativedelta(years=3, months=2)).strftime('%Y-%m-%d')"/>
+            <field name="purchase_price">850.00</field>
+            <field name="supplier_id" ref="base.res_partner_12"/>
+            <field name="note">Ancien poste de travail du service RH. Matériel décommissionné suite au renouvellement du parc.</field>
+        </record>
+    </data>
+</odoo>

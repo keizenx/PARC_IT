@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_it_ticket_resolve_wizard_form" model="ir.ui.view">
+        <field name="name">it.ticket.resolve.wizard.form</field>
+        <field name="model">it.ticket.resolve.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Résoudre le ticket">
+                <group>
+                    <field name="ticket_id" invisible="1"/>
+                    <field name="ticket_name" readonly="1"/>
+                    <field name="resolution_note" placeholder="Veuillez indiquer comment vous avez résolu ce ticket..." required="1"/>
+                </group>
+                <footer>
+                    <button string="Résoudre" name="action_resolve_ticket" type="object" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo> 

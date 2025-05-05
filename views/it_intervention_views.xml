@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vues pour les types d'interventions -->
+    <record id="view_it_intervention_type_tree" model="ir.ui.view">
+        <field name="name">it.intervention.type.tree</field>
+        <field name="model">it.intervention.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="intervention_count"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="view_it_intervention_type_form" model="ir.ui.view">
+        <field name="name">it.intervention.type.form</field>
+        <field name="model">it.intervention.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="intervention_count"/>
+                    </group>
+                    <group>
+                        <field name="description" placeholder="Description du type d'intervention..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_it_intervention_type" model="ir.actions.act_window">
+        <field name="name">Types d'interventions</field>
+        <field name="res_model">it.intervention.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer le premier type d'intervention
+            </p>
+            <p>
+                Les types d'interventions permettent de classifier les interventions techniques
+                (ex: Installation, Maintenance, Réparation, Formation, etc.)
+            </p>
+        </field>
+    </record>
+    
+    <!-- Vues pour les interventions -->
+    <record id="view_it_intervention_tree" model="ir.ui.view">
+        <field name="name">it.intervention.tree</field>
+        <field name="model">it.intervention</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'draft'" decoration-warning="state == 'planned'" decoration-danger="state == 'in_progress'" decoration-success="state == 'done'" decoration-muted="state == 'cancelled'">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="incident_id"/>
+                <field name="technician_id"/>
+                <field name="start_datetime"/>
+                <field name="end_datetime"/>
+                <field name="duration" widget="float_time" sum="Total"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_it_intervention_form" model="ir.ui.view">
+        <field name="name">it.intervention.form</field>
+        <field name="model">it.intervention</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" string="Démarrer" type="object" 
+                            invisible="state not in ('draft', 'planned')"
+                            class="oe_highlight" groups="base.group_user"/>
+                    <button name="action_done" string="Terminer" type="object" 
+                            invisible="state != 'in_progress'"
+                            class="oe_highlight" groups="base.group_user"/>
+                    <button name="button_plan" string="Planifier" type="object" 
+                            invisible="state != 'draft'"
+                            class="oe_highlight" groups="base.group_user"/>
+                    <button name="action_cancel" string="Annuler" type="object" 
+                            invisible="state in ('done', 'cancelled')"
+                            class="btn-danger" groups="base.group_user"/>
+                    <button name="action_reset" string="Réinitialiser" type="object" 
+                            invisible="state != 'cancelled'"
+                            class="oe_highlight" groups="base.group_user"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,planned,in_progress,done,cancelled"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_timesheets" type="object" class="oe_stat_button" icon="fa-clock-o">
+                            <field name="effective_hours" widget="statinfo" string="Heures"/>
+                        </button>
+                        <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="invoice_count == 0">
+                            <field name="invoice_count" widget="statinfo" string="Factures"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="reference" readonly="1"/>
+                        </h1>
+                        <label for="name" class="oe_edit_only"/>
+                        <h2>
+                            <field name="name" placeholder="Titre de l'intervention..."/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id" domain="[('it_technician', '=', True)]" 
+                                   options="{'no_create': True}" 
+                                   context="{'search_default_it_technician': 1}"/>
+                            <field name="intervention_type"/>
+                            <field name="intervention_type_id"/>
+                            <field name="client_id" domain="[('is_it_client', '=', True), ('is_company', '=', True)]" 
+                                   options="{'no_create': True}"
+                                   context="{'search_default_is_it_client': 1}"/>
+                            <field name="equipment_id" domain="[('client_id', '=', client_id)]" context="{'default_client_id': client_id}"/>
+                            <field name="contract_id" domain="[('partner_id', '=', client_id)]"/>
+                            <field name="incident_id" domain="[('client_id', '=', client_id)]" context="{'default_client_id': client_id}"/>
+                        </group>
+                        <group>
+                            <field name="start_datetime"/>
+                            <field name="end_datetime"/>
+                            <field name="duration" widget="float_time"/>
+                            <field name="planned_hours" widget="float_time"/>
+                            <field name="is_billable"/>
+                            <field name="invoiced" invisible="not is_billable"/>
+                            <field name="invoice_status" invisible="not is_billable"/>
+                            <field name="currency_id" invisible="not is_billable"/>
+                            <field name="hourly_rate" invisible="not is_billable"/>
+                            <field name="price_total" invisible="not is_billable"/>
+                            <!-- Le champ product_id est commenté car il n'existe pas dans le modèle it.intervention -->
+                            <!-- <field name="product_id" invisible="not is_billable"/> -->
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" placeholder="Description des travaux à effectuer..."/>
+                        </page>
+                        <page string="Rapport" name="report">
+                            <field name="report" placeholder="Rapport d'intervention..."/>
+                        </page>
+                        <page string="Équipements" name="equipments">
+                            <field name="equipment_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+                <footer invisible="state != 'done' or not is_billable or invoiced">
+                    <button name="action_create_invoice" string="Créer une facture" type="object" class="btn-primary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_it_intervention_search" model="ir.ui.view">
+        <field name="name">it.intervention.search</field>
+        <field name="model">it.intervention</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher des interventions">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="incident_id"/>
+                <field name="technician_id"/>
+                <separator/>
+                <filter string="Mes interventions" name="my_interventions" domain="[('technician_id', '=', uid)]"/>
+                <filter string="Brouillon" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Planifiées" name="planned" domain="[('state', '=', 'planned')]"/>
+                <filter string="En cours" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Terminées" name="done" domain="[('state', '=', 'done')]"/>
+                <filter string="Annulées" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter string="Facturable" name="billable" domain="[('is_billable', '=', True)]"/>
+                <filter string="Non facturable" name="non_billable" domain="[('is_billable', '=', False)]"/>
+                <filter string="Facturé" name="invoiced" domain="[('invoiced', '=', True)]"/>
+                <filter string="À facturer" name="to_invoice" domain="[('is_billable', '=', True), ('invoiced', '=', False), ('state', '=', 'done')]"/>
+                <filter string="Clients IT" name="it_clients" domain="[('client_id.is_it_client', '=', True)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Client" name="client" context="{'group_by': 'client_id'}"/>
+                    <filter string="Incident" name="incident" context="{'group_by': 'incident_id'}"/>
+                    <filter string="Technicien" name="technician" context="{'group_by': 'technician_id'}"/>
+                    <filter string="Type" name="type" context="{'group_by': 'intervention_type'}"/>
+                    <filter string="État" name="state" context="{'group_by': 'state'}"/>
+                    <filter string="Date" name="start_date" context="{'group_by': 'start_datetime:day'}"/>
+                    <filter string="Mois" name="start_month" context="{'group_by': 'start_datetime:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_it_intervention" model="ir.actions.act_window">
+        <field name="name">Interventions</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">it.intervention</field>
+        <field name="view_mode">kanban,calendar,list,form</field>
+        <field name="context">{'search_default_planned': 1, 'search_default_in_progress': 1, 'search_default_it_clients': 1, 'default_client_id.is_it_client': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre première intervention
+            </p>
+        </field>
+    </record>
+
+    <!-- Action pour voir les interventions d'un incident -->
+    <record id="action_it_intervention_for_incident" model="ir.actions.act_window">
+        <field name="name">Interventions</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">it.intervention</field>
+        <field name="view_mode">list,form,calendar</field>
+        <field name="domain">[('incident_id', '=', active_id)]</field>
+        <field name="context">{'default_incident_id': active_id, 'search_default_incident_id': active_id, 'default_client_id.is_it_client': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer une intervention pour cet incident
+            </p>
+        </field>
+    </record>
+
+    <record id="view_it_intervention_calendar" model="ir.ui.view">
+        <field name="name">it.intervention.calendar</field>
+        <field name="model">it.intervention</field>
+        <field name="arch" type="xml">
+            <calendar string="Interventions" date_start="start_datetime" date_stop="end_datetime" color="technician_id" mode="month">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="incident_id"/>
+                <field name="technician_id"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_it_intervention_kanban" model="ir.ui.view">
+        <field name="name">it.intervention.kanban</field>
+        <field name="model">it.intervention</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="incident_id"/>
+                <field name="technician_id"/>
+                <field name="start_datetime"/>
+                <field name="end_datetime"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="reference"/> - <field name="name"/>
+                                        </strong>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div><strong>Client:</strong> <field name="client_id"/></div>
+                                    <div t-if="record.incident_id.value"><strong>Incident:</strong> <field name="incident_id"/></div>
+                                    <div><strong>Début:</strong> <field name="start_datetime"/></div>
+                                    <div t-if="record.end_datetime.value"><strong>Fin:</strong> <field name="end_datetime"/></div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="technician_id" widget="many2one_avatar_user"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Menu item -->
+    <menuitem id="menu_it_intervention"
+              name="Interventions"
+              parent="menu_it_support"
+              action="action_it_intervention"
+              sequence="20"/>
+
+    <!-- Dashboards -->
+    <record id="action_it_intervention_dashboard" model="ir.actions.act_window">
+        <field name="name">Tableau de bord des interventions</field>
+        <field name="res_model">it.intervention</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="context">{'search_default_this_month': 1}</field>
+    </record>
+
+    <menuitem id="menu_it_intervention_dashboard"
+              name="Statistiques des interventions"
+              parent="menu_it_reporting"
+              action="action_it_intervention_dashboard"
+              sequence="20"/>
+</odoo> 

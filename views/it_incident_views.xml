@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vues pour les types d'incidents -->
+    <record id="view_it_incident_type_list" model="ir.ui.view">
+        <field name="name">it.incident.type.list</field>
+        <field name="model">it.incident.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="view_it_incident_type_form" model="ir.ui.view">
+        <field name="name">it.incident.type.form</field>
+        <field name="model">it.incident.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                        <field name="description"/>
+                        <field name="color" widget="color_picker"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_it_incident_type_tree" model="ir.ui.view">
+        <field name="name">it.incident.type.tree</field>
+        <field name="model">it.incident.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_it_incident_type" model="ir.actions.act_window">
+        <field name="name">Types d'incidents</field>
+        <field name="res_model">it.incident.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer le premier type d'incident
+            </p>
+            <p>
+                Les types d'incidents permettent de classifier les problèmes signalés
+                (ex: Matériel, Logiciel, Réseau, etc.)
+            </p>
+        </field>
+    </record>
+    
+    <!-- Vues pour les priorités d'incidents -->
+    <record id="view_it_incident_priority_list" model="ir.ui.view">
+        <field name="name">it.incident.priority.list</field>
+        <field name="model">it.incident.priority</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="view_it_incident_priority_form" model="ir.ui.view">
+        <field name="name">it.incident.priority.form</field>
+        <field name="model">it.incident.priority</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                        <field name="description"/>
+                        <field name="color" widget="color_picker"/>
+                        <field name="high_priority"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_it_incident_priority_tree" model="ir.ui.view">
+        <field name="name">it.incident.priority.tree</field>
+        <field name="model">it.incident.priority</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="high_priority"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_it_incident_priority" model="ir.actions.act_window">
+        <field name="name">Priorités d'incidents</field>
+        <field name="res_model">it.incident.priority</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer la première priorité d'incident
+            </p>
+            <p>
+                Les priorités d'incidents permettent de classifier l'urgence des problèmes
+                (ex: Basse, Moyenne, Haute, Critique, etc.)
+            </p>
+        </field>
+    </record>
+    
+    <!-- Vue arborescente pour les incidents -->
+    <record id="view_it_incident_tree" model="ir.ui.view">
+        <field name="name">it.incident.tree</field>
+        <field name="model">it.incident</field>
+        <field name="arch" type="xml">
+            <list 
+                class="o_it_incident_list" 
+                decoration-danger="state in ('new','assigned') and priority_id.name == 'high'" 
+                decoration-warning="state in ('new','assigned') and priority_id.name == 'medium'" 
+                decoration-info="state in ('new','assigned') and priority_id.name == 'low'" 
+                decoration-muted="state == 'closed'"
+                decoration-bf="state in ('new','assigned')"
+            >
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="equipment_id"/>
+                <field name="priority_id"/>
+                <field name="tech_id"/>
+                <field name="date_reported"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vue formulaire pour les incidents -->
+    <record id="view_it_incident_form" model="ir.ui.view">
+        <field name="name">it.incident.form</field>
+        <field name="model">it.incident</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="assign_to_me" string="M'assigner" type="object" 
+                            invisible="state != 'new'" class="oe_highlight"/>
+                    <button name="action_start" string="Démarrer" type="object" 
+                            invisible="state != 'assigned'" class="oe_highlight"/>
+                    <button name="action_pause" string="Mettre en pause" type="object" 
+                            invisible="state != 'in_progress'" class="oe_highlight"/>
+                    <button name="action_resolve" string="Résoudre" type="object" 
+                            invisible="state not in ('in_progress', 'waiting')" class="oe_highlight"/>
+                    <button name="action_close" string="Clôturer" type="object" 
+                            invisible="state != 'resolved'" class="oe_highlight"/>
+                    <button name="action_cancel" string="Annuler" type="object" 
+                            invisible="state in ('closed', 'cancelled')"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="new,assigned,in_progress,resolved,closed"/>
+                </header>
+                <sheet>
+                    <div class="o_it_incident_progress" invisible="state in ['closed', 'cancelled']">
+                        <ul class="o_it_incident_progress_steps">
+                            <li t-attf-class="o_it_step_active #{state in ['new','assigned','in_progress','waiting','resolved','closed'] and 'o_it_step_done'}">
+                                <span class="o_it_step_marker">1</span>
+                                <span class="o_it_step_text">Nouveau</span>
+                            </li>
+                            <li t-attf-class="#{state in ['assigned','in_progress','waiting','resolved','closed'] and 'o_it_step_active'} #{state in ['in_progress','waiting','resolved','closed'] and 'o_it_step_done'}">
+                                <span class="o_it_step_marker">2</span>
+                                <span class="o_it_step_text">Assigné</span>
+                            </li>
+                            <li t-attf-class="#{state in ['in_progress','waiting','resolved','closed'] and 'o_it_step_active'} #{state in ['resolved','closed'] and 'o_it_step_done'}">
+                                <span class="o_it_step_marker">3</span>
+                                <span class="o_it_step_text">En cours</span>
+                            </li>
+                            <li t-attf-class="#{state in ['resolved','closed'] and 'o_it_step_active'} #{state in ['closed'] and 'o_it_step_done'}">
+                                <span class="o_it_step_marker">4</span>
+                                <span class="o_it_step_text">Résolu</span>
+                            </li>
+                            <li t-attf-class="#{state in ['closed'] and 'o_it_step_active o_it_step_done'}">
+                                <span class="o_it_step_marker">5</span>
+                                <span class="o_it_step_text">Clôturé</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="oe_button_box" name="button_box">
+                        <!-- Bouton commenté car helpdesk_ticket_id n'existe pas dans le modèle -->
+                        <!--
+                        <button name="action_view_helpdesk_ticket" type="object" class="oe_stat_button" icon="fa-life-ring"
+                                invisible="helpdesk_ticket_id == False">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Ticket Helpdesk</span>
+                            </div>
+                        </button>
+                        -->
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="reference" readonly="1"/>
+                        </h1>
+                        <h2>
+                            <field name="name" placeholder="Titre de l'incident"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="client_id"/>
+                            <field name="reporter_type_id" options="{'no_create': True}" placeholder="Type de rapporteur"/>
+                            <field name="is_new_reporter" widget="boolean_toggle"/>
+                            <field name="reporter_id" options="{'no_create': True}" 
+                                   invisible="is_new_reporter"
+                                   required="not is_new_reporter and reporter_type_id"
+                                   placeholder="Sélectionner un rapporteur existant"/>
+                            <field name="reporter_name" 
+                                   invisible="not is_new_reporter"
+                                   required="is_new_reporter"
+                                   placeholder="Nom du nouveau rapporteur"/>
+                            <button name="create_reporter" string="Créer rapporteur" type="object" class="btn-primary"
+                                    invisible="not is_new_reporter or not reporter_name or not reporter_type_id"/>
+                            <field name="equipment_id"/>
+                            <field name="type_id" options="{'no_create': True}" required="1"/>
+                            <field name="priority_id" options="{'no_create': True}" required="1"/>
+                        </group>
+                        <group>
+                            <field name="date_reported"/>
+                            <field name="tech_id" options="{'no_create': False, 'no_open': False}" 
+                                   context="{'default_is_it_technician': True, 'form_view_ref': 'it__park.view_it_technician_form'}"/>
+                            <field name="date_assigned" readonly="1"/>
+                            <field name="date_start" readonly="1"/>
+                            <field name="date_end" readonly="1"/>
+                            <!-- Le champ helpdesk_ticket_id est commenté car il n'existe pas dans le modèle -->
+                            <!-- <field name="helpdesk_ticket_id" readonly="1" invisible="not helpdesk_ticket_id"/> -->
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" placeholder="Décrivez l'incident..."/>
+                        </page>
+                        <page string="Résolution" invisible="state not in ('resolved', 'closed')">
+                            <group>
+                                <field name="resolution_note" placeholder="Notes de résolution..."/>
+                                <field name="resolution_date" readonly="1"/>
+                                <field name="resolution_time" widget="float_time"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue recherche pour les incidents -->
+    <record id="view_it_incident_search" model="ir.ui.view">
+        <field name="name">it.incident.search</field>
+        <field name="model">it.incident</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher des incidents">
+                <field name="reference"/>
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="equipment_id"/>
+                <field name="tech_id"/>
+                <separator/>
+                <filter string="Mes incidents" name="my_incidents" domain="[('create_uid', '=', uid)]"/>
+                <filter string="Haute priorité" name="high_priority" domain="[('priority_id.name', '=', 'high')]"/>
+                <filter string="Nouveaux" name="new" domain="[('state', '=', 'new')]"/>
+                <filter string="Assignés" name="assigned" domain="[('state', '=', 'assigned')]"/>
+                <filter string="En cours" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Résolus" name="resolved" domain="[('state', '=', 'resolved')]"/>
+                <filter string="Fermés" name="closed" domain="[('state', '=', 'closed')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Client" name="client" context="{'group_by': 'client_id'}"/>
+                    <filter string="Équipement" name="equipment" context="{'group_by': 'equipment_id'}"/>
+                    <filter string="Technicien" name="technician" context="{'group_by': 'tech_id'}"/>
+                    <filter string="Priorité" name="priority" context="{'group_by': 'priority_id'}"/>
+                    <filter string="État" name="state" context="{'group_by': 'state'}"/>
+                    <filter string="Date de signalement" name="date_reported" context="{'group_by': 'date_reported:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action pour les incidents -->
+    <record id="action_it_incident" model="ir.actions.act_window">
+        <field name="name">Incidents</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">it.incident</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_new': 1, 'search_default_in_progress': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre premier incident
+            </p>
+        </field>
+    </record>
+
+    <!-- Action pour les incidents à résoudre par les administrateurs -->
+    <record id="action_incidents_to_resolve" model="ir.actions.act_window">
+        <field name="name">Tickets à résoudre</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">it.incident</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('state', 'in', ['new', 'assigned', 'in_progress', 'waiting'])]</field>
+        <field name="context">{'search_default_high_priority': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucun ticket à résoudre pour le moment
+            </p>
+            <p>
+                Cette vue affiche tous les tickets qui nécessitent l'attention des administrateurs.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu item pour les incidents -->
+    <menuitem id="menu_it_helpdesk_tickets"
+              name="Incidents"
+              parent="menu_it_support"
+              action="action_it_incident"
+              sequence="10"/>
+
+    <!-- Action pour filtrer les interventions liées à un incident spécifique -->
+    <record id="action_it_intervention_for_incident" model="ir.actions.act_window">
+        <field name="name">Interventions de l'incident</field>
+        <field name="res_model">it.intervention</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('incident_id', '=', active_id)]</field>
+        <field name="context">{'default_incident_id': active_id}</field>
+    </record>
+
+    <!-- Kanban view -->
+    <record id="view_it_incident_kanban" model="ir.ui.view">
+        <field name="name">it.incident.kanban</field>
+        <field name="model">it.incident</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column o_it_incident_kanban">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="client_id"/>
+                <field name="equipment_id"/>
+                <field name="priority_id"/>
+                <field name="state"/>
+                <field name="date_reported"/>
+                <field name="tech_id"/>
+                <field name="priority"/>
+                <field name="intervention_count"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_it_incident_kanban_card">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                    <span class="o_kanban_record_subtitle">
+                                        <field name="reference"/>
+                                    </span>
+                                </div>
+                                <div class="o_dropdown_kanban dropdown">
+                                    <a class="dropdown-toggle o-no-caret btn" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Menu">
+                                        <span class="fa fa-ellipsis-v"/>
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <t t-if="widget.deletable">
+                                            <a role="menuitem" type="delete" class="dropdown-item">Supprimer</a>
+                                        </t>
+                                        <ul class="oe_kanban_colorpicker" data-field="color"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div>
+                                    <strong>Client:</strong> <field name="client_id"/>
+                                </div>
+                                <div>
+                                    <strong>Équipement:</strong> <field name="equipment_id"/>
+                                </div>
+                                <div>
+                                    <strong>Technicien:</strong> <field name="tech_id"/>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="badge rounded-pill text-bg-danger" t-if="record.priority.raw_value === 'high'">Haute priorité</span>
+                                    <span class="badge rounded-pill text-bg-warning" t-if="record.priority.raw_value === 'medium'">Priorité moyenne</span>
+                                    <span class="badge rounded-pill text-bg-success" t-if="record.priority.raw_value === 'low'">Priorité basse</span>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="badge rounded-pill text-bg-info" t-if="['new', 'assigned'].includes(record.state.raw_value)">Nouveau</span>
+                                    <span class="badge rounded-pill text-bg-warning" t-if="record.state.raw_value === 'in_progress'">En cours</span>
+                                    <span class="badge rounded-pill text-bg-secondary" t-if="record.state.raw_value === 'waiting'">En attente</span>
+                                    <span class="badge rounded-pill text-bg-success" t-if="record.state.raw_value === 'resolved'">Résolu</span>
+                                    <span class="badge rounded-pill text-bg-dark" t-if="record.state.raw_value === 'closed'">Clôturé</span>
+                                </div>
+                                <div class="o_kanban_badges mt-2">
+                                    <a name="%(action_it_intervention_for_incident)d" type="action" context="{'default_incident_id': id}">
+                                        <span class="badge rounded-pill text-bg-info">
+                                            <i class="fa fa-wrench" title="Interventions"/> <field name="intervention_count"/> Interventions
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="date_reported" widget="date"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="priority" widget="priority"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Dashboards -->
+    <record id="action_it_incident_dashboard" model="ir.actions.act_window">
+        <field name="name">Tableau de bord des incidents</field>
+        <field name="res_model">it.incident</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="context">{'search_default_this_month': 1}</field>
+    </record>
+
+    <menuitem id="menu_it_incident_dashboard"
+              name="Statistiques des incidents"
+              parent="menu_it_reporting"
+              action="action_it_incident_dashboard"
+              sequence="10"/>
+
+    <!-- Catégories d'incidents -->
+    <record id="view_it_incident_category_tree" model="ir.ui.view">
+        <field name="name">it.incident.category.tree</field>
+        <field name="model">it.incident.category</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_it_incident_category_form" model="ir.ui.view">
+        <field name="name">it.incident.category.form</field>
+        <field name="model">it.incident.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_it_incident_category" model="ir.actions.act_window">
+        <field name="name">Catégories d'incidents</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">it.incident.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre première catégorie d'incident
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu items -->
+    <menuitem id="menu_it_operations"
+              name="Opérations"
+              parent="menu_it_park_root"
+              sequence="20"/>
+
+    <menuitem id="menu_it_incident_category"
+              name="Catégories d'incidents"
+              parent="menu_it_config"
+              action="action_it_incident_category"
+              sequence="25"/>
+
+    <!-- Vue pour les statuts SLA -->
+    <record id="view_it_sla_status_tree" model="ir.ui.view">
+        <field name="name">it.sla.status.tree</field>
+        <field name="model">it.sla.status</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="deadline"/>
+                <field name="reached_date"/>
+                <field name="status"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Menus -->
+    <menuitem id="menu_it_incident_type"
+              name="Types d'incidents"
+              parent="menu_it_config"
+              action="action_it_incident_type"
+              sequence="30"/>
+
+    <menuitem id="menu_it_incident_priority"
+              name="Priorités d'incidents"
+              parent="menu_it_config"
+              action="action_it_incident_priority"
+              sequence="35"/>
+
+    <!-- Données de démonstration pour les types d'incidents -->
+    <record id="incident_type_hardware" model="it.incident.type">
+        <field name="name">Problème matériel</field>
+        <field name="code">HARD</field>
+        <field name="sequence">10</field>
+        <field name="description">Problèmes liés au matériel informatique</field>
+    </record>
+
+    <record id="incident_type_software" model="it.incident.type">
+        <field name="name">Problème logiciel</field>
+        <field name="code">SOFT</field>
+        <field name="sequence">20</field>
+        <field name="description">Problèmes liés aux logiciels</field>
+    </record>
+
+    <record id="incident_type_network" model="it.incident.type">
+        <field name="name">Problème réseau</field>
+        <field name="code">NET</field>
+        <field name="sequence">30</field>
+        <field name="description">Problèmes de connexion réseau</field>
+    </record>
+
+    <record id="incident_type_security" model="it.incident.type">
+        <field name="name">Problème de sécurité</field>
+        <field name="code">SEC</field>
+        <field name="sequence">40</field>
+        <field name="description">Problèmes de sécurité informatique</field>
+    </record>
+
+    <!-- Données de démonstration pour les priorités -->
+    <record id="incident_priority_critical" model="it.incident.priority">
+        <field name="name">Critique</field>
+        <field name="sequence">10</field>
+        <field name="description">Impact majeur sur l'activité</field>
+        <field name="high_priority">True</field>
+        <field name="color">1</field>
+    </record>
+
+    <record id="incident_priority_high" model="it.incident.priority">
+        <field name="name">Haute</field>
+        <field name="sequence">20</field>
+        <field name="description">Impact significatif sur l'activité</field>
+        <field name="high_priority">True</field>
+        <field name="color">2</field>
+    </record>
+
+    <record id="incident_priority_medium" model="it.incident.priority">
+        <field name="name">Moyenne</field>
+        <field name="sequence">30</field>
+        <field name="description">Impact modéré sur l'activité</field>
+        <field name="color">3</field>
+    </record>
+
+    <record id="incident_priority_low" model="it.incident.priority">
+        <field name="name">Basse</field>
+        <field name="sequence">40</field>
+        <field name="description">Impact mineur sur l'activité</field>
+        <field name="color">4</field>
+    </record>
+</odoo> 

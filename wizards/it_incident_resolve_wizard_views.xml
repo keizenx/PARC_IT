@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_it_incident_resolve_wizard_form" model="ir.ui.view">
+        <field name="name">it.incident.resolve.wizard.form</field>
+        <field name="model">it.incident.resolve.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Résoudre l'incident">
+                <sheet>
+                    <group>
+                        <field name="incident_id" invisible="1"/>
+                        <field name="incident_name"/>
+                        <field name="resolution_time" widget="float_time"/>
+                        <field name="resolution_note" placeholder="Décrivez comment vous avez résolu cet incident"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_resolve" string="Résoudre" type="object" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo> 

@@ -1,0 +1,555 @@
+/* Styles pour le portail IT Park */
+
+/* Styles de test très visibles pour vérifier le chargement */
+.o_portal_navbar {
+    background-color: #e6f7ff !important;
+    border-bottom: 5px solid #0066cc !important;
+}
+
+.btn.btn-primary {
+    background-color: #0066cc !important;
+    border-color: #0055aa !important;
+    box-shadow: 0 4px 8px rgba(0, 102, 204, 0.3) !important;
+    border-radius: 30px !important;
+    transform: scale(1.05);
+    transition: all 0.3s;
+}
+
+.btn.btn-primary:hover {
+    background-color: #0055aa !important;
+    transform: scale(1.1);
+}
+
+.it-park-portal-content {
+    background-color: #f8f9fa !important;
+}
+
+/* Styles pour les titres */
+h1, h2, h3 {
+    color: #0066cc !important;
+    font-weight: bold !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Mettre en évidence les éléments du tableau */
+.table {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+}
+
+.table thead th {
+    background-color: #0066cc !important;
+    color: white !important;
+    border: none !important;
+}
+
+.table tbody tr:hover {
+    background-color: #e6f7ff !important;
+    transform: scale(1.01);
+}
+
+/* Styles pour les badges */
+.badge {
+    padding: 8px 12px !important;
+    font-size: 0.9rem !important;
+    font-weight: normal !important;
+}
+
+.badge-pill {
+    border-radius: 20px !important;
+}
+
+/* Widget SLA */
+.sla-widget {
+    border: 1px solid #e9ecef;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    
+    .sla-title {
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+    
+    .sla-item {
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        
+        &.sla-reached {
+            background-color: rgba(40, 167, 69, 0.1);
+            border-left: 4px solid #28a745;
+        }
+        
+        &.sla-failed {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left: 4px solid #dc3545;
+        }
+        
+        &.sla-ongoing {
+            background-color: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+        }
+        
+        .sla-name {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        
+        .sla-deadline {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+    }
+}
+
+/* Support IT */
+.it-support-card {
+    transition: transform 0.3s;
+    height: 100%;
+    
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    }
+}
+
+/* Badges pour les statuts */
+.badge-it {
+    &.badge-new {
+        background-color: #17a2b8;
+        color: white;
+    }
+    
+    &.badge-in-progress {
+        background-color: #fd7e14;
+        color: white;
+    }
+    
+    &.badge-resolved {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    &.badge-cancelled {
+        background-color: #6c757d;
+        color: white;
+    }
+}
+
+/* Timeline pour les incidents */
+.it-timeline {
+    position: relative;
+    margin: 0 0 2rem 0;
+    
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 18px;
+        height: 100%;
+        width: 4px;
+        background: #e9ecef;
+        z-index: 0;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-left: 40px;
+        margin-bottom: 1.5rem;
+        
+        &:last-child {
+            margin-bottom: 0;
+        }
+        
+        .timeline-badge {
+            position: absolute;
+            top: 0;
+            left: -40px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            text-align: center;
+            background: white;
+            border: 4px solid #007bff;
+            z-index: 1;
+            
+            i {
+                line-height: 28px;
+                font-size: 1rem;
+                color: #007bff;
+            }
+        }
+        
+        .timeline-panel {
+            position: relative;
+            background: white;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            
+            &:before {
+                content: " ";
+                display: inline-block;
+                position: absolute;
+                top: 11px;
+                left: -10px;
+                border-top: 10px solid transparent;
+                border-right: 10px solid #e9ecef;
+                border-bottom: 10px solid transparent;
+            }
+            
+            .timeline-time {
+                color: #6c757d;
+                font-size: 0.875rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .timeline-title {
+                margin-top: 0;
+                color: #212529;
+            }
+            
+            .timeline-body {
+                p {
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+}
+
+/* Styles pour la page d'accueil IT Park */
+
+.s_cover.bg-black-50 {
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 0;
+    }
+    
+    .container {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+.ticket-submitted-notification {
+    text-align: center;
+    padding: 30px;
+}
+
+.ticket-timeline {
+    position: relative;
+    padding: 20px 0;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 20px;
+        width: 2px;
+        background-color: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+        
+        .timeline-badge {
+            position: absolute;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            background-color: #007bff;
+            border-radius: 50%;
+            color: white;
+            z-index: 1;
+            
+            i {
+                font-size: 10px;
+            }
+        }
+        
+        .timeline-content {
+            margin-left: 40px;
+            background-color: #f8f9fa;
+        }
+    }
+}
+
+.ticket-item {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: box-shadow 0.3s;
+    
+    &:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    &.priority-3 {
+        border-left: 5px solid #dc3545;
+    }
+    
+    &.priority-2 {
+        border-left: 5px solid #fd7e14;
+    }
+    
+    &.priority-1 {
+        border-left: 5px solid #28a745;
+    }
+    
+    &.priority-0 {
+        border-left: 5px solid #17a2b8;
+    }
+}
+
+.badge-new, .badge-assigned, .badge-in_progress, .badge-waiting, .badge-resolved, .badge-closed {
+    display: inline-block;
+    padding: 0.4em 0.8em;
+    font-size: 0.75em;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 10rem;
+}
+
+.badge-new {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.badge-assigned {
+    background-color: #6f42c1;
+    color: white;
+}
+
+.badge-in_progress {
+    background-color: #007bff;
+    color: white;
+}
+
+.badge-waiting {
+    background-color: #fd7e14;
+    color: white;
+}
+
+.badge-resolved {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge-closed {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Style pour simuler une image de bannière IT si nous n'en avons pas une réelle */
+.s_cover .s_parallax_bg {
+    background-image: linear-gradient(45deg, #0062E6, #33AEFF) !important;
+    background-position: center center !important;
+    background-size: cover !important;
+}
+
+/* Timeline simple pour les tickets */
+.timeline {
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 0;
+    list-style: none;
+}
+.timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+    border-left: 2px solid #e9ecef;
+}
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+.timeline-marker {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    left: -13px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+.timeline-content {
+    padding: 5px 0 0 15px;
+}
+
+/* Nouveaux styles améliorés pour le portail */
+.o_portal_my_doc_table {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.o_portal_my_doc_table thead th {
+    background-color: #f5f9fd;
+    border-bottom: 2px solid #e9ecef;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.dashboard-card {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    height: 100%;
+    
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        border-radius: 10px 10px 0 0;
+        border-bottom: none;
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+        
+        .fa {
+            margin-right: 10px;
+        }
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+}
+
+.stat-card {
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #3c4b64;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #768192;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .stat-icon {
+        font-size: 2.5rem;
+        color: rgba(0, 123, 255, 0.1);
+        position: absolute;
+        right: 1.5rem;
+        top: 1.5rem;
+    }
+}
+
+.btn-action {
+    border-radius: 30px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+    
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.incident-detail-header {
+    background: linear-gradient(135deg, #2979ff, #1976d2);
+    color: white;
+    padding: 2rem 0;
+    border-radius: 10px 10px 0 0;
+    margin-bottom: 0;
+    
+    h3 {
+        margin-bottom: 0;
+    }
+}
+
+.info-section {
+    background-color: #f9fbfd;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 0.5rem;
+    }
+}
+
+/* Améliorations pour les formulaires */
+.form-control {
+    border-radius: 6px;
+    border: 1px solid #d1dbe8;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s;
+    
+    &:focus {
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+        border-color: #80bdff;
+    }
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Animations pour les cartes et boutons */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeInUp {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; } 

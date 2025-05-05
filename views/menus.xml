@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Actions pour le portail -->
+    <record id="action_it_portal_tickets" model="ir.actions.act_window">
+        <field name="name">Mes Tickets</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">it.ticket</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('partner_id', '=', user.partner_id.id)]</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Vous n'avez pas encore de tickets
+            </p>
+            <p>
+                Les tickets vous permettent de suivre vos demandes de support technique.
+            </p>
+        </field>
+    </record>
+    
+    <record id="action_it_portal_equipment" model="ir.actions.act_window">
+        <field name="name">Mon Parc</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">it.equipment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('client_id', '=', user.partner_id.id)]</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Vous n'avez pas encore d'équipements
+            </p>
+            <p>
+                Cette section affiche tous les équipements qui vous sont attribués.
+            </p>
+        </field>
+    </record>
+    
+    <record id="action_it_portal_contracts" model="ir.actions.act_window">
+        <field name="name">Mes Contrats</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">it.contract</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('partner_id', '=', user.partner_id.id)]</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Vous n'avez pas encore de contrats
+            </p>
+            <p>
+                Cette section affiche tous vos contrats de maintenance.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu principal du portail IT -->
+    <menuitem id="menu_it_portal_root"
+              name="Support IT"
+              sequence="50"
+              web_icon="it__park,static/description/icon.png"
+              groups="base.group_portal"/>
+
+    <!-- Sous-menu Tickets -->
+    <menuitem id="menu_it_portal_tickets"
+              name="Mes Tickets"
+              parent="menu_it_portal_root"
+              action="action_it_portal_tickets"
+              sequence="10"/>
+
+    <!-- Sous-menu Équipements -->
+    <menuitem id="menu_it_portal_equipment"
+              name="Mon Parc"
+              parent="menu_it_portal_root"
+              action="action_it_portal_equipment"
+              sequence="20"/>
+
+    <!-- Sous-menu Contrats -->
+    <menuitem id="menu_it_portal_contracts"
+              name="Mes Contrats"
+              parent="menu_it_portal_root"
+              action="action_it_portal_contracts"
+              sequence="30"/>
+</odoo> 

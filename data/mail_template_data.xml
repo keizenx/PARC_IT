@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Template pour les notifications de nouveau ticket -->
+        <record id="email_template_new_ticket_notification" model="mail.template">
+            <field name="name">Notification de nouveau ticket</field>
+            <field name="model_id" ref="model_it_ticket"/>
+            <field name="subject">Nouveau ticket IT: {{ object.name }}</field>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="partner_to">{{ object.client_id.id }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Bonjour,
+                        <br/><br/>
+                        Un nouveau ticket IT a été créé.
+                        <br/><br/>
+                        <strong>Ticket:</strong> {{ object.reference }} - {{ object.name }}<br/>
+                        <strong>Client:</strong> {{ object.client_id.name }}<br/>
+                        <strong>Priorité:</strong> {{ object.get_priority_display() }}<br/>
+                        <strong>Créé le:</strong> {{ format_datetime(object.date_created, tz=user.tz) }}<br/>
+                        <br/>
+                        <strong>Description:</strong><br/>
+                        {{ object.description }}
+                        <br/><br/>
+                        Vous pouvez voir ce ticket en cliquant sur le lien suivant:
+                        <div style="margin: 16px 0px 16px 0px;">
+                            <a href="/web#id={{ object.id }}&amp;model=it.ticket&amp;view_type=form"
+                               style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+                                Voir le ticket
+                            </a>
+                        </div>
+                        <br/><br/>
+                        Cordialement,<br/>
+                        L'équipe Support IT
+                    </p>
+                </div>
+            </field>
+            <field name="lang">{{ object.client_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    </data>
+</odoo> 

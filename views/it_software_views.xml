@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vue arborescente pour les logiciels -->
+    <record id="view_it_software_tree" model="ir.ui.view">
+        <field name="name">it.software.tree</field>
+        <field name="model">it.software</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="editor_id"/>
+                <field name="version"/>
+                <field name="category_id"/>
+                <field name="license_required"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vue formulaire pour les logiciels -->
+    <record id="view_it_software_form" model="ir.ui.view">
+        <field name="name">it.software.form</field>
+        <field name="model">it.software</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom du logiciel..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="editor_id" options="{'no_create_edit': False, 'no_quick_create': True, 'no_create': False}"/>
+                            <field name="version"/>
+                            <field name="category_id"/>
+                        </group>
+                        <group>
+                            <field name="license_required"/>
+                            <field name="purchase_url" widget="url"/>
+                            <field name="support_url" widget="url"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" placeholder="Description du logiciel..."/>
+                        </page>
+                        <page string="Licences" name="licenses" visible="id">
+                            <field name="license_ids">
+                                <list>
+                                    <field name="reference"/>
+                                    <field name="key"/>
+                                    <field name="supplier_id"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Équipements" name="equipments" visible="id">
+                            <field name="equipment_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="type_id"/>
+                                    <field name="client_id"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue recherche pour les logiciels -->
+    <record id="view_it_software_search" model="ir.ui.view">
+        <field name="name">it.software.search</field>
+        <field name="model">it.software</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher des logiciels">
+                <field name="name"/>
+                <field name="editor_id"/>
+                <field name="version"/>
+                <field name="category_id"/>
+                <field name="license_required"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Éditeur" name="editor" context="{'group_by': 'editor_id'}"/>
+                    <filter string="Catégorie" name="category" context="{'group_by': 'category_id'}"/>
+                    <filter string="Licence requise" name="license_required" context="{'group_by': 'license_required'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vue kanban pour les logiciels -->
+    <record id="view_it_software_kanban" model="ir.ui.view">
+        <field name="name">it.software.kanban</field>
+        <field name="model">it.software</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="editor_id"/>
+                <field name="version"/>
+                <field name="category_id"/>
+                <field name="license_required"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <span class="o_kanban_record_subtitle">
+                                            Version <field name="version"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div><strong>Éditeur:</strong> <field name="editor_id"/></div>
+                                    <div><strong>Catégorie:</strong> <field name="category_id"/></div>
+                                    <div><strong>Licence requise:</strong> <field name="license_required"/></div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action pour les logiciels -->
+    <record id="action_it_software" model="ir.actions.act_window">
+        <field name="name">Logiciels</field>
+        <field name="res_model">it.software</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre premier logiciel
+            </p>
+        </field>
+    </record>
+
+    <!-- Vue arborescente pour les catégories de logiciels -->
+    <record id="view_it_software_category_tree" model="ir.ui.view">
+        <field name="name">it.software.category.tree</field>
+        <field name="model">it.software.category</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="software_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vue formulaire pour les catégories de logiciels -->
+    <record id="view_it_software_category_form" model="ir.ui.view">
+        <field name="name">it.software.category.form</field>
+        <field name="model">it.software.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_softwares" type="object" class="oe_stat_button" icon="fa-list">
+                            <field name="software_count" string="Logiciels" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom de la catégorie..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" placeholder="Description de la catégorie..."/>
+                        </page>
+                        <page string="Logiciels" name="softwares" visible="id">
+                            <field name="software_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="editor_id"/>
+                                    <field name="version"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action pour les catégories de logiciels -->
+    <record id="action_it_software_category" model="ir.actions.act_window">
+        <field name="name">Catégories de logiciels</field>
+        <field name="res_model">it.software.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre première catégorie de logiciel
+            </p>
+        </field>
+    </record>
+
+    <!-- Éléments de menu pour les logiciels et les catégories -->
+    <menuitem id="menu_it_software_list"
+              name="Logiciels"
+              parent="menu_it_assets"
+              action="action_it_software"
+              sequence="10"/>
+
+    <menuitem id="menu_it_software_category"
+              name="Catégories de logiciels"
+              parent="menu_it_config"
+              action="action_it_software_category"
+              sequence="50"/>
+</odoo> 

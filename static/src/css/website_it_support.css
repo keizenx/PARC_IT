@@ -1,0 +1,156 @@
+/* Styles pour le portail client IT support */
+
+/* Carte de support */
+.it-support-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.it-support-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.it-support-card .card-header {
+    font-weight: 600;
+}
+
+/* Style des tickets */
+.it-ticket-list .ticket-item {
+    border-left: 5px solid #ccc;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.it-ticket-list .ticket-item:hover {
+    background-color: #f0f0f0;
+}
+
+.it-ticket-list .ticket-item.priority-high {
+    border-left-color: #dc3545;
+}
+
+.it-ticket-list .ticket-item.priority-medium {
+    border-left-color: #ffc107;
+}
+
+.it-ticket-list .ticket-item.priority-low {
+    border-left-color: #28a745;
+}
+
+/* Badges d'état */
+.badge-new {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.badge-assigned {
+    background-color: #007bff;
+    color: white;
+}
+
+.badge-in-progress {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-waiting {
+    background-color: #6c757d;
+    color: white;
+}
+
+.badge-resolved {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge-closed {
+    background-color: #343a40;
+    color: white;
+}
+
+/* Barre de progression de résolution */
+.resolution-progress {
+    height: 8px;
+    border-radius: 4px;
+}
+
+/* Formulaire de création de ticket */
+.it-ticket-form .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.it-ticket-form label {
+    font-weight: 600;
+}
+
+.it-ticket-form .required-field::after {
+    content: " *";
+    color: #dc3545;
+}
+
+/* Notification après soumission */
+.ticket-submitted-notification {
+    padding: 30px;
+    text-align: center;
+    background-color: #e8f4f8;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.ticket-submitted-notification i {
+    font-size: 48px;
+    color: #28a745;
+    margin-bottom: 20px;
+}
+
+/* Mise en page responsive */
+@media (max-width: 768px) {
+    .it-ticket-form .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+/* Style pour la chronologie des interventions */
+.ticket-timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.ticket-timeline:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 11px;
+    width: 2px;
+    background-color: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-badge {
+    position: absolute;
+    top: 0;
+    left: -30px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    line-height: 24px;
+}
+
+.timeline-date {
+    color: #6c757d;
+    font-size: 0.85rem;
+} 

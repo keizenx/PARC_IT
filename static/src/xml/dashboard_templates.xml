@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="it_park.Dashboard" owl="1">
+        <div class="container-fluid py-4">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h1 class="display-6 mb-0">Tableau de bord du parc informatique</h1>
+                </div>
+            </div>
+
+            <!-- Ligne des cartes KPI -->
+            <div class="row mb-4 g-3">
+                <div class="col-md-6 col-lg-4 col-xl">
+                    <t t-component="ITDashboardCard" 
+                        title="Équipements"
+                        value="state.equipmentCount"
+                        description="équipements enregistrés"
+                        onClick="() => this.openEquipments()"
+                    />
+                </div>
+                <div class="col-md-6 col-lg-4 col-xl">
+                    <t t-component="ITDashboardCard" 
+                        title="Logiciels"
+                        value="state.softwareCount"
+                        description="applications installées"
+                        onClick="() => this.openSoftware()"
+                    />
+                </div>
+                <div class="col-md-6 col-lg-4 col-xl">
+                    <t t-component="ITDashboardCard" 
+                        title="Licences"
+                        value="state.expiringLicenses"
+                        description="licences expirant dans les 30 jours"
+                        onClick="() => this.openExpiringLicenses()"
+                    />
+                </div>
+                <div class="col-md-6 col-lg-4 col-xl">
+                    <t t-component="ITDashboardCard" 
+                        title="Incidents"
+                        value="state.openIncidents"
+                        description="incidents non résolus"
+                        onClick="() => this.openOpenIncidents()"
+                    />
+                </div>
+                <div class="col-md-6 col-lg-4 col-xl">
+                    <t t-component="ITDashboardCard" 
+                        title="Interventions"
+                        value="state.pendingInterventions"
+                        description="interventions planifiées"
+                        onClick="() => this.openPendingInterventions()"
+                    />
+                </div>
+            </div>
+
+            <!-- Ligne du graphique -->
+            <div class="row g-3">
+                <div class="col-lg-6">
+                    <t t-component="ITDashboardChart" />
+                </div>
+                <div class="col-lg-6">
+                    <!-- Espace pour un futur graphique ou widget -->
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="it_park.DashboardCard" owl="1">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title mb-3 text-primary">
+                    <t t-esc="props.title"/>
+                </h5>
+                <div class="d-flex align-items-center mb-3">
+                    <h2 class="fw-bold mb-0">
+                        <t t-esc="props.value"/>
+                    </h2>
+                </div>
+                <p t-if="props.description" class="card-text text-muted mt-auto">
+                    <t t-esc="props.description"/>
+                </p>
+            </div>
+            <div t-if="props.onClick" class="card-footer bg-transparent border-0 p-3 pt-0">
+                <button t-on-click="props.onClick" class="btn btn-sm btn-outline-primary w-100">
+                    Voir les détails
+                </button>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="it_park.DashboardChart" owl="1">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-4 text-primary">Incidents par priorité</h5>
+                <div class="position-relative" style="height: 220px;">
+                    <div t-if="!state.loaded" class="position-absolute top-50 start-50 translate-middle">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                    </div>
+                    <canvas t-ref="chart" t-if="state.loaded"></canvas>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates> 
