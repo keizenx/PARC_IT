@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vue formulaire pour le wizard -->
+    <record id="view_it_portal_user_wizard_form" model="ir.ui.view">
+        <field name="name">it.portal.user.wizard.form</field>
+        <field name="model">it.portal.user.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Créer un utilisateur du portail">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Utilisez cet assistant pour créer rapidement un utilisateur du portail pour vos clients.
+                    </div>
+                    <group>
+                        <group string="Contact">
+                            <field name="existing_partner_id"/>
+                            <field name="create_new_contact" invisible="context.get('hide_create_new', False)"/>
+                            <field name="name" readonly="existing_partner_id != False"/>
+                            <field name="email" readonly="existing_partner_id != False"/>
+                            <field name="phone" readonly="existing_partner_id != False"/>
+                            <field name="is_company" readonly="existing_partner_id != False"/>
+                            <field name="company_name" invisible="is_company == True" readonly="existing_partner_id != False"/>
+                        </group>
+                        <group string="Authentification">
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="auto_generate_password"/>
+                            <field name="password" password="True" invisible="auto_generate_password == True"/>
+                            <field name="send_invitation"/>
+                        </group>
+                    </group>
+                    <group string="Accès au portail">
+                        <field name="access_tickets"/>
+                        <field name="access_equipment"/>
+                        <field name="access_contracts"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Créer l'utilisateur" name="create_portal_user" type="object" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Action pour le wizard -->
+    <record id="action_it_portal_user_wizard" model="ir.actions.act_window">
+        <field name="name">Créer un utilisateur du portail</field>
+        <field name="res_model">it.portal.user.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_it_portal_user_wizard_form"/>
+    </record>
+    
+    <!-- Menu pour accéder au wizard -->
+    <menuitem id="menu_it_portal_user_wizard"
+              name="Créer utilisateur portail"
+              parent="it__park.menu_it_config"
+              action="action_it_portal_user_wizard"
+              sequence="95"/>
+</odoo> 

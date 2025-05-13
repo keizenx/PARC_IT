@@ -41,6 +41,8 @@ class ITEquipment(models.Model):
     name = fields.Char(string='Nom', required=True, tracking=True)
     reference = fields.Char(string='Référence', required=True, copy=False, readonly=True, default=lambda self: _('Nouveau'))
     serial_number = fields.Char(string='Numéro de série', tracking=True)
+    brand = fields.Char(string='Marque', tracking=True)
+    model = fields.Char(string='Modèle', tracking=True)
     type_id = fields.Many2one('it.equipment.type', string='Type d\'équipement', required=True, tracking=True)
     client_id = fields.Many2one('res.partner', string='Client', domain=[('is_company', '=', True), ('is_it_client', '=', True)], required=True, tracking=True)
     partner_id = fields.Many2one('res.partner', string='Propriétaire', related='client_id', store=True, readonly=False, tracking=True,
@@ -440,3 +442,14 @@ class ITEquipment(models.Model):
         })
         
         return True 
+
+    def action_view_equipment_detail(self):
+        """Afficher les détails de l'équipement dans le portail"""
+        self.ensure_one()
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        equipment_url = f"{base_url}/my/equipment/{self.id}"
+        return {
+            'type': 'ir.actions.act_url',
+            'url': equipment_url,
+            'target': 'self',
+        } 

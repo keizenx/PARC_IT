@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template pour la création de ticket -->
+    <template id="portal_create_ticket" name="Create Ticket">
+        <t t-call="portal.portal_layout">
+            <div class="container py-3">
+                <div class="row">
+                    <div class="col-12">
+                        <h1 class="text-center mb-4">Créer un nouveau ticket</h1>
+                        <form action="/my/tickets/submit" method="post" enctype="multipart/form-data" class="card shadow-sm">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Titre *</label>
+                                    <input type="text" class="form-control" name="name" id="name" required="required" placeholder="Résumé du problème"/>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="category_id" class="form-label">Catégorie *</label>
+                                    <select class="form-select" name="category_id" id="category_id" required="required">
+                                        <option value="">Choisir une catégorie...</option>
+                                        <t t-foreach="categories" t-as="category">
+                                            <option t-att-value="category.id">
+                                                <t t-esc="category.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="equipment_id" class="form-label">Équipement concerné</label>
+                                    <select class="form-select" name="equipment_id" id="equipment_id">
+                                        <option value="">Choisir un équipement...</option>
+                                        <t t-foreach="equipment" t-as="equip">
+                                            <option t-att-value="equip.id">
+                                                <t t-esc="equip.name"/>
+                                                <t t-if="equip.serial_number"> - <t t-esc="equip.serial_number"/></t>
+                                            </option>
+                                        </t>
+                                    </select>
+                                    <small class="form-text text-muted">Sélectionnez l'équipement concerné par ce ticket, si applicable.</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="priority" class="form-label">Priorité</label>
+                                    <select class="form-select" name="priority" id="priority">
+                                        <option value="0">Basse</option>
+                                        <option value="1" selected="selected">Normale</option>
+                                        <option value="2">Haute</option>
+                                        <option value="3">Urgente</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description détaillée *</label>
+                                    <textarea class="form-control" name="description" id="description" rows="6" required="required" placeholder="Veuillez décrire votre problème en détail..."></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="attachment" class="form-label">Pièce jointe (optionnel)</label>
+                                    <input type="file" class="form-control" name="attachment" id="attachment"/>
+                                    <small class="form-text text-muted">Vous pouvez joindre une capture d'écran ou un document pour illustrer votre problème.</small>
+                                </div>
+                            </div>
+                            
+                            <div class="card-footer bg-transparent d-flex justify-content-between">
+                                <a href="/my/tickets" class="btn btn-secondary">Annuler</a>
+                                <button type="submit" class="btn btn-primary">Soumettre le ticket</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo> 

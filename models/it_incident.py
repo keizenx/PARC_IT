@@ -217,4 +217,20 @@ class ITIncident(models.Model):
         """Annuler l'incident"""
         self.write({
             'state': 'cancelled'
-        }) 
+        })
+        
+    @api.model
+    def _cron_send_sla_reminders(self):
+        """Envoie des rappels pour les SLA qui approchent de leur date limite"""
+        _logger.info("Exécution de la tâche planifiée : Envoi des rappels SLA")
+        # Chercher les incidents avec des SLA actifs qui approchent de la date d'échéance
+        # Cette méthode sera implémentée complètement dans une version future
+        return True
+        
+    @api.model
+    def _cron_auto_assign_incidents(self):
+        """Assigne automatiquement les incidents aux techniciens disponibles"""
+        _logger.info("Exécution de la tâche planifiée : Assignation automatique des incidents")
+        # Chercher les incidents non assignés et les assigner aux techniciens disponibles
+        # Cette méthode sera implémentée complètement dans une version future
+        return True 

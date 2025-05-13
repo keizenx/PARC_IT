@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- DONNÉES DE DÉMONSTRATION POUR CARREFOUR -->
+        
+        <!-- Catégories de logiciels et d'équipements pour retail -->
+        <record id="software_category_pos" model="it.software.category">
+            <field name="name">Systèmes d'encaissement</field>
+            <field name="code">POS</field>
+            <field name="description">Logiciels pour les systèmes de caisses et encaissement</field>
+        </record>
+        
+        <record id="equipment_type_pos" model="it.equipment.type">
+            <field name="name">Caisse enregistreuse</field>
+            <field name="code">POS</field>
+            <field name="description">Terminal point de vente et caisse enregistreuse</field>
+            <field name="track_in_stock">True</field>
+        </record>
+        
+        <record id="equipment_type_server" model="it.equipment.type">
+            <field name="name">Serveur</field>
+            <field name="code">SERVER</field>
+            <field name="description">Serveurs pour applications d'entreprise</field>
+            <field name="track_in_stock">True</field>
+        </record>
+        
+        <!-- Éditeur de logiciel retail -->
+        <record id="partner_retail_soft" model="res.partner">
+            <field name="name">RetailSoft Solutions</field>
+            <field name="is_company">True</field>
+            <field name="is_it_editor">True</field>
+            <field name="street">57 Avenue de la Grande Armée</field>
+            <field name="city">Paris</field>
+            <field name="zip">75016</field>
+            <field name="country_id" ref="base.fr"/>
+            <field name="email">contact@retailsoft.fr</field>
+            <field name="website">www.retailsoft.fr</field>
+            <field name="phone">+33 1 45 72 30 00</field>
+        </record>
+        
+        <!-- Cliente Carrefour avec sites -->
+        <record id="partner_carrefour" model="res.partner">
+            <field name="name">Carrefour France - Siège Social</field>
+            <field name="is_company">True</field>
+            <field name="is_it_client">True</field>
+            <field name="street">93 Avenue de Paris</field>
+            <field name="city">Massy</field>
+            <field name="zip">91300</field>
+            <field name="country_id" ref="base.fr"/>
+            <field name="email">it-support@carrefour.fr</field>
+            <field name="phone">+33 1 64 50 22 22</field>
+            <field name="website">www.carrefour.fr</field>
+        </record>
+        
+        <!-- Site hypermarché Évry -->
+        <record id="partner_carrefour_evry" model="res.partner">
+            <field name="name">Carrefour Évry</field>
+            <field name="type">delivery</field>
+            <field name="is_it_site">True</field>
+            <field name="parent_id" ref="partner_carrefour"/>
+            <field name="street">Centre Commercial Évry 2</field>
+            <field name="city">Évry</field>
+            <field name="zip">91000</field>
+            <field name="country_id" ref="base.fr"/>
+            <field name="email">it-evry@carrefour.fr</field>
+            <field name="phone">+33 1 60 77 12 34</field>
+        </record>
+        
+        <!-- Site supermarché -->
+        <record id="partner_carrefour_st_michel" model="res.partner">
+            <field name="name">Carrefour Market Saint-Michel-sur-Orge</field>
+            <field name="type">delivery</field>
+            <field name="is_it_site">True</field>
+            <field name="parent_id" ref="partner_carrefour"/>
+            <field name="street">2 Rue de Sainte-Geneviève</field>
+            <field name="city">Saint-Michel-sur-Orge</field>
+            <field name="zip">91240</field>
+            <field name="country_id" ref="base.fr"/>
+            <field name="email">it-stmichel@carrefour.fr</field>
+            <field name="phone">+33 1 69 25 24 80</field>
+        </record>
+        
+        <!-- Contrat de maintenance -->
+        <record id="contract_carrefour" model="it.contract">
+            <field name="name">Contrat Infogérance Carrefour Région Île-de-France</field>
+            <field name="partner_id" ref="partner_carrefour"/>
+            <field name="contract_type_id" ref="it__park.contract_type_maintenance"/>
+            <field name="date_start" eval="(DateTime.today()).strftime('%Y-%m-%d')"/>
+            <field name="date_end" eval="(DateTime.today() + relativedelta(years=2)).strftime('%Y-%m-%d')"/>
+            <field name="recurring_interval">1</field>
+            <field name="recurring_rule_type">monthly</field>
+            <field name="recurring_amount">15000.00</field>
+            <field name="description">Ce contrat couvre:
+- Maintenance préventive trimestrielle
+- Support des systèmes d'encaissement
+- Maintenance des serveurs locaux
+- Support utilisateurs (limité à 100h/mois)
+- Surveillance des systèmes 7j/7</field>
+            <field name="auto_invoice">True</field>
+        </record>
+        
+        <!-- Logiciel d'encaissement -->
+        <record id="software_retailpro" model="it.software">
+            <field name="name">RetailPro POS</field>
+            <field name="editor_id" ref="partner_retail_soft"/>
+            <field name="category_id" ref="software_category_pos"/>
+            <field name="version">4.2.1</field>
+            <field name="description">Solution d'encaissement complète pour grande distribution</field>
+            <field name="license_required">True</field>
+        </record>
+        
+        <!-- Licence logiciel -->
+        <record id="license_retailpro" model="it.license">
+            <field name="name">RetailPro POS Enterprise - Carrefour</field>
+            <field name="software_id" ref="software_retailpro"/>
+            <field name="client_id" ref="partner_carrefour"/>
+            <field name="key">RPE-CAR-FR-2025-E45889732</field>
+            <field name="seats">50</field>
+            <field name="date_start" eval="(DateTime.today()).strftime('%Y-%m-%d')"/>
+            <field name="date_end" eval="(DateTime.today() + relativedelta(years=1)).strftime('%Y-%m-%d')"/>
+            <field name="recurring_amount">25000.00</field>
+            <field name="state">active</field>
+            <field name="notes">Licence site pour tous les équipements du magasin d'Évry</field>
+        </record>
+        
+        <!-- Équipements -->
+        <record id="equipment_server_evry" model="it.equipment">
+            <field name="name">SRV-EVRY-MAIN01</field>
+            <field name="type_id" ref="equipment_type_server"/>
+            <field name="serial_number">HPGS8829A1</field>
+            <field name="client_id" ref="partner_carrefour"/>
+            <field name="site_id" ref="partner_carrefour_evry"/>
+            <field name="purchase_date" eval="(DateTime.today() - relativedelta(years=1, months=3)).strftime('%Y-%m-%d')"/>
+            <field name="warranty_end_date" eval="(DateTime.today() + relativedelta(years=2)).strftime('%Y-%m-%d')"/>
+            <field name="state">installed</field>
+            <field name="installation_date" eval="(DateTime.today() - relativedelta(months=11)).strftime('%Y-%m-%d')"/>
+            <field name="note">Serveur principal du magasin - Héberge le système d'encaissement et la base de données locale
+- CPU: 2x Intel Xeon Gold 6230 (20 cœurs)
+- RAM: 128GB DDR4
+- Stockage: 6x 1.2TB SAS 10K (RAID 5)
+- Système: Windows Server 2022 Datacenter</field>
+            <field name="contract_id" ref="contract_carrefour"/>
+        </record>
+        
+        <record id="equipment_pos_evry1" model="it.equipment">
+            <field name="name">POS-EVRY-01</field>
+            <field name="type_id" ref="equipment_type_pos"/>
+            <field name="serial_number">TSB2735914</field>
+            <field name="client_id" ref="partner_carrefour"/>
+            <field name="site_id" ref="partner_carrefour_evry"/>
+            <field name="purchase_date" eval="(DateTime.today() - relativedelta(months=6)).strftime('%Y-%m-%d')"/>
+            <field name="warranty_end_date" eval="(DateTime.today() + relativedelta(years=3)).strftime('%Y-%m-%d')"/>
+            <field name="state">installed</field>
+            <field name="installation_date" eval="(DateTime.today() - relativedelta(months=5)).strftime('%Y-%m-%d')"/>
+            <field name="note">Caisse enregistreuse - Allée 1, Position 1</field>
+            <field name="software_ids" eval="[(6, 0, [ref('software_retailpro')])]"/>
+            <field name="contract_id" ref="contract_carrefour"/>
+        </record>
+        
+        <!-- Incident -->
+        <record id="incident_pos_evry1" model="it.incident">
+            <field name="name">Blocage caisse POS-EVRY-01 pendant transactions</field>
+            <field name="client_id" ref="partner_carrefour"/>
+            <field name="site_id" ref="partner_carrefour_evry"/>
+            <field name="equipment_id" ref="equipment_pos_evry1"/>
+            <field name="priority_id" ref="it__park.incident_priority_high"/>
+            <field name="description">La caisse POS-EVRY-01 se bloque aléatoirement pendant les transactions.
+Écran qui se fige, obligeant à redémarrer la caisse.
+Problème survenu 3 fois ce matin, perturbant fortement l'activité.</field>
+            <field name="date_reported" eval="DateTime.now()"/>
+            <field name="contract_id" ref="contract_carrefour"/>
+            <field name="state">new</field>
+        </record>
+        
+        <!-- Intervention -->
+        <record id="intervention_pos_evry1" model="it.intervention">
+            <field name="name">Intervention sur caisse POS-EVRY-01</field>
+            <field name="incident_id" ref="incident_pos_evry1"/>
+            <field name="client_id" ref="partner_carrefour"/>
+            <field name="site_id" ref="partner_carrefour_evry"/>
+            <field name="equipment_id" ref="equipment_pos_evry1"/>
+            <field name="scheduled_date" eval="(DateTime.now() + relativedelta(hours=3)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="estimated_duration">2.0</field>
+            <field name="description">Intervention sur place pour diagnostic et réparation de la caisse enregistreuse qui se bloque</field>
+            <field name="state">scheduled</field>
+        </record>
+    </data>
+</odoo> 

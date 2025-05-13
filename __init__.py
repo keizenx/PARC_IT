@@ -11,6 +11,8 @@ from . import controllers
 
 # Scripts
 from . import fix_menu_action
+from . import fix_portal_tickets_domain
+from . import run_diagnostics
 
 # Correction pour les avertissements de dépréciation Werkzeug
 try:
@@ -18,6 +20,35 @@ try:
 except Exception as e:
     import logging
     logging.getLogger(__name__).warning(f"Échec de l'importation du correctif d'actions: {e}")
+
+from .post_init_hook import post_init_hook
+from .run_diagnostics import fix_tickets_visibility
+
+from . import utils
+
+def run_fix_tickets():
+    """Fonction appelée après le chargement du module pour corriger les tickets dans le portail"""
+    import logging
+    from odoo import api, SUPERUSER_ID
+    import odoo
+    
+    _logger = logging.getLogger(__name__)
+    _logger.info("Exécution de la correction des tickets du portail...")
+    
+    try:
+        # Exécuter directement la correction dans l'environnement actuel
+        cr = odoo.registry(odoo.service.db.list_dbs()[0]).cursor()
+        try:
+            env = api.Environment(cr, SUPERUSER_ID, {})
+            from .run_diagnostics import fix_tickets_visibility
+            fix_tickets_visibility(env)
+            # Valider les modifications
+            cr.commit()
+            _logger.info("Correction des tickets terminée avec succès")
+        finally:
+            cr.close()
+    except Exception as e:
+        _logger.error(f"Erreur lors de la correction des tickets: {str(e)}")
 
 def post_init_hook(env):
     """Post-installation hook pour configurer automatiquement certains éléments"""

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Désactivation des menus dupliqués par ID -->
+    
+    <!-- Méthode alternative: désactiver directement les menus dupliqués connus par ID -->
+    <!-- Nous désactivons les menus du fichier views/menus.xml qui dupliquent ceux de it_park_menus.xml -->
+    
+    <!-- Désactivation du menu Logiciels dupliqué -->
+    <record id="it__park.menu_it_software" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    
+    <!-- Désactivation du menu Licences dupliqué -->
+    <record id="it__park.menu_it_licenses" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    
+    <!-- Désactivation du menu Contrats dupliqué -->
+    <record id="it__park.menu_it_contracts" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    
+    <!-- Désactivation du menu Tickets IT dupliqué -->
+    <record id="it__park.menu_it_tickets" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    
+    <!-- Désactivation du menu Incidents dupliqué -->
+    <record id="it__park.menu_it_incidents" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    
+    <!-- Désactivation du menu Interventions dupliqué -->
+    <record id="it__park.menu_it_interventions" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    
+    <!-- Désactivation du menu Tickets Helpdesk dupliqué -->
+    <record id="it__park.menu_helpdesk_tickets" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    
+    <!-- Rafraîchir le cache des menus avec la syntaxe correcte -->
+    <function model="ir.ui.menu" name="clear_caches" eval="[]"/>
+</odoo> 

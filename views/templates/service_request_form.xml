@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="it_service_request_form" name="Demande de services informatiques">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow">
+                            <div class="card-header bg-primary text-white">
+                                <h2 class="m-0">Demande de services informatiques</h2>
+                            </div>
+                            <div class="card-body p-4">
+                                <p class="lead">Complétez le formulaire ci-dessous pour nous faire part de vos besoins en services informatiques.</p>
+                                
+                                <form action="/web/it_service_request/submit" method="post" class="mt-4" enctype="multipart/form-data">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    
+                                    <h4 class="mb-3">Informations sur votre entreprise</h4>
+                                    
+                                    <div class="form-group mb-3">
+                                        <label for="company_size" class="form-label">Taille de l'entreprise</label>
+                                        <select name="company_size" id="company_size" class="form-select">
+                                            <option value="small">Petite (1-10 employés)</option>
+                                            <option value="medium">Moyenne (11-50 employés)</option>
+                                            <option value="large">Grande (51-250 employés)</option>
+                                            <option value="enterprise">Très grande (251+ employés)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group mb-3">
+                                        <label for="site_count" class="form-label">Nombre de sites</label>
+                                        <input type="number" name="site_count" id="site_count" class="form-control" min="1" value="1"/>
+                                    </div>
+                                    
+                                    <div class="form-group mb-3">
+                                        <label for="employee_count" class="form-label">Nombre d'employés</label>
+                                        <input type="number" name="employee_count" id="employee_count" class="form-control" min="1" value="1"/>
+                                    </div>
+                                    
+                                    <h4 class="mb-3 mt-4">Services requis</h4>
+                                    <p>Sélectionnez les services dont vous avez besoin :</p>
+                                    
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" name="services[]" id="service_maintenance" value="maintenance" class="form-check-input"/>
+                                        <label for="service_maintenance" class="form-check-label">Maintenance informatique</label>
+                                    </div>
+                                    
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" name="services[]" id="service_network" value="network" class="form-check-input"/>
+                                        <label for="service_network" class="form-check-label">Gestion réseau</label>
+                                    </div>
+                                    
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" name="services[]" id="service_security" value="security" class="form-check-input"/>
+                                        <label for="service_security" class="form-check-label">Sécurité informatique</label>
+                                    </div>
+                                    
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" name="services[]" id="service_cloud" value="cloud" class="form-check-input"/>
+                                        <label for="service_cloud" class="form-check-label">Services Cloud</label>
+                                    </div>
+                                    
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" name="services[]" id="service_support" value="support" class="form-check-input"/>
+                                        <label for="service_support" class="form-check-label">Support technique</label>
+                                    </div>
+                                    
+                                    <div class="form-check mb-4">
+                                        <input type="checkbox" name="services[]" id="service_backup" value="backup" class="form-check-input"/>
+                                        <label for="service_backup" class="form-check-label">Sauvegarde de données</label>
+                                    </div>
+                                    
+                                    <h4 class="mb-3 mt-4">Informations complémentaires</h4>
+                                    
+                                    <div class="form-group mb-3">
+                                        <label for="expected_start_date" class="form-label">Date de début souhaitée</label>
+                                        <input type="date" name="expected_start_date" id="expected_start_date" class="form-control"/>
+                                    </div>
+                                    
+                                    <div class="form-group mb-4">
+                                        <label for="description" class="form-label">Description de vos besoins</label>
+                                        <textarea name="description" id="description" rows="5" class="form-control"></textarea>
+                                    </div>
+                                    
+                                    <div class="alert alert-info mb-4">
+                                        <i class="fa fa-info-circle"></i> En soumettant ce formulaire, vous acceptez d'être contacté par notre équipe pour discuter de vos besoins spécifiques.
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary btn-lg">Soumettre ma demande</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section descriptive en bas de page -->
+            <section class="bg-light py-5 mt-5">
+                <div class="container">
+                    <h3 class="text-center mb-4">Designed for companies</h3>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <p class="text-center mb-5">
+                                We are a team of passionate people whose goal is to improve everyone's life through disruptive products. 
+                                We build great products to solve your business problems. 
+                                Our products are designed for small to medium size companies willing to optimize their performance.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Footer personnalisé -->
+            <footer class="bg-dark text-white py-4 mt-auto">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>My Company</h5>
+                            <p>
+                                250 Executive Park Blvd, Suite 3400<br/>
+                                San Francisco CA 94134<br/>
+                                United States<br/>
+                            </p>
+                            <p>
+                                <i class="fa fa-phone"></i> +1 555-555-5556<br/>
+                                <i class="fa fa-envelope"></i> hello@mycompany.com
+                            </p>
+                        </div>
+                        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                            <p>Copyright © Company name</p>
+                            <p class="small">Powered by Odoo - Create a free website</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </t>
+    </template>
+    
+    <!-- Template pour l'affichage des détails d'une demande de service -->
+    <template id="it_service_request_detail" name="Détails de la demande de service">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow">
+                            <div class="card-header bg-primary text-white">
+                                <h2 class="m-0">Détails de votre demande</h2>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="alert alert-info mb-4">
+                                    <strong>État de la demande: </strong>
+                                    <span t-if="service_request.state == 'draft'" class="badge badge-secondary">Brouillon</span>
+                                    <span t-if="service_request.state == 'submitted'" class="badge badge-info">Soumise</span>
+                                    <span t-if="service_request.state == 'under_review'" class="badge badge-primary">En cours d'analyse</span>
+                                    <span t-if="service_request.state == 'proposal_sent'" class="badge badge-warning">Proposition envoyée</span>
+                                    <span t-if="service_request.state == 'proposal_accepted'" class="badge badge-success">Proposition acceptée</span>
+                                    <span t-if="service_request.state == 'invoiced'" class="badge badge-info">Facturée</span>
+                                    <span t-if="service_request.state == 'paid'" class="badge badge-success">Payée</span>
+                                    <span t-if="service_request.state == 'completed'" class="badge badge-success">Terminée</span>
+                                    <span t-if="service_request.state == 'canceled'" class="badge badge-danger">Annulée</span>
+                                </div>
+                                
+                                <h4 class="mb-3">Informations sur votre entreprise</h4>
+                                <div class="row mb-4">
+                                    <div class="col-md-4">
+                                        <strong>Taille de l'entreprise:</strong>
+                                        <p t-esc="service_request.company_size"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Nombre de sites:</strong>
+                                        <p t-esc="service_request.site_count"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Nombre d'employés:</strong>
+                                        <p t-esc="service_request.employee_count"/>
+                                    </div>
+                                </div>
+                                
+                                <h4 class="mb-3">Services demandés</h4>
+                                <div class="mb-4">
+                                    <ul>
+                                        <t t-foreach="service_request.services_needed" t-as="service">
+                                            <li t-esc="service.name"/>
+                                        </t>
+                                    </ul>
+                                </div>
+                                
+                                <h4 class="mb-3">Description de vos besoins</h4>
+                                <div class="mb-4 p-3 bg-light rounded">
+                                    <p t-esc="service_request.description"/>
+                                </div>
+                                
+                                <div t-if="service_request.state == 'proposal_sent'">
+                                    <h4 class="mb-3">Proposition commerciale</h4>
+                                    <div class="alert alert-warning">
+                                        <p><strong>Une proposition commerciale vous a été envoyée.</strong></p>
+                                        <p>Veuillez l'examiner et nous faire part de votre décision.</p>
+                                    </div>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-md-6">
+                                            <a t-if="service_request.proposal_attachment_id" 
+                                               t-att-href="'/web/it_service_request/%s/download_proposal' % service_request.id" 
+                                               class="btn btn-info btn-block">
+                                                <i class="fa fa-download"></i> Télécharger la proposition
+                                            </a>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="btn-group w-100">
+                                                <a t-att-href="'/web/it_service_request/%s/accept' % service_request.id" 
+                                                   class="btn btn-success">
+                                                    <i class="fa fa-check"></i> Accepter
+                                                </a>
+                                                <a t-att-href="'/web/it_service_request/%s/reject' % service_request.id" 
+                                                   class="btn btn-danger">
+                                                    <i class="fa fa-times"></i> Refuser
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div t-if="service_request.state == 'paid'">
+                                    <div class="alert alert-success mb-4">
+                                        <h4><i class="fa fa-check-circle"></i> Paiement effectué</h4>
+                                        <p>Merci pour votre paiement. Votre contrat a été créé et notre équipe vous contactera prochainement pour planifier le début des prestations.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Template pour la page de simulation de paiement -->
+    <template id="it_service_request_payment_simulation" name="Simulation de paiement">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow">
+                            <div class="card-header bg-primary text-white">
+                                <h2 class="m-0">Paiement de votre commande</h2>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-4">
+                                    <div class="progress mb-3">
+                                        <div class="progress-bar" role="progressbar" t-att-style="'width: ' + str(progress_step) + '%'" 
+                                             t-att-aria-valuenow="progress_step" aria-valuemin="0" aria-valuemax="100">
+                                             <t t-esc="progress_text"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <h4 class="mb-3">Récapitulatif de la commande</h4>
+                                <div class="table-responsive mb-4">
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                            <tr>
+                                                <th>Service</th>
+                                                <th class="text-end">Prix</th>
+                                            </tr>
+                                            <t t-foreach="service_request.services_needed" t-as="service">
+                                                <tr>
+                                                    <td t-esc="service.name"/>
+                                                    <td class="text-end">€ 
+                                                        <t t-if="service.has_fixed_price" t-esc="service.fixed_price"/>
+                                                        <t t-elif="service.has_user_price" t-esc="service.price_per_user"/>
+                                                        <t t-elif="service.has_equipment_price" t-esc="service.price_per_equipment"/>
+                                                        <t t-else="" t-esc="service.base_price"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                            <tr class="table-active">
+                                                <th>Total</th>
+                                                <th class="text-end">€ <t t-esc="service_request.total_amount"/></th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <form t-attf-action="/web/it_service_request/#{service_request.id}/simulate_payment" method="post" class="mt-4">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    
+                                    <h4 class="mb-3">Informations de paiement</h4>
+                                    <div class="alert alert-warning mb-4">
+                                        <i class="fa fa-info-circle"></i> Ceci est une simulation. Aucun paiement réel ne sera effectué.
+                                    </div>
+                                    
+                                    <div class="form-group mb-3">
+                                        <label for="card_number" class="form-label">Numéro de carte</label>
+                                        <input type="text" id="card_number" name="card_number" class="form-control" placeholder="1234 5678 9012 3456" value="4242 4242 4242 4242" readonly="readonly"/>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="expiry_date" class="form-label">Date d'expiration</label>
+                                            <input type="text" id="expiry_date" name="expiry_date" class="form-control" placeholder="MM/YY" value="12/25" readonly="readonly"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="security_code" class="form-label">Code de sécurité</label>
+                                            <input type="text" id="security_code" name="security_code" class="form-control" placeholder="123" value="123" readonly="readonly"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group mb-4">
+                                        <label for="cardholder_name" class="form-label">Nom du titulaire</label>
+                                        <input type="text" id="cardholder_name" name="cardholder_name" class="form-control" placeholder="John Doe" value="Simulation Client" readonly="readonly"/>
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary btn-lg">Effectuer le paiement</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Template pour la page de confirmation de paiement -->
+    <template id="it_service_request_payment_confirmation" name="Confirmation de paiement">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow">
+                            <div class="card-header bg-success text-white">
+                                <h2 class="m-0">Paiement confirmé</h2>
+                            </div>
+                            <div class="card-body p-4 text-center">
+                                <i class="fa fa-check-circle fa-5x text-success mb-4"></i>
+                                <h3 class="mb-4">Votre paiement a bien été effectué</h3>
+                                
+                                <div class="mb-4">
+                                    <div class="progress mb-3">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%" 
+                                             aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                             <t t-esc="progress_text"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-success mb-4">
+                                    <h4><i class="fa fa-unlock-alt me-2"></i> Accès complet débloqué !</h4>
+                                    <p class="mb-0">Vous avez maintenant accès à toutes les fonctionnalités de votre parc informatique. Vous pouvez désormais gérer vos équipements, suivre vos tickets, consulter vos contrats et bien plus encore.</p>
+                                </div>
+                                
+                                <p class="lead">Merci pour votre confiance !</p>
+                                <p>Votre contrat a été créé et notre équipe vous contactera prochainement pour planifier le début des prestations.</p>
+                                
+                                <div class="mt-4">
+                                    <a href="/my/home" class="btn btn-primary btn-lg">
+                                        <i class="fa fa-home me-2"></i>Accéder à votre espace client
+                                    </a>
+                                    <a t-if="service_request.contract_id" t-attf-href="/my/contracts/#{service_request.contract_id.id}" class="btn btn-outline-primary btn-lg ms-2">
+                                        <i class="fa fa-file-contract me-2"></i>Voir le contrat
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo> 

@@ -34,8 +34,8 @@
             <notebook position="inside">
                 <page string="SLA IT" name="it_sla" invisible="not sla_deadline">
                     <group>
-                        <field name="sla_deadline"/>
-                        <field name="sla_reached_date"/>
+                    <field name="sla_deadline"/>
+                    <field name="sla_reached_date"/>
                     </group>
                     <p class="text-muted" invisible="not it_incident_id">
                         Le SLA est défini par la politique SLA associée à l'incident IT.

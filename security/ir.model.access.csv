@@ -72,3 +72,15 @@ access_it_contract_type_portal,it.contract.type.portal,model_it_contract_type,ba
 access_it_sla_user,it.sla.user,model_it_sla,it__park.group_it_park_user,1,0,0,0
 access_it_sla_manager,it.sla.manager,model_it_sla,it__park.group_it_park_manager,1,1,1,1
 access_it_sla_portal,it.sla.portal,model_it_sla,base.group_portal,1,0,0,0
+access_it_portal_user_wizard_manager,it.portal.user.wizard,model_it_portal_user_wizard,it__park.group_it_park_manager,1,1,1,0
+access_it_service_type_manager,it.service.type,model_it_service_type,it__park.group_it_park_manager,1,1,1,1
+access_it_service_type_user,it.service.type,model_it_service_type,it__park.group_it_park_user,1,0,0,0
+access_it_service_type_customer,it.service.type,model_it_service_type,base.group_portal,1,0,0,0
+access_it_service_request_manager,it.service.request,model_it_service_request,it__park.group_it_park_manager,1,1,1,1
+access_it_service_request_user,it.service.request,model_it_service_request,it__park.group_it_park_user,1,1,1,0
+access_it_service_request_customer,it.service.request,model_it_service_request,base.group_portal,1,1,0,0
+access_it_service_proposal_wizard_manager,it.service.proposal.wizard,model_it_service_proposal_wizard,it__park.group_it_park_manager,1,1,1,0
+access_it_service_proposal_wizard_user,it.service.proposal.wizard,model_it_service_proposal_wizard,it__park.group_it_park_user,1,1,1,0
+access_it_ticket_category_user,it.ticket.category.user,model_it_ticket_category,base.group_user,1,0,0,0
+access_it_ticket_category_manager,it.ticket.category.manager,model_it_ticket_category,it__park.group_it_park_manager,1,1,1,1
+access_it_ticket_category_portal,it.ticket.category.portal,model_it_ticket_category,base.group_portal,1,0,0,0

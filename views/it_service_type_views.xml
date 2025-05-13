@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_it_service_type_tree" model="ir.ui.view">
+        <field name="name">it.service.type.tree</field>
+        <field name="model">it.service.type</field>
+        <field name="arch" type="xml">
+            <list string="Service Types">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="billing_type"/>
+                <field name="base_price"/>
+                <field name="currency_id"/>
+                <field name="request_count"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_it_service_type_form" model="ir.ui.view">
+        <field name="name">it.service.type.form</field>
+        <field name="model">it.service.type</field>
+        <field name="arch" type="xml">
+            <form string="Service Type">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                        <button name="action_view_requests" type="object" class="oe_stat_button" icon="fa-list">
+                            <field name="request_count" widget="statinfo" string="Requests"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="e.g. Server Maintenance"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="billing_type"/>
+                            <field name="base_price"/>
+                            <field name="currency_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="requires_contract"/>
+                            <field name="requires_approval"/>
+                            <field name="requires_payment"/>
+                            <field name="min_contract_duration" invisible="not requires_contract"/>
+                            <field name="notice_period" invisible="not requires_contract"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Detailed description of the service..."/>
+                        </page>
+                        <page string="Documents" invisible="not requires_contract">
+                            <group>
+                                <field name="required_documents" widget="many2many_tags"/>
+                                <field name="document_checklist" placeholder="List of required documents and their specifications..."/>
+                            </group>
+                        </page>
+                        <page string="Service Level Agreement">
+                            <group>
+                                <field name="sla_id"/>
+                                <field name="response_time"/>
+                                <field name="resolution_time"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_it_service_type_search" model="ir.ui.view">
+        <field name="name">it.service.type.search</field>
+        <field name="model">it.service.type</field>
+        <field name="arch" type="xml">
+            <search string="Search Service Types">
+                <field name="name"/>
+                <field name="code"/>
+                <separator/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Billing Type" name="billing_type" context="{'group_by': 'billing_type'}"/>
+                    <filter string="Contract Required" name="requires_contract" context="{'group_by': 'requires_contract'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_it_service_type" model="ir.actions.act_window">
+        <field name="name">Service Types</field>
+        <field name="res_model">it.service.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first service type
+            </p>
+            <p>
+                Define the different types of IT services you offer to your clients.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_it_service_type"
+              name="Service Types"
+              parent="it__park.menu_it_park_configuration"
+              action="action_it_service_type"
+              sequence="20"/>
+</odoo> 

@@ -1,43 +1,236 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <data noupdate="1">
-        <!-- Template pour les notifications de nouveau ticket -->
-        <record id="email_template_new_ticket_notification" model="mail.template">
-            <field name="name">Notification de nouveau ticket</field>
-            <field name="model_id" ref="model_it_ticket"/>
-            <field name="subject">Nouveau ticket IT: {{ object.name }}</field>
-            <field name="email_from">{{ user.email_formatted }}</field>
-            <field name="partner_to">{{ object.client_id.id }}</field>
-            <field name="body_html" type="html">
-                <div style="margin: 0px; padding: 0px; font-size: 13px;">
-                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
-                        Bonjour,
-                        <br/><br/>
-                        Un nouveau ticket IT a été créé.
-                        <br/><br/>
-                        <strong>Ticket:</strong> {{ object.reference }} - {{ object.name }}<br/>
-                        <strong>Client:</strong> {{ object.client_id.name }}<br/>
-                        <strong>Priorité:</strong> {{ object.get_priority_display() }}<br/>
-                        <strong>Créé le:</strong> {{ format_datetime(object.date_created, tz=user.tz) }}<br/>
-                        <br/>
-                        <strong>Description:</strong><br/>
-                        {{ object.description }}
-                        <br/><br/>
-                        Vous pouvez voir ce ticket en cliquant sur le lien suivant:
-                        <div style="margin: 16px 0px 16px 0px;">
-                            <a href="/web#id={{ object.id }}&amp;model=it.ticket&amp;view_type=form"
-                               style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
-                                Voir le ticket
-                            </a>
-                        </div>
-                        <br/><br/>
-                        Cordialement,<br/>
-                        L'équipe Support IT
-                    </p>
+  <data noupdate="1">
+    <!-- Template pour les notifications de nouveau ticket -->
+    <record id="email_template_new_ticket_notification" model="mail.template">
+      <field name="name">Notification de nouveau ticket</field>
+      <field name="model_id" ref="model_it_ticket"/>
+      <field name="subject">Nouveau ticket IT: <t t-out="object.name"/></field>
+      <field name="email_from">
+        <t t-out="user.email_formatted"/>
+      </field>
+      <field name="partner_to">
+        <t t-out="object.client_id.id"/>
+      </field>
+      <field name="body_html" type="html">
+        <div style="margin: 0px; padding: 0px; font-size: 13px;">
+          <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                      Bonjour,
+                      <br/><br/>
+                      Un nouveau ticket IT a été créé.
+                      <br/><br/>
+                      <strong>Ticket:</strong> <t t-out="object.reference"/> - <t t-out="object.name"/><br/>
+                      <strong>Client:</strong> <t t-out="object.client_id.name"/><br/>
+                      <strong>Priorité:</strong> <t t-if="object.priority == '0'">Basse</t>
+                                                         <t t-elif="object.priority == '1'">Normale</t>
+                                                         <t t-elif="object.priority == '2'">Haute</t>
+                                                         <t t-elif="object.priority == '3'">Urgente</t><br/>
+                      <strong>Créé le:</strong> <t t-out="format_datetime(object.date_created, tz=user.tz)"/><br/>
+                      <br/>
+                      <strong>Description:</strong><br/>
+                      <t t-out="object.description"/>
+                      <br/><br/>
+                      Vous pouvez voir ce ticket en cliquant sur le lien suivant:
+                      <div style="margin: 16px 0px 16px 0px;"><a t-attf-href="/my/tickets/${object.id}" style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+                              Voir le ticket
+                          </a></div>
+                      <br/><br/>
+                      Cordialement,<br/>
+                      L'équipe Support IT
+                  </p>
+        </div>
+      </field>
+      <field name="lang">
+        <t t-out="object.client_id.lang"/>
+      </field>
+      <field name="auto_delete" eval="True"/>
+    </record>
+    <!-- Template pour notification de proposition commerciale -->
+    <record id="email_template_service_proposal" model="mail.template">
+      <field name="name">Proposition commerciale disponible</field>
+      <field name="model_id" ref="model_it_service_request"/>
+      <field name="subject">Proposition commerciale pour votre demande de prestation <t t-out="object.name"/></field>
+      <field name="partner_to">
+        <t t-out="object.partner_id.id"/>
+      </field>
+      <field name="lang">
+        <t t-out="object.partner_id.lang"/>
+      </field>
+      <field name="body_html" type="html">
+        <div style="margin: 0px; padding: 0px; font-size: 14px;">
+          <p>Bonjour <t t-out="object.partner_id.name"/>,</p>
+          <p>Nous avons le plaisir de vous informer qu'une proposition commerciale est maintenant disponible pour votre demande de prestation <strong><t t-out="object.name"/></strong>.</p>
+          <p>Vous pouvez consulter cette proposition en vous connectant à votre espace client et en accédant à votre demande de prestation.</p>
+          <p>Si la proposition vous convient, vous pouvez l'accepter directement depuis votre espace client.</p>
+          <p>Lien direct : <a t-att-href="'/web/it_service_request/%s' % object.id">Voir la proposition</a></p>
+          <p>N'hésitez pas à nous contacter si vous avez des questions.</p>
+          <p>Cordialement,</p>
+          <p>L'équipe <t t-out="object.company_id.name"/></p>
+        </div>
+      </field>
+      <field name="auto_delete" eval="True"/>
+    </record>
+    <!-- Email template pour la confirmation d'inscription -->
+    <record id="email_template_client_registration" model="mail.template">
+      <field name="name">IT Park: Confirmation d'inscription</field>
+      <field name="model_id" ref="base.model_res_partner"/>
+      <field name="subject">Bienvenue chez IT Park - Confirmation de votre demande d'inscription</field>
+      <field name="email_from">
+        <t t-out="user.email_formatted"/>
+      </field>
+      <field name="email_to">
+        <t t-out="ctx.get('email_to')"/>
+      </field>
+      <field name="lang">
+        <t t-out="object.lang"/>
+      </field>
+      <field name="body_html" type="html">
+        <div style="margin: 0px; padding: 0px; background-color: #f2f2f2;">
+          <table style="width:100%; background-color: #ffffff; border-collapse:separate;">
+            <tr>
+              <td align="center">
+                <table style="width: 600px; margin: 0px auto; background-color: white; border: 1px solid #e1e1e1; border-radius: 5px; font-family: Arial,Helvetica,sans-serif; color: #454748;">
+                  <tr>
+                    <td style="padding: 20px; text-align: center;">
+                      <img src="/logo.png" style="max-width: 150px; height: auto;" alt="Logo"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 20px;">
+                      <h2 style="color: #3f4185; margin-top: 0;">Confirmation de votre demande d'inscription</h2>
+                      <p style="margin-top: 20px;">Bonjour <strong><t t-out="ctx.get('client_name')"/></strong>,</p>
+                      <p>Nous avons bien reçu votre demande d'inscription à notre plateforme de gestion de parc informatique.</p>
+                      <p>Notre équipe va examiner votre demande et vous contactera dans les plus brefs délais pour finaliser votre inscription et configurer votre compte.</p>
+                      <p>Une fois votre compte validé, vous recevrez vos identifiants de connexion pour accéder à tous nos services.</p>
+                      <div style="margin: 30px 0; text-align: center;">
+                        <span style="padding: 10px 20px; background-color: #3f4185; color: white; border-radius: 5px; text-decoration: none; font-weight: bold;">Demande en cours de traitement</span>
+                      </div>
+                      <p>Merci de votre confiance,</p>
+                      <p>L'équipe IT Park</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 20px; text-align: center; background-color: #f8f8f8; color: #888888; font-size: 12px;">
+                      <p>Ceci est un message automatique, merci de ne pas y répondre directement.</p>
+                      <p>Pour toute question, contactez-nous à <a href="mailto:support@it-services.com">support@it-services.com</a></p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </field>
+      <field name="auto_delete" eval="True"/>
+    </record>
+    <!-- Email template pour la validation d'email -->
+    <record id="email_template_client_email_validation" model="mail.template">
+      <field name="name">IT Park: Validation de votre adresse email</field>
+      <field name="model_id" ref="base.model_res_partner"/>
+      <field name="subject">IT Park - Confirmez votre adresse email</field>
+      <field name="email_from">
+        <t t-out="object.company_id.email"/>
+      </field>
+      <field name="email_to">
+        <t t-out="ctx.get('email_to')"/>
+      </field>
+      <field name="lang">
+        <t t-out="object.lang"/>
+      </field>
+      <field name="body_html" type="html">
+        <div style="margin: 0px; padding: 0px; background-color: #f2f2f2;">
+          <table style="width:100%; max-width: 600px; margin: 0 auto; background-color: white; border-collapse: separate; border-spacing: 0; border-radius: 8px; overflow: hidden; font-family: Arial, sans-serif;">
+            <!-- En-tête -->
+            <tr>
+              <td style="padding: 30px 40px; background-color: #3f4185; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 28px;">Validation de votre compte</h1>
+              </td>
+            </tr>
+            <!-- Contenu principal -->
+            <tr>
+              <td style="padding: 40px;">
+                <p style="margin-top: 0; font-size: 16px; color: #333333;">
+                                  Bonjour <strong><t t-out="ctx.get('client_name')"/></strong>,
+                              </p>
+                <p style="font-size: 16px; color: #333333; line-height: 1.5;">
+                                  Merci pour votre inscription à notre plateforme de gestion de parc informatique.
+                                  Pour finaliser votre inscription et activer votre compte, veuillez cliquer sur le bouton ci-dessous :
+                              </p>
+                <!-- Bouton de validation -->
+                <div style="text-align: center; margin: 30px 0;">
+                  <a t-att-href="ctx.get('validation_url')" style="display: inline-block; padding: 14px 30px; background-color: #3f4185; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+                                      Valider mon adresse email
+                                  </a>
                 </div>
-            </field>
-            <field name="lang">{{ object.client_id.lang }}</field>
-            <field name="auto_delete" eval="True"/>
-        </record>
-    </data>
-</odoo> 
+                <p style="font-size: 14px; color: #666666;">
+                                  Si le bouton ne fonctionne pas, vous pouvez copier et coller le lien suivant dans votre navigateur :
+                              </p>
+                <p style="font-size: 14px; color: #666666; word-break: break-all; background-color: #f8f9fa; padding: 10px; border-radius: 4px;">
+                  <t t-out="ctx.get('validation_url')"/>
+                </p>
+                <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 4px;">
+                  <p style="margin: 0 0 10px 0; font-size: 16px; color: #333333;">
+                    <strong>Prochaines étapes :</strong>
+                  </p>
+                  <ol style="margin: 0; padding-left: 20px; color: #666666;">
+                    <li style="margin-bottom: 8px;">Cliquez sur le lien de validation ci-dessus</li>
+                    <li style="margin-bottom: 8px;">Votre compte sera examiné par notre équipe (24-48h)</li>
+                    <li style="margin-bottom: 8px;">Vous recevrez vos identifiants de connexion</li>
+                    <li>Vous pourrez accéder à tous nos services</li>
+                  </ol>
+                </div>
+                <p style="margin-top: 30px; font-size: 16px; color: #333333;">
+                                  Cordialement,<br/>
+                                  L'équipe IT Park
+                              </p>
+              </td>
+            </tr>
+            <!-- Pied de page -->
+            <tr>
+              <td style="padding: 20px; background-color: #f8f9fa; text-align: center; font-size: 12px; color: #666666;">
+                <p style="margin: 0 0 10px 0;">
+                                  Ce message est envoyé automatiquement, merci de ne pas y répondre.
+                              </p>
+                <p style="margin: 0;">
+                                  Pour toute question, contactez-nous à 
+                                  <a t-att-href="'mailto:' + object.company_id.email" style="color: #3f4185; text-decoration: none;"><t t-out="object.company_id.email"/></a>
+                              </p>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </field>
+      <field name="auto_delete" eval="True"/>
+    </record>
+    <!-- Email template pour re-envoyer une proposition commerciale -->
+    <record id="email_template_service_proposal_resend" model="mail.template">
+      <field name="name">IT Park: Proposition Commerciale</field>
+      <field name="model_id" ref="it__park.model_it_service_request"/>
+      <field name="subject">Proposition commerciale - <t t-out="object.name"/></field>
+      <field name="email_from">
+        <t t-out="object.company_id.email or user.email_formatted"/>
+      </field>
+      <field name="partner_to">
+        <t t-out="object.partner_id.id"/>
+      </field>
+      <field name="body_html" type="html">
+        <div style="margin: 0px; padding: 0px; font-size: 13px;">
+          <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                      Bonjour <t t-out="object.partner_id.name"/>,
+                      <br/><br/>
+                      Suite à votre demande, veuillez trouver ci-joint notre proposition commerciale pour votre demande de prestation <t t-out="object.name"/>.
+                      <br/><br/>
+                      N'hésitez pas à nous contacter pour toute question complémentaire.
+                      <br/><br/>
+                      Cordialement,<br/>
+                      L'équipe IT Park
+                  </p>
+        </div>
+      </field>
+      <field name="lang">
+        <t t-out="object.partner_id.lang"/>
+      </field>
+      <field name="auto_delete" eval="True"/>
+    </record>
+  </data>
+</odoo>

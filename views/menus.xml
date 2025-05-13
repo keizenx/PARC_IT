@@ -52,31 +52,37 @@
         </field>
     </record>
 
-    <!-- Menu principal du portail IT -->
+    <!-- Menu principal du portail IT - nom complètement différent -->
     <menuitem id="menu_it_portal_root"
-              name="Support IT"
+              name="Espace Client IT"
               sequence="50"
               web_icon="it__park,static/description/icon.png"
               groups="base.group_portal"/>
 
-    <!-- Sous-menu Tickets -->
+    <!-- Sous-menu Tickets avec nom différent -->
     <menuitem id="menu_it_portal_tickets"
               name="Mes Tickets"
               parent="menu_it_portal_root"
               action="action_it_portal_tickets"
               sequence="10"/>
 
-    <!-- Sous-menu Équipements -->
+    <!-- Sous-menu Équipements avec nom différent -->
     <menuitem id="menu_it_portal_equipment"
-              name="Mon Parc"
+              name="Mon Parc Informatique"
               parent="menu_it_portal_root"
               action="action_it_portal_equipment"
               sequence="20"/>
 
-    <!-- Sous-menu Contrats -->
+    <!-- Sous-menu Contrats avec nom différent -->
     <menuitem id="menu_it_portal_contracts"
               name="Mes Contrats"
               parent="menu_it_portal_root"
               action="action_it_portal_contracts"
               sequence="30"/>
+
+    <menuitem id="menu_it_clients_pending"
+              name="Clients IT en attente"
+              parent="menu_it_portal_root"
+              action="action_it_clients_pending"
+              sequence="40"/>
 </odoo> 

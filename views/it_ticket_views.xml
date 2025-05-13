@@ -39,7 +39,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="client_id"/>
+                            <field name="client_id" domain="[('is_it_client', '=', True), ('is_company', '=', True)]" options="{'no_create': True}"/>
+                            <field name="partner_id" string="Contact" help="Contact spécifique pour ce ticket (peut être différent du client principal)" domain="['|', ('id', '=', client_id), ('parent_id', '=', client_id)]"/>
                             <field name="equipment_id"/>
                             <field name="tech_id"/>
                         </group>
@@ -231,6 +232,7 @@
         name="Tickets"
         parent="menu_it_park_root"
         action="action_it_tickets"
+        active="false"
         sequence="20"/>
         
     <!-- Menu pour la vue Tickets IT dans la section Support -->
@@ -240,4 +242,96 @@
         parent="menu_it_support"
         action="action_it_tickets_support"
         sequence="5"/>
+
+    <!-- Vues pour les catégories de tickets -->
+    <record id="view_it_ticket_category_tree" model="ir.ui.view">
+        <field name="name">it.ticket.category.tree</field>
+        <field name="model">it.ticket.category</field>
+        <field name="arch" type="xml">
+            <list string="Catégories de tickets">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="parent_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_it_ticket_category_form" model="ir.ui.view">
+        <field name="name">it.ticket.category.form</field>
+        <field name="model">it.ticket.category</field>
+        <field name="arch" type="xml">
+            <form string="Catégorie de ticket">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <widget name="web_ribbon" title="Archivé" bg_color="bg-danger" invisible="active"/>
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="parent_id"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Description détaillée de la catégorie..."/>
+                        </page>
+                        <page string="Sous-catégories" invisible="not child_ids">
+                            <field name="child_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_it_ticket_category" model="ir.actions.act_window">
+        <field name="name">Catégories de tickets</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">it.ticket.category</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre première catégorie de ticket !
+            </p>
+            <p>
+                Les catégories permettent d'organiser et de classer les tickets par type de demande.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu racine IT Park -->
+    <menuitem id="menu_it_park_root" 
+              name="IT Park" 
+              web_icon="it__park,static/description/icon.png" 
+              sequence="10"/>
+
+    <!-- Menu Configuration -->
+    <menuitem id="menu_it_configuration" 
+              name="Configuration" 
+              parent="menu_it_park_root" 
+              sequence="100"/>
+
+    <!-- Menu Catégories de tickets -->
+    <menuitem id="menu_it_ticket_category" 
+              name="Catégories de tickets" 
+              parent="menu_it_configuration" 
+              action="action_it_ticket_category" 
+              sequence="20"/>
 </odoo> 

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
 <!--
@@ -21,4 +22,164 @@
         </template>
 -->
     </data>
+
+    <!-- Template pour l'erreur de validation d'email -->
+    <template id="email_validation_error" name="Erreur de validation email">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="fa fa-exclamation-circle text-danger fa-4x mb-3"/>
+                                <h2 class="card-title text-danger">Erreur de validation</h2>
+                                <p class="card-text" t-esc="error"/>
+                                
+                                <t t-if="show_contact">
+                                    <hr class="my-4"/>
+                                    <p class="text-muted">
+                                        Si vous continuez à rencontrer des problèmes, veuillez contacter notre support :
+                                    </p>
+                                    <a href="mailto:support@example.com" class="btn btn-primary">
+                                        <i class="fa fa-envelope"/> Contacter le support
+                                    </a>
+                                </t>
+                                
+                                <div class="mt-4">
+                                    <a href="/it/inscription" class="btn btn-secondary">
+                                        <i class="fa fa-arrow-left"/> Retour à l'inscription
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Template pour le succès de validation d'email -->
+    <template id="email_validation_success" name="Succès de validation email">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h2 class="m-0">Félicitations !</h2>
+                            </div>
+                            <div class="card-body text-center">
+                                <i class="fa fa-check-circle text-success fa-4x mb-3"/>
+                                <h3 class="card-title text-success">Votre compte a été activé avec succès</h3>
+                                
+                                <p class="card-text mt-3">
+                                    Merci d'avoir validé votre adresse email. Votre compte a été créé et sera examiné par notre équipe.
+                                </p>
+                                
+                                <div class="alert alert-info mt-4" role="alert">
+                                    <i class="fa fa-info-circle"/> Vous recevrez un email dès que votre compte sera approuvé.
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <a href="/" class="btn btn-primary btn-lg">
+                                        <i class="fa fa-home"/> Retour à l'accueil
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Template pour la confirmation d'inscription -->
+    <template id="it_registration_confirmation" name="Confirmation d'inscription">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h3 class="m-0">Inscription réussie</h3>
+                            </div>
+                            <div class="card-body">
+                                <h4>Merci pour votre inscription, <t t-esc="company_name"/>!</h4>
+                                
+                                <div t-if="email_sent" class="alert alert-success mt-3">
+                                    <i class="fa fa-check-circle"></i> Un email de confirmation a été envoyé à <strong t-esc="email"/>.
+                                </div>
+                                
+                                <div t-if="not email_sent" class="alert alert-warning mt-3">
+                                    <i class="fa fa-exclamation-triangle"></i> 
+                                    <t t-if="error_message">
+                                        <p>Nous n'avons pas pu vous envoyer l'email de confirmation : <t t-esc="error_message"/></p>
+                                    </t>
+                                    <t t-else="">
+                                        <p>Nous n'avons pas pu vous envoyer l'email de confirmation. Veuillez contacter notre support.</p>
+                                    </t>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <h5>Prochaines étapes :</h5>
+                                    <ol class="mt-2">
+                                        <li>Vérifiez votre boîte de réception pour l'email de confirmation</li>
+                                        <li>Cliquez sur le lien de validation dans cet email</li>
+                                        <li>Notre équipe examinera votre inscription</li>
+                                        <li>Une fois approuvée, vous recevrez vos identifiants de connexion</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="mt-4 pt-3 border-top">
+                                    <a href="/" class="btn btn-primary">
+                                        <i class="fa fa-home"></i> Retour à l'accueil
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Template pour l'erreur d'inscription -->
+    <template id="it_registration_error" name="Erreur d'inscription">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h3 class="m-0">Erreur d'inscription</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center mb-4">
+                                    <i class="fa fa-exclamation-triangle fa-3x text-danger"></i>
+                                </div>
+                                
+                                <div class="alert alert-danger">
+                                    <p><strong>Une erreur est survenue lors de votre inscription :</strong></p>
+                                    <p t-esc="error_message"></p>
+                                </div>
+                                
+                                <div class="mt-4 text-center">
+                                    <p>Veuillez réessayer ou contacter notre support si le problème persiste.</p>
+                                    
+                                    <div class="mt-4">
+                                        <a href="/it/inscription" class="btn btn-primary mr-2">
+                                            <i class="fa fa-refresh"></i> Réessayer
+                                        </a>
+                                        <a href="/contactus" class="btn btn-secondary">
+                                            <i class="fa fa-envelope"></i> Contacter le support
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
 </odoo>

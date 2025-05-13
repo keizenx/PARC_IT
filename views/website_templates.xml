@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="it_registration_template" name="Inscription Client IT">
+        <t t-call="website.layout">
+            <div class="container mt32 mb32">
+                <div class="row">
+                    <div class="col-lg-8 offset-lg-2">
+                        <h2 class="text-center mb32">Inscription Client IT</h2>
+                        <form action="/it/inscription/submit" method="post" class="s_website_form" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            
+                            <div class="form-group row mb-3">
+                                <label class="col-form-label col-sm-3" for="name">Nom de l'entreprise</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="name" required="required"/>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row mb-3">
+                                <label class="col-form-label col-sm-3" for="email">Email</label>
+                                <div class="col-sm-9">
+                                    <input type="email" class="form-control" name="email" required="required"/>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row mb-3">
+                                <label class="col-form-label col-sm-3" for="phone">Téléphone</label>
+                                <div class="col-sm-9">
+                                    <input type="tel" class="form-control" name="phone"/>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row mb-3">
+                                <label class="col-form-label col-sm-3" for="street">Adresse</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="street"/>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row mb-3">
+                                <label class="col-form-label col-sm-3" for="city">Ville</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="city"/>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row mb-3">
+                                <label class="col-form-label col-sm-3" for="zip">Code postal</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="zip"/>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row mb-3">
+                                <div class="offset-sm-3 col-sm-9">
+                                    <div class="alert alert-info" role="status">
+                                        <i class="fa fa-info-circle"/> En vous inscrivant, vous acceptez nos conditions générales d'utilisation.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row mb-3">
+                                <div class="offset-sm-3 col-sm-9">
+                                    <button type="submit" class="btn btn-primary">S'inscrire</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Template pour le nouveau formulaire d'inscription simple -->
+    <template id="it_registration_simple" name="Inscription Client IT Simplifiée">
+        <t t-call="website.layout">
+            <div class="container mt-5 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow">
+                            <div class="card-body p-5">
+                                <h1 class="text-center mb-4">Inscription Client IT</h1>
+                                
+                                <form action="/it/inscription/submit" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Nom de l'entreprise</label>
+                                        <input type="text" name="name" id="name" class="form-control" required="required"/>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" name="email" id="email" class="form-control" required="required"/>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label">Mot de passe</label>
+                                        <input type="password" name="password" id="password" class="form-control" required="required" minlength="8"/>
+                                        <small class="form-text text-muted">Minimum 8 caractères</small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="confirm_password" class="form-label">Confirmer le mot de passe</label>
+                                        <input type="password" name="confirm_password" id="confirm_password" class="form-control" required="required"/>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="phone" class="form-label">Téléphone</label>
+                                        <input type="tel" name="phone" id="phone" class="form-control"/>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="street" class="form-label">Adresse</label>
+                                        <input type="text" name="street" id="street" class="form-control"/>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="city" class="form-label">Ville</label>
+                                            <input type="text" name="city" id="city" class="form-control"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="zip" class="form-label">Code postal</label>
+                                            <input type="text" name="zip" id="zip" class="form-control"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4 alert alert-info" role="status">
+                                        <i class="fa fa-info-circle"></i> En vous inscrivant, vous acceptez nos conditions générales d'utilisation.
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary px-4 py-2">Créer mon compte</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Template pour la page d'accueil IT -->
+    <template id="it_park_homepage_simple" name="IT Park Homepage">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-4">
+                                <h1 class="text-center mb-4">Gestion de parc informatique</h1>
+                                <p class="lead text-center mb-4">Solution complète pour la gestion de votre infrastructure IT</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card h-100 border-0 shadow-sm">
+                                            <div class="card-body text-center">
+                                                <i class="fa fa-users fa-3x mb-3 text-primary"></i>
+                                                <h3>Accès client</h3>
+                                                <p>Connectez-vous à votre espace client pour gérer vos services et équipements</p>
+                                                <a href="/web/login" class="btn btn-primary mt-2">Connexion</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card h-100 border-0 shadow-sm">
+                                            <div class="card-body text-center">
+                                                <i class="fa fa-user-plus fa-3x mb-3 text-success"></i>
+                                                <h3>Nouveau client ?</h3>
+                                                <p>Créez un compte pour accéder à nos services de gestion de parc informatique</p>
+                                                <a href="/register" class="btn btn-success mt-2">S'inscrire</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-5">
+                                    <h2 class="text-center mb-4">Nos services</h2>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="text-center">
+                                                <i class="fa fa-laptop fa-2x mb-2 text-info"></i>
+                                                <h4>Gestion d'équipements</h4>
+                                                <p>Suivez l'inventaire et l'état de tous vos équipements informatiques</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-center">
+                                                <i class="fa fa-life-ring fa-2x mb-2 text-warning"></i>
+                                                <h4>Support technique</h4>
+                                                <p>Signalement et suivi des incidents et demandes d'assistance</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-center">
+                                                <i class="fa fa-chart-line fa-2x mb-2 text-danger"></i>
+                                                <h4>Tableaux de bord</h4>
+                                                <p>Visualisez les indicateurs clés de votre infrastructure IT</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+        
+    <!-- Template pour la page de confirmation d'inscription -->
+    <template id="it_registration_confirmation" name="Confirmation d'inscription">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow">
+                            <div class="card-body p-5 text-center">
+                                <i class="fa fa-check-circle fa-5x text-success mb-4"></i>
+                                <h1 class="mb-4">Inscription réussie !</h1>
+                                
+                                <t t-if="email_sent">
+                                    <div class="alert alert-success" role="alert">
+                                        <p>Un email de validation a été envoyé à l'adresse <strong t-esc="email"/></p>
+                                        <p class="mb-0">Veuillez vérifier votre boîte de réception et cliquer sur le lien de validation pour activer votre compte.</p>
+                                    </div>
+                                </t>
+                                
+                                <t t-if="not email_sent">
+                                    <div class="alert alert-warning" role="alert">
+                                        <p>Une erreur est survenue lors de l'envoi de l'email de validation.</p>
+                                        <t t-if="error_message">
+                                            <p class="mb-0"><small t-esc="error_message"/></p>
+                                        </t>
+                                        <p class="mb-0">Veuillez contacter le support technique.</p>
+                                    </div>
+                                </t>
+                                
+                                <div class="mt-4">
+                                    <h4>Prochaines étapes :</h4>
+                                    <ol class="text-start">
+                                        <li>Validez votre adresse email en utilisant le lien reçu</li>
+                                        <li>Attendez l'approbation de votre compte (généralement sous 24-48h)</li>
+                                        <li>Recevez vos identifiants de connexion</li>
+                                        <li>Faites une demande de prestation pour définir vos besoins</li>
+                                        <li>Accédez à tous nos services</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <a href="/" class="btn btn-primary">Retour à l'accueil</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Template pour la validation d'email réussie -->
+    <template id="email_validation_success" name="Email Validation Success">
+        <t t-call="website.layout">
+            <div class="container mt-5 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow">
+                            <div class="card-body p-5">
+                                <div class="text-center mb-4">
+                                    <i class="fa fa-check-circle fa-4x text-success"></i>
+                                </div>
+                                
+                                <h1 class="text-center mb-3">Adresse email validée avec succès !</h1>
+                                
+                                <div class="p-4 bg-light rounded mt-4">
+                                    <p>Cher(e) <strong t-out="partner.name"/>,</p>
+                                    
+                                    <p>Votre adresse email a été validée avec succès !</p>
+                                    
+                                    <p>Votre demande d'inscription est désormais en cours d'examen par notre équipe. Une fois votre compte approuvé, vous pourrez accéder à tous nos services de gestion de parc informatique.</p>
+                                    
+                                    <p>Vous recevrez un email de confirmation dès que votre compte sera activé.</p>
+                                </div>
+                                
+                                <div class="text-center mt-4">
+                                    <a href="/web/login" class="btn btn-primary">Aller à la page de connexion</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Template pour les erreurs de validation d'email -->
+    <template id="email_validation_error" name="Email Validation Error">
+        <t t-call="website.layout">
+            <div class="container mt-5 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow">
+                            <div class="card-body p-5">
+                                <div class="text-center mb-4">
+                                    <i class="fa fa-exclamation-circle fa-4x text-danger"></i>
+                                </div>
+                                
+                                <h1 class="text-center mb-3">Erreur de validation</h1>
+                                
+                                <div class="alert alert-danger">
+                                    <p class="mb-0">
+                                        <strong>Erreur :</strong> <span t-out="error"/>
+                                    </p>
+                                </div>
+                                
+                                <div class="p-4 bg-light rounded mt-4">
+                                    <p>Le lien de validation que vous avez utilisé est invalide ou a expiré.</p>
+                                    
+                                    <p>Causes possibles :</p>
+                                    <ul>
+                                        <li>Le lien a expiré (plus de 24 heures)</li>
+                                        <li>L'adresse email a déjà été validée</li>
+                                        <li>Le token de validation est incorrect</li>
+                                    </ul>
+                                    
+                                    <p>Veuillez contacter notre support pour obtenir un nouveau lien de validation.</p>
+                                </div>
+                                
+                                <div class="text-center mt-4">
+                                    <a href="/web/login" class="btn btn-primary">Aller à la page de connexion</a>
+                                    <a href="/" class="btn btn-link">Retour à l'accueil</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Template pour la page d'inscription réussie -->
+    <template id="it_registration_success" name="IT Registration Success">
+        <t t-call="website.layout">
+            <div class="container mt-5 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow">
+                            <div class="card-body p-5">
+                                <div class="text-center mb-4">
+                                    <i class="fa fa-check-circle fa-4x text-success"></i>
+                                </div>
+                                
+                                <h1 class="text-center mb-3">Inscription reçue avec succès !</h1>
+                                
+                                <div class="alert alert-info">
+                                    <p class="mb-0">
+                                        <strong>Important :</strong> Votre compte est actuellement <strong>en attente d'approbation</strong> par notre équipe.
+                                    </p>
+                                </div>
+                                
+                                <div class="p-4 bg-light rounded mt-4">
+                                    <p>Cher(e) <strong t-out="company_name"/>,</p>
+                                    
+                                    <p>Nous vous remercions pour votre inscription à notre plateforme de gestion de parc informatique.</p>
+                                    
+                                    <p>Votre demande d'inscription est en cours d'examen par notre équipe. Une fois votre compte approuvé, vous recevrez un email de confirmation à l'adresse <strong t-out="email"/>, et vous pourrez alors accéder à tous nos services.</p>
+                                    
+                                    <p>
+                                        <strong>Prochaines étapes :</strong>
+                                    </p>
+                                    <ol>
+                                        <li>Attendre l'approbation de votre compte (généralement sous 24-48h)</li>
+                                        <li>Se connecter avec vos identifiants</li>
+                                        <li>Faire une demande de prestation pour définir vos besoins</li>
+                                        <li>Recevoir et accepter une proposition commerciale</li>
+                                        <li>Procéder au paiement pour activer votre contrat</li>
+                                    </ol>
+                                    
+                                    <p>Notre équipe vous contactera prochainement pour discuter de vos besoins spécifiques.</p>
+                                </div>
+                                
+                                <div class="text-center mt-4">
+                                    <a href="/web/login" class="btn btn-primary">Aller à la page de connexion</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Template pour la page d'erreur d'inscription -->
+    <template id="it_registration_error" name="Erreur d'inscription">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow">
+                            <div class="card-body p-5 text-center">
+                                <i class="fa fa-exclamation-circle fa-5x text-danger mb-4"></i>
+                                <h1 class="mb-4">Une erreur est survenue</h1>
+                                
+                                <div class="alert alert-danger" role="alert">
+                                    <p>Désolé, nous n'avons pas pu traiter votre inscription.</p>
+                                    <t t-if="error_message">
+                                        <p class="mb-0"><small t-esc="error_message"/></p>
+                                    </t>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <p>Vous pouvez essayer de :</p>
+                                    <ul class="text-start">
+                                        <li>Vérifier que l'adresse email n'est pas déjà utilisée</li>
+                                        <li>Réessayer l'inscription dans quelques minutes</li>
+                                        <li>Contacter notre support technique si le problème persiste</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <a href="/it/inscription" class="btn btn-primary me-2">Réessayer</a>
+                                    <a href="/" class="btn btn-secondary">Retour à l'accueil</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo> 

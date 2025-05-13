@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action pour les sites clients -->
+    <record id="action_it_client_sites" model="ir.actions.act_window">
+        <field name="name">Sites clients</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">form</field>
+        <field name="domain">[('is_it_site', '=', True)]</field>
+        <field name="context">{'default_is_it_site': True, 'default_is_company': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer un nouveau site client
+            </p>
+            <p>
+                Les sites clients sont des emplacements physiques ou logiques appartenant à un client IT.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action pour les équipements clients -->
+    <record id="action_it_equipment_client" model="ir.actions.act_window">
+        <field name="name">Équipements</field>
+        <field name="res_model">it.equipment</field>
+        <field name="view_mode">form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer un nouvel équipement
+            </p>
+            <p>
+                Gérez les équipements informatiques de vos clients.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action pour les incidents clients -->
+    <record id="action_it_incident_client" model="ir.actions.act_window">
+        <field name="name">Incidents</field>
+        <field name="res_model">it.incident</field>
+        <field name="view_mode">form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer un nouvel incident
+            </p>
+            <p>
+                Gérez les incidents informatiques signalés par vos clients.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action pour les tickets -->
+    <record id="action_it_ticket" model="ir.actions.act_window">
+        <field name="name">Tickets</field>
+        <field name="res_model">it.ticket</field>
+        <field name="view_mode">form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer un nouveau ticket
+            </p>
+            <p>
+                Gérez les tickets de support pour vos clients.
+            </p>
+        </field>
+    </record>
+</odoo> 

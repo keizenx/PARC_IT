@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Types de services IT -->
+        <record id="service_type_maintenance" model="it.service.type">
+            <field name="name">Maintenance informatique</field>
+            <field name="code">maintenance</field>
+            <field name="description">Service de maintenance préventive et corrective de vos équipements informatiques</field>
+            <field name="sequence">10</field>
+            <field name="has_fixed_price">True</field>
+            <field name="fixed_price">500.00</field>
+            <field name="has_user_price">True</field>
+            <field name="price_per_user">20.00</field>
+        </record>
+
+        <record id="service_type_network" model="it.service.type">
+            <field name="name">Gestion réseau</field>
+            <field name="code">network</field>
+            <field name="description">Configuration et maintenance de votre infrastructure réseau</field>
+            <field name="sequence">20</field>
+            <field name="has_fixed_price">True</field>
+            <field name="fixed_price">800.00</field>
+        </record>
+
+        <record id="service_type_security" model="it.service.type">
+            <field name="name">Sécurité informatique</field>
+            <field name="code">security</field>
+            <field name="description">Audit, conseil et mise en place de solutions de sécurité</field>
+            <field name="sequence">30</field>
+            <field name="has_fixed_price">True</field>
+            <field name="fixed_price">1200.00</field>
+        </record>
+
+        <record id="service_type_cloud" model="it.service.type">
+            <field name="name">Services Cloud</field>
+            <field name="code">cloud</field>
+            <field name="description">Migration et gestion de vos applications dans le cloud</field>
+            <field name="sequence">40</field>
+            <field name="has_fixed_price">True</field>
+            <field name="fixed_price">1500.00</field>
+            <field name="has_user_price">True</field>
+            <field name="price_per_user">15.00</field>
+        </record>
+
+        <record id="service_type_support" model="it.service.type">
+            <field name="name">Support technique</field>
+            <field name="code">support</field>
+            <field name="description">Assistance technique à distance ou sur site</field>
+            <field name="sequence">50</field>
+            <field name="has_user_price">True</field>
+            <field name="price_per_user">25.00</field>
+        </record>
+
+        <record id="service_type_backup" model="it.service.type">
+            <field name="name">Sauvegarde de données</field>
+            <field name="code">backup</field>
+            <field name="description">Solutions de sauvegarde automatisée et sécurisée</field>
+            <field name="sequence">60</field>
+            <field name="has_fixed_price">True</field>
+            <field name="fixed_price">300.00</field>
+            <field name="has_equipment_price">True</field>
+            <field name="price_per_equipment">10.00</field>
+        </record>
+    </data>
+</odoo> 

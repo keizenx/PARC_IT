@@ -87,6 +87,8 @@
                 <field name="state" decoration-success="state == 'installed'" decoration-warning="state == 'maintenance'" decoration-danger="state == 'end_of_life'"/>
                 <field name="purchase_date"/>
                 <field name="warranty_end_date"/>
+                <field name="id" invisible="1"/>
+                <button name="action_view_equipment_detail" string="Voir" type="object" class="btn btn-link"/>
             </list>
         </field>
     </record>

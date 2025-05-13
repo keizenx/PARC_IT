@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vues pour demandes de prestation -->
+    <record id="view_it_service_request_form" model="ir.ui.view">
+        <field name="name">it.service.request.form</field>
+        <field name="model">it.service.request</field>
+        <field name="arch" type="xml">
+            <form string="Demande de prestation">
+                <header>
+                    <button name="action_submit" string="Soumettre" type="object" invisible="state != 'draft'" class="oe_highlight"/>
+                    <button name="action_review" string="Analyser" type="object" invisible="state != 'submitted'" class="oe_highlight" groups="it__park.group_it_park_manager"/>
+                    <button name="action_send_proposal" string="Envoyer proposition" type="object" invisible="state != 'under_review'" class="oe_highlight" groups="it__park.group_it_park_manager"/>
+                    <button name="action_accept_proposal" string="Proposition acceptée" type="object" invisible="state != 'proposal_sent'" groups="it__park.group_it_park_manager"/>
+                    <button name="action_mark_as_paid" string="Marquer comme payée" type="object" invisible="state != 'invoiced'" class="oe_highlight" groups="it__park.group_it_park_manager"/>
+                    <button name="action_create_contract" string="Créer contrat" type="object" invisible="state != 'paid'" class="oe_highlight" groups="it__park.group_it_park_manager"/>
+                    <button name="action_activate" string="Activer" type="object" invisible="state != 'contract_created'" class="oe_highlight" groups="it__park.group_it_park_manager"/>
+                    <button name="action_reject" string="Rejeter" type="object" invisible="state not in ('submitted', 'under_review')" groups="it__park.group_it_park_manager"/>
+                    <button name="action_cancel" string="Annuler" type="object" invisible="state in ('rejected', 'cancelled')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,under_review,proposal_sent,proposal_accepted,invoiced,paid,contract_created,active"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="user_id"/>
+                            <field name="company_size"/>
+                            <field name="site_count"/>
+                            <field name="employee_count"/>
+                        </group>
+                        <group>
+                            <field name="expected_start_date"/>
+                            <field name="proposal_attachment_id" filename="proposal_name"/>
+                            <field name="proposal_name" invisible="1"/>
+                            <field name="invoice_id" readonly="1" invisible="not invoice_id"/>
+                            <field name="invoice_state" invisible="not invoice_id"/>
+                            <field name="total_amount" widget="monetary"/>
+                            <field name="contract_id" readonly="1"/>
+                            <field name="create_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Services demandés">
+                            <field name="services_needed"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_it_service_request_list" model="ir.ui.view">
+        <field name="name">it.service.request.list</field>
+        <field name="model">it.service.request</field>
+        <field name="arch" type="xml">
+            <list string="Demandes de prestation">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="company_size"/>
+                <field name="create_date"/>
+                <field name="state" decoration-info="state in ('draft', 'submitted')" decoration-warning="state == 'under_review'" decoration-success="state in ('proposal_accepted', 'active')" decoration-danger="state in ('rejected', 'cancelled')"/>
+                <field name="expected_start_date"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="invoice_id"/>
+                <field name="invoice_state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_it_service_request_search" model="ir.ui.view">
+        <field name="name">it.service.request.search</field>
+        <field name="model">it.service.request</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher demandes de prestation">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="description"/>
+                <separator/>
+                <filter string="Brouillons" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Soumises" name="submitted" domain="[('state', '=', 'submitted')]"/>
+                <filter string="En analyse" name="under_review" domain="[('state', '=', 'under_review')]"/>
+                <filter string="Proposition envoyée" name="proposal_sent" domain="[('state', '=', 'proposal_sent')]"/>
+                <filter string="Proposition acceptée" name="proposal_accepted" domain="[('state', '=', 'proposal_accepted')]"/>
+                <filter string="Facturées" name="invoiced" domain="[('state', '=', 'invoiced')]"/>
+                <filter string="Payées" name="paid" domain="[('state', '=', 'paid')]"/>
+                <filter string="Contrat créé" name="contract_created" domain="[('state', '=', 'contract_created')]"/>
+                <filter string="Actives" name="active" domain="[('state', '=', 'active')]"/>
+                <filter string="Rejetées" name="rejected" domain="[('state', '=', 'rejected')]"/>
+                <filter string="Annulées" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Client" name="partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="État" name="state" context="{'group_by': 'state'}"/>
+                    <filter string="Date de création" name="create_date" context="{'group_by': 'create_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_it_service_request" model="ir.actions.act_window">
+        <field name="name">Demandes de prestation</field>
+        <field name="res_model">it.service.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_submitted': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre première demande de prestation
+            </p>
+            <p>
+                Les demandes de prestation permettent de gérer le processus commercial,
+                depuis la demande client jusqu'à la création du contrat.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menus -->
+    <menuitem id="menu_it_service_request"
+              name="Demandes de prestation"
+              parent="menu_it_sales_root"
+              action="action_it_service_request"
+              sequence="10"/>
+
+    <!-- Configuration -->
+    <record id="view_it_service_type_form" model="ir.ui.view">
+        <field name="name">it.service.type.form</field>
+        <field name="model">it.service.type</field>
+        <field name="arch" type="xml">
+            <form string="Type de service">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="has_fixed_price"/>
+                            <field name="fixed_price" invisible="not has_fixed_price"/>
+                            <field name="has_user_price"/>
+                            <field name="price_per_user" invisible="not has_user_price"/>
+                            <field name="has_equipment_price"/>
+                            <field name="price_per_equipment" invisible="not has_equipment_price"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Types de contrats">
+                            <field name="contract_type_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_it_service_type_list" model="ir.ui.view">
+        <field name="name">it.service.type.list</field>
+        <field name="model">it.service.type</field>
+        <field name="arch" type="xml">
+            <list string="Types de service">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="has_fixed_price"/>
+                <field name="fixed_price" invisible="not context.get('show_prices', False)"/>
+                <field name="has_user_price"/>
+                <field name="price_per_user" invisible="not context.get('show_prices', False)"/>
+                <field name="has_equipment_price"/>
+                <field name="price_per_equipment" invisible="not context.get('show_prices', False)"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_it_service_type" model="ir.actions.act_window">
+        <field name="name">Types de service</field>
+        <field name="res_model">it.service.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'show_prices': True}</field>
+    </record>
+
+    <menuitem id="menu_it_service_type"
+              name="Types de service"
+              parent="menu_it_config"
+              action="action_it_service_type"
+              sequence="35"/>
+
+    <!-- Données de séquence -->
+    <record id="seq_it_service_request" model="ir.sequence">
+        <field name="name">Séquence demandes de prestation</field>
+        <field name="code">it.service.request</field>
+        <field name="prefix">SR</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo> 

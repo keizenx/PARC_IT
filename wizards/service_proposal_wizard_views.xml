@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_it_service_proposal_wizard_form" model="ir.ui.view">
+        <field name="name">it.service.proposal.wizard.form</field>
+        <field name="model">it.service.proposal.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Envoyer une proposition commerciale">
+                <sheet>
+                    <group>
+                        <field name="service_request_id" invisible="1"/>
+                        <field name="proposal_file" filename="proposal_filename" />
+                        <field name="proposal_filename" invisible="1"/>
+                    </group>
+                    <group string="Note (optionnelle)">
+                        <field name="note" nolabel="1" placeholder="Informations supplémentaires pour le client..."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_send_proposal" string="Envoyer" type="object" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_it_service_proposal_wizard" model="ir.actions.act_window">
+        <field name="name">Envoyer une proposition commerciale</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">it.service.proposal.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo> 

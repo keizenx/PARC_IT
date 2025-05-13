@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template pour le détail d'un ticket -->
+    <template id="portal_ticket_detail" name="Ticket Detail">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <h3 class="mb-0">
+                                            Ticket #<t t-esc="ticket.reference"/> - <t t-esc="ticket.name"/>
+                                        </h3>
+                                    </div>
+                                    <div class="col-auto">
+                                        <span t-field="ticket.state" class="badge"
+                                              t-attf-class="badge bg-#{'success' if ticket.state == 'resolved' 
+                                                                   else 'primary' if ticket.state == 'new'
+                                                                   else 'info' if ticket.state == 'in_progress'
+                                                                   else 'warning' if ticket.state == 'waiting'
+                                                                   else 'danger' if ticket.state == 'closed'
+                                                                   else 'secondary'} rounded-pill">
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <p><strong>Catégorie:</strong> <span t-field="ticket.category_id.name"/></p>
+                                        <p><strong>Priorité:</strong> <span t-field="ticket.priority"/></p>
+                                        <p><strong>Date de création:</strong> <span t-field="ticket.date_created"/></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>État:</strong> <span t-field="ticket.state"/></p>
+                                        <p t-if="ticket.tech_id"><strong>Technicien:</strong> <span t-field="ticket.tech_id.name"/></p>
+                                        <p t-if="ticket.date_closed"><strong>Date de clôture:</strong> <span t-field="ticket.date_closed"/></p>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h4>Description</h4>
+                                        <p t-field="ticket.description"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4" t-if="ticket.resolution_note">
+                                    <div class="col-12">
+                                        <h4>Notes de résolution</h4>
+                                        <p t-field="ticket.resolution_note"/>
+                                    </div>
+                                </div>
+                                
+                                <!-- Section des messages (chatter) -->
+                                <div class="row mt-5">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header bg-light">
+                                                <h4 class="mb-0">Discussion</h4>
+                                            </div>
+                                            <div class="card-body">
+                                                <!-- Affichage des messages existants -->
+                                                <div class="messages-list mb-4">
+                                                    <t t-if="messages">
+                                                        <t t-foreach="messages" t-as="message">
+                                                            <div class="message mb-3 p-3" t-attf-style="background-color: #{message.author_id.id == user.partner_id.id and '#f8f9fa' or 'white'}; border-radius: 8px; border-left: 4px solid #{message.author_id.id == user.partner_id.id and '#007bff' or '#6c757d'}">
+                                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                    <div>
+                                                                        <strong t-field="message.author_id.name"/>
+                                                                    </div>
+                                                                    <small class="text-muted">
+                                                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                                                        <span t-field="message.date" t-options='{"widget": "datetime"}'/>
+                                                                    </small>
+                                                                </div>
+                                                                <div class="message-body" t-field="message.body"/>
+                                                            </div>
+                                                        </t>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <div class="alert alert-info">
+                                                            Aucun message pour le moment.
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                                
+                                                <!-- Formulaire pour ajouter un nouveau message -->
+                                                <form t-attf-action="/my/tickets_detail/#{ticket.id}/comment" method="POST">
+                                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                                    <div class="form-group">
+                                                        <label for="comment"><strong>Ajouter un commentaire</strong></label>
+                                                        <textarea name="comment" id="comment" class="form-control" rows="4" placeholder="Écrivez votre message ici..."></textarea>
+                                                    </div>
+                                                    <div class="form-group mt-3">
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <i class="fa fa-paper-plane me-2"></i>Envoyer
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo> 

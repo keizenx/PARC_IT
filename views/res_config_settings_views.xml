@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_it_park" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.it_park</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Parc Informatique">
+                    <block title="Configuration Générale">
+                        <setting string="Notifications Email" help="Activer les notifications par email pour les tickets et incidents">
+                            <field name="it_email_notifications"/>
+                        </setting>
+                        <setting string="Auto-assignation" help="Assigner automatiquement les tickets aux techniciens disponibles">
+                            <field name="it_auto_assignment"/>
+                        </setting>
+                    </block>
+                    <block title="SLA et Support">
+                        <setting string="SLA par défaut" help="Définir le SLA par défaut pour les nouveaux tickets">
+                            <field name="it_default_sla_id"/>
+                        </setting>
+                        <setting string="Heures de support" help="Définir les heures d'ouverture du support">
+                            <div class="content-group">
+                                <div class="row">
+                                    <label for="it_support_hours_from" string="De" class="col-3 col-lg-3 o_light_label"/>
+                                    <field name="it_support_hours_from" widget="float_time" class="col-3 col-lg-3"/>
+                                    <label for="it_support_hours_to" string="À" class="col-3 col-lg-3 o_light_label"/>
+                                    <field name="it_support_hours_to" widget="float_time" class="col-3 col-lg-3"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Portail Client">
+                        <setting string="Accès Portail" help="Permettre aux clients de créer des tickets via le portail">
+                            <field name="it_enable_customer_portal"/>
+                        </setting>
+                        <setting string="Inscription client" help="Permettre aux clients de s'inscrire directement sur le portail">
+                            <field name="it_enable_customer_signup"/>
+                        </setting>
+                        <setting string="Validation Admin" help="Exiger une validation admin pour les nouveaux comptes">
+                            <field name="it_require_admin_validation"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo> 

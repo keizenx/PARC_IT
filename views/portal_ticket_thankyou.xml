@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template pour la page de remerciement -->
+    <template id="portal_ticket_thankyou" name="Thank You">
+        <t t-call="portal.portal_layout">
+            <div class="container py-5">
+                <div class="card border-success shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="mb-4">
+                            <i class="fa fa-check-circle fa-5x text-success"></i>
+                        </div>
+                        <h2 class="card-title">Merci pour votre ticket !</h2>
+                        <p class="card-text lead">
+                            Votre ticket a été créé avec succès. Un technicien va l'examiner dans les plus brefs délais.
+                        </p>
+                        <div class="mt-4">
+                            <a href="/my/tickets" class="btn btn-outline-primary me-2">
+                                <i class="fa fa-ticket-alt me-2"></i>Retour aux tickets
+                            </a>
+                            <a t-att-href="'/my/tickets/%s' % ticket.id" class="btn btn-primary">
+                                <i class="fa fa-eye me-2"></i>Voir mon ticket
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Référence: <t t-esc="ticket.reference"/></small>
+                            <small class="text-muted">Date: <t t-esc="ticket.date_created"/></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo> 

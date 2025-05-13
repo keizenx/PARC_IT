@@ -29,5 +29,41 @@
             <field name="implied_ids" eval="[(4, ref('group_it_park_technician'))]"/>
             <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         </record>
+
+        <!-- Règles de sécurité -->
+        <record id="it_client_portal_rule" model="ir.rule">
+            <field name="name">Client IT Portal: voir ses propres données</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="domain_force">['|', ('id', '=', user.partner_id.id), ('parent_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Règle pour les utilisateurs internes -->
+        <record id="it_client_internal_rule" model="ir.rule">
+            <field name="name">Client IT: accès complet pour les utilisateurs internes</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('it__park.group_it_park_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Règle pour voir les clients IT -->
+        <record id="it_client_view_rule" model="ir.rule">
+            <field name="name">Voir tous les clients IT</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="domain_force">[('is_it_client', '=', True)]</field>
+            <field name="groups" eval="[(4, ref('it__park.group_it_park_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
     </data>
 </odoo> 

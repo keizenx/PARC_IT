@@ -62,7 +62,7 @@ class ITSLAPolicy(models.Model):
     )
     
     team_ids = fields.Many2many(
-        'crm.team',
+        'helpdesk.team',
         'it_sla_team_rel',
         'sla_id',
         'team_id',

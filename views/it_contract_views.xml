@@ -63,6 +63,8 @@
                 <field name="renewal_date"/>
                 <field name="type"/>
                 <field name="state"/>
+                <field name="id" invisible="1"/>
+                <button name="action_view_contract_detail" string="Voir" type="object" class="btn btn-link"/>
             </list>
         </field>
     </record>

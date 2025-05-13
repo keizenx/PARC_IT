@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="it_support_ticket_list" name="Support Tickets">
+        <t t-call="website.layout">
+            <div class="container py-5">
+                <div class="row mb-4">
+                    <div class="col">
+                        <h1 class="mb-0">Mes tickets de support</h1>
+                        <p class="text-muted">Suivez l'état de vos demandes de support</p>
+                    </div>
+                    <div class="col-auto">
+                        <a href="/my/tickets/new" class="btn btn-primary">
+                            <i class="fa fa-plus me-2"></i>Nouveau ticket
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Référence</th>
+                                        <th>Titre</th>
+                                        <th>Date</th>
+                                        <th>Priorité</th>
+                                        <th>État</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="tickets or []" t-as="ticket">
+                                        <tr>
+                                            <td><t t-esc="ticket.reference"/></td>
+                                            <td><t t-esc="ticket.name"/></td>
+                                            <td><t t-esc="ticket.create_date" t-options='{"widget": "date"}'/></td>
+                                            <td>
+                                                <span t-attf-class="badge bg-#{ticket.priority_color or 'secondary'}">
+                                                    <t t-esc="ticket.priority"/>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span t-attf-class="badge bg-#{ticket.state_color or 'secondary'}">
+                                                    <t t-esc="ticket.state"/>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a t-attf-href="/my/tickets/#{ticket.id}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <tr t-if="not tickets">
+                                        <td colspan="6" class="text-center py-4">
+                                            <div class="text-muted">
+                                                <i class="fa fa-info-circle me-2"></i>
+                                                Vous n'avez pas encore de tickets de support
+                                            </div>
+                                            <a href="/my/tickets/new" class="btn btn-primary mt-3">
+                                                Créer mon premier ticket
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo> 

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Template pour l'email de validation d'inscription -->
+    <record id="email_template_it_registration_validation" model="mail.template">
+        <field name="name">Validation d'inscription IT Park</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="subject">Validation de votre inscription au portail IT</field>
+        <field name="email_from">${ (user.email_formatted or user.company_id.email_formatted) }</field>
+        <field name="email_to">${ object.email }</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                    Bonjour <t t-out="object.name or ''"/>,
+                    <br/><br/>
+                    Merci de vous être inscrit au portail de gestion IT. Pour finaliser votre inscription, veuillez cliquer sur le lien ci-dessous:
+                    <br/><br/>
+                    <a t-att-href="object.validation_url" style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+                        Valider mon compte
+                    </a>
+                    <br/><br/>
+                    Ce lien est valable pendant 24 heures.
+                    <br/><br/>
+                    Si vous n'avez pas demandé cette inscription, veuillez ignorer cet email.
+                    <br/><br/>
+                    Cordialement,
+                    <br/><br/>
+                    L'équipe IT
+                </p>
+            </div>
+        </field>
+        <field name="lang">${ object.lang }</field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+    <!-- Template pour l'email de notification admin -->
+    <record id="email_template_it_registration_admin_notification" model="mail.template">
+        <field name="name">Notification admin - Nouvelle inscription IT</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="subject">Nouvelle inscription au portail IT: ${ object.name }</field>
+        <field name="email_from">${ (user.email_formatted or user.company_id.email_formatted) }</field>
+        <field name="email_to">${ user.company_id.email }</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                    Bonjour,
+                    <br/><br/>
+                    Un nouvel utilisateur s'est inscrit au portail IT:
+                    <br/><br/>
+                    <strong>Nom:</strong> <t t-out="object.name or ''"/><br/>
+                    <strong>Email:</strong> <t t-out="object.email or ''"/><br/>
+                    <strong>Téléphone:</strong> <t t-out="object.phone or ''"/><br/>
+                    <strong>Date d'inscription:</strong> <t t-out="object.create_date.strftime('%d/%m/%Y %H:%M') if object.create_date else ''"/><br/>
+                    <br/><br/>
+                    Veuillez vérifier cette inscription et prendre les mesures nécessaires.
+                    <br/><br/>
+                    Cordialement,
+                    <br/><br/>
+                    Système IT Park
+                </p>
+            </div>
+        </field>
+        <field name="lang">${ user.lang }</field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+    <!-- Template pour l'email de confirmation d'inscription validée -->
+    <record id="email_template_it_registration_confirmed" model="mail.template">
+        <field name="name">Confirmation d'inscription IT validée</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="subject">Bienvenue au portail IT - Inscription confirmée</field>
+        <field name="email_from">${ (user.email_formatted or user.company_id.email_formatted) }</field>
+        <field name="email_to">${ object.email }</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-size: 13px;">
+                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                    Bonjour <t t-out="object.name or ''"/>,
+                    <br/><br/>
+                    Votre inscription au portail de gestion IT a été validée avec succès. 
+                    <br/><br/>
+                    Vous pouvez maintenant vous connecter à votre espace client en utilisant votre adresse email et le mot de passe que vous avez défini lors de l'inscription.
+                    <br/><br/>
+                    <a t-att-href="'/web/login'" style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+                        Accéder à mon espace
+                    </a>
+                    <br/><br/>
+                    N'hésitez pas à nous contacter si vous avez des questions.
+                    <br/><br/>
+                    Cordialement,
+                    <br/><br/>
+                    L'équipe IT
+                </p>
+            </div>
+        </field>
+        <field name="lang">${ object.lang }</field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+</odoo> 

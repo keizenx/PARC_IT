@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="signup_fields_it_client" inherit_id="auth_signup.fields">
+        <xpath expr="//div[hasclass('field-password')]" position="after">
+            <input type="hidden" name="is_it_client" value="1"/>
+            <div class="form-group">
+                <label class="col-form-label" for="company_name">Nom de l'entreprise</label>
+                <input type="text" name="name" t-att-value="name" id="company_name" class="form-control" required="required"/>
+            </div>
+            <div class="form-group">
+                <label class="col-form-label" for="phone">Téléphone</label>
+                <input type="tel" name="phone" t-att-value="phone" id="phone" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <label class="col-form-label" for="street">Adresse</label>
+                <input type="text" name="street" t-att-value="street" id="street" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <label class="col-form-label" for="city">Ville</label>
+                <input type="text" name="city" t-att-value="city" id="city" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <label class="col-form-label" for="zip">Code postal</label>
+                <input type="text" name="zip" t-att-value="zip" id="zip" class="form-control"/>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Template pour le formulaire d'inscription IT -->
+    <template id="it_signup_form" name="IT Client Signup Form">
+        <t t-call="web.login_layout">
+            <form class="oe_signup_form" role="form" method="post">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="is_it_client" value="1"/>
+
+                <div class="alert alert-danger" t-if="error" role="alert">
+                    <t t-esc="error"/>
+                </div>
+
+                <div class="alert alert-success" t-if="message" role="alert">
+                    <t t-esc="message"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="company_name" class="form-label">Nom de l'entreprise</label>
+                    <input type="text" name="name" t-att-value="name" id="company_name" class="form-control" required="required" autofocus="autofocus"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="login" class="form-label">Email</label>
+                    <input type="email" name="login" t-att-value="login" id="login" class="form-control" required="required"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Mot de passe</label>
+                    <input type="password" name="password" id="password" class="form-control" required="required"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="confirm_password" class="form-label">Confirmer le mot de passe</label>
+                    <input type="password" name="confirm_password" id="confirm_password" class="form-control" required="required"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Téléphone</label>
+                    <input type="tel" name="phone" t-att-value="phone" id="phone" class="form-control"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="street" class="form-label">Adresse</label>
+                    <input type="text" name="street" t-att-value="street" id="street" class="form-control"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="city" class="form-label">Ville</label>
+                    <input type="text" name="city" t-att-value="city" id="city" class="form-control"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="zip" class="form-label">Code postal</label>
+                    <input type="text" name="zip" t-att-value="zip" id="zip" class="form-control"/>
+                </div>
+
+                <div class="justify-content-between mt-2 d-flex">
+                    <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
+                </div>
+                
+                <div class="mt-3 text-center">
+                    <a t-attf-href="/web/login" class="btn btn-link">Déjà inscrit ? Se connecter</a>
+                </div>
+            </form>
+        </t>
+    </template>
+
+    <!-- Modification du template de login pour ajouter le lien d'inscription IT -->
+    <template id="it_login_link" inherit_id="web.login">
+        <xpath expr="//form" position="inside">
+            <div class="mt-4">
+                <hr class="mt-3 mb-3"/>
+                <div class="text-center">
+                    <p class="text-muted">Vous n'avez pas encore de compte ?</p>
+                    <a href="/it/inscription" class="btn btn-outline-primary">
+                        Créer un compte client IT
+                    </a>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo> 

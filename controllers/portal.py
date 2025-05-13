@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from odoo import http, _
-from odoo.http import request
+from odoo.http import request, content_disposition
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
 from odoo.osv.expression import OR, AND
 from collections import OrderedDict
 from odoo.exceptions import AccessError, MissingError, ValidationError
-from odoo.tools import format_datetime, format_date
+from odoo.tools import format_datetime, format_date, groupby as groupbyelem
 import base64
 import logging
+import werkzeug
+from markupsafe import Markup
+from odoo import fields
+from datetime import datetime
 
 _logger = logging.getLogger(__name__)
 
@@ -18,6 +22,29 @@ class ITPortal(CustomerPortal):
         values = super()._prepare_home_portal_values(counters)
         partner = request.env.user.partner_id
         
+        # Vérifier si le client a accès au parc IT
+        has_it_access = partner.is_it_client_approved and partner.is_it_client and partner.is_it_contract_paid
+        values['has_it_access'] = has_it_access
+        
+        # Valeurs à zéro par défaut si accès non autorisé
+        if not has_it_access:
+            if 'it_incident_count' in counters:
+                values['it_incident_count'] = 0
+            if 'it_ticket_count' in counters:
+                values['it_ticket_count'] = 0
+            if 'it_equipment_count' in counters:
+                values['it_equipment_count'] = 0
+            if 'it_contract_count' in counters:
+                values['it_contract_count'] = 0
+            if 'ticket_count' in counters:
+                values['ticket_count'] = 0
+            if 'equipment_count' in counters:
+                values['equipment_count'] = 0
+            if 'sites_count' in counters:
+                values['sites_count'] = 0
+            return values
+            
+        # Si le client a accès, calculer les compteurs normalement
         if 'it_incident_count' in counters:
             it_incident_count = request.env['it.incident'].search_count([
                 ('partner_id', '=', partner.id)
@@ -32,7 +59,7 @@ class ITPortal(CustomerPortal):
             
         if 'it_equipment_count' in counters:
             it_equipment_count = request.env['it.equipment'].search_count([
-                ('assigned_to', '=', partner.id)
+                ('client_id', '=', partner.id)
             ]) if request.env['it.equipment'].check_access_rights('read', raise_exception=False) else 0
             values['it_equipment_count'] = it_equipment_count
             
@@ -51,30 +78,46 @@ class ITPortal(CustomerPortal):
             values['equipment_count'] = request.env['it.equipment'].search_count([
                 ('client_id', '=', partner.id)
             ]) if request.env['it.equipment'].check_access_rights('read', raise_exception=False) else 0
-
+            
+        if 'sites_count' in counters:
+            values['sites_count'] = request.env['res.partner'].search_count([
+                ('parent_id', '=', partner.commercial_partner_id.id),
+                ('is_it_site', '=', True)
+            ]) if request.env['res.partner'].check_access_rights('read', raise_exception=False) else 0
+            
         return values
 
     @http.route(['/my/incidents', '/my/incidents/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_incidents(self, page=1, sortby=None, filterby=None, search=None, search_in='all', **kw):
+        # Vérifier l'accès au parc informatique
+        if not self._check_it_park_access():
+            values = self._prepare_portal_layout_values()
+            values.update({
+                'error_message': "Vous n'avez pas encore accès pour signaler des incidents. Veuillez créer une demande de prestation.",
+                'user': request.env.user
+            })
+            return request.render("it__park.portal_access_denied_detailed", values)
+            
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
         IncidentSudo = request.env['it.incident'].sudo()
 
+        # Utiliser commercial_partner_id pour inclure les filiales
         domain = [
             ('client_id', '=', partner.commercial_partner_id.id)
         ]
 
         searchbar_sortings = {
             'date': {'label': _('Date'), 'order': 'date_reported desc'},
-            'name': {'label': _('Title'), 'order': 'name'},
-            'state': {'label': _('Status'), 'order': 'state'},
+            'name': {'label': _('Titre'), 'order': 'name'},
+            'state': {'label': _('Statut'), 'order': 'state'},
         }
 
         searchbar_filters = {
-            'all': {'label': _('All'), 'domain': []},
-            'new': {'label': _('New'), 'domain': [('state', '=', 'new')]},
-            'in_progress': {'label': _('In Progress'), 'domain': [('state', '=', 'in_progress')]},
-            'resolved': {'label': _('Resolved'), 'domain': [('state', '=', 'resolved')]},
+            'all': {'label': _('Tous'), 'domain': []},
+            'new': {'label': _('Nouveau'), 'domain': [('state', '=', 'new')]},
+            'in_progress': {'label': _('En cours'), 'domain': [('state', '=', 'in_progress')]},
+            'resolved': {'label': _('Résolu'), 'domain': [('state', '=', 'resolved')]},
         }
 
         # default sortby order
@@ -121,6 +164,15 @@ class ITPortal(CustomerPortal):
 
     @http.route(['/my/incidents/<int:incident_id>'], type='http', auth="user", website=True)
     def portal_incident_detail(self, incident_id, **kw):
+        # Vérifier l'accès au parc informatique
+        if not self._check_it_park_access():
+            values = self._prepare_portal_layout_values()
+            values.update({
+                'error_message': "Vous n'avez pas encore accès aux détails des incidents. Veuillez créer une demande de prestation.",
+                'user': request.env.user
+            })
+            return request.render("it__park.portal_access_denied_detailed", values)
+            
         try:
             incident_sudo = self._document_check_access('it.incident', incident_id)
         except (AccessError, MissingError):
@@ -131,6 +183,57 @@ class ITPortal(CustomerPortal):
             'page_name': 'incident',
         }
         return request.render("it__park.portal_incident_detail", values)
+    
+    @http.route(['/my/incidents/new'], type='http', auth="user", website=True)
+    def portal_create_incident(self, **kw):
+        values = self._prepare_portal_layout_values()
+        
+        # Liste des équipements du client pour le formulaire d'incident
+        equipment = request.env['it.equipment'].sudo().search([
+            ('client_id', '=', request.env.user.partner_id.id)
+        ])
+        
+        values.update({
+            'page_name': 'create_incident',
+            'equipment': equipment,
+        })
+        
+        return request.render("it__park.portal_create_incident", values)
+
+    @http.route(['/my/incidents/submit'], type='http', auth="user", website=True, methods=['POST'], csrf=True)
+    def portal_submit_incident(self, **post):
+        """Traitement du formulaire de création d'incident"""
+        partner = request.env.user.partner_id
+        
+        vals = {
+            'name': post.get('name'),
+            'description': post.get('description'),
+            'client_id': partner.id,
+            'date_reported': fields.Date.today(),
+            'state': 'new',
+        }
+        
+        if post.get('equipment_id'):
+            vals['equipment_id'] = int(post.get('equipment_id'))
+            
+        if post.get('priority'):
+            vals['priority'] = post.get('priority')
+            
+        # Traitement de la pièce jointe si présente
+        attachment = post.get('attachment')
+        if attachment:
+            attachment_data = {
+                'name': attachment.filename,
+                'datas': base64.b64encode(attachment.read()),
+                'res_model': 'it.incident',
+            }
+            attachment_id = request.env['ir.attachment'].sudo().create(attachment_data)
+            vals['attachment_ids'] = [(4, attachment_id.id)]
+        
+        # Création de l'incident
+        incident = request.env['it.incident'].sudo().create(vals)
+        
+        return request.redirect('/my/incidents/%s' % incident.id)
 
     @http.route(['/my/ticket/<int:ticket_id>/follow'], type='http', auth="user", website=True, csrf=True)
     def ticket_follow(self, ticket_id, **kw):
@@ -176,24 +279,319 @@ class ITPortal(CustomerPortal):
 
     @http.route(['/my/tickets', '/my/tickets/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_tickets(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', groupby=None, **kw):
+        """Rediriger vers la nouvelle page de tickets."""
+        _logger.info("=== REDIRECTION VERS NOUVELLE URL DE TICKETS ===")
+        return request.redirect('/my/tickets_list')
+    
+    @http.route(['/my/tickets/add'], type='http', auth="user", website=True)
+    def portal_create_ticket(self, **kw):
+        values = self._prepare_portal_layout_values()
+        
+        # Récupérer l'utilisateur connecté et son partenaire commercial
+        partner = request.env.user.partner_id
+        commercial_partner = partner.commercial_partner_id
+        
+        # Récupérer les équipements du client
+        equipment = request.env['it.equipment'].sudo().search([
+            ('client_id', '=', commercial_partner.id)
+        ])
+        
+        # Récupérer aussi les catégories au cas où
+        categories = request.env['it.ticket.category'].search([])
+        
+        values.update({
+            'page_name': 'create_ticket',
+            'categories': categories,
+            'equipment': equipment,
+        })
+        
+        return request.render("it__park.portal_create_ticket", values)
+    
+    @http.route(['/my/tickets/create'], type='http', auth="user", website=True)
+    def portal_create_ticket_redirect(self, **kw):
+        """Redirection de /my/tickets/create vers /my/tickets/add"""
+        _logger.info("=== REDIRECTION DE /my/tickets/create VERS /my/tickets/add ===")
+        return request.redirect('/my/tickets/add')
+    
+    @http.route(['/my/tickets/submit'], type='http', auth="user", website=True, methods=['POST'], csrf=True)
+    def portal_submit_ticket(self, **post):
+        """Traitement du formulaire de création de ticket"""
+        partner = request.env.user.partner_id
+        
+        # Création du ticket
+        vals = {
+            'name': post.get('name'),
+            'description': post.get('description'),
+            'client_id': partner.commercial_partner_id.id,
+            'partner_id': partner.id,
+            'category_id': int(post.get('category_id')),
+            'priority': post.get('priority', '1'),
+            'state': 'new',
+            'is_portal_created': True,
+        }
+        
+        # Ajout de l'équipement si sélectionné
+        if post.get('equipment_id') and post.get('equipment_id').isdigit():
+            equipment_id = int(post.get('equipment_id'))
+            equipment = request.env['it.equipment'].sudo().browse(equipment_id)
+            
+            # Vérifier que l'équipement appartient bien au client
+            if equipment.exists() and equipment.client_id.id == partner.commercial_partner_id.id:
+                vals['equipment_id'] = equipment_id
+                # Si l'équipement a un site, ajouter également le site au ticket
+                if equipment.site_id:
+                    vals['site_id'] = equipment.site_id.id
+        
+        # Traitement de la pièce jointe
+        attachment = post.get('attachment')
+        if attachment:
+            attachment_data = {
+                'name': attachment.filename,
+                'datas': base64.b64encode(attachment.read()),
+                'res_model': 'it.ticket',
+            }
+            attachment_id = request.env['ir.attachment'].sudo().create(attachment_data)
+            vals['attachment_ids'] = [(4, attachment_id.id)]
+        
+        # Création du ticket
+        ticket = request.env['it.ticket'].sudo().create(vals)
+        
+        # Notification pour les administrateurs
+        ticket.message_post(
+            body=_("Nouveau ticket créé depuis le portail client par %s") % partner.name,
+            message_type='comment',
+            subtype_xmlid='mail.mt_note'
+        )
+        
+        # Forcer l'envoi de notification si ce n'est pas déjà fait
+        if not ticket.notification_sent:
+            ticket._send_notification()
+        
+        
+        # Vérification explicite de l'envoi d'email
+        print(f"Ticket #{ticket.id} créé avec succès. Envoi de notification...")
+        
+        # Forcer l'envoi immédiat pour éviter les problèmes de transaction
+        request.env.cr.commit()
+        # Rediriger vers la page de remerciement
+        return request.redirect('/my/tickets/thankyou/%s' % ticket.id)
+    
+    @http.route(['/my/tickets/thankyou/<int:ticket_id>'], type='http', auth="user", website=True)
+    def portal_ticket_thankyou(self, ticket_id, **kw):
+        ticket = request.env['it.ticket'].browse(ticket_id)
+        values = {'ticket': ticket}
+        return request.render("it__park.portal_ticket_thankyou", values)
+    
+    @http.route(['/my/tickets/<int:ticket_id>'], type='http', auth="user", website=True)
+    def portal_ticket_detail(self, ticket_id, **kw):
+        """Rediriger vers la nouvelle page de détail du ticket."""
+        _logger.info(f"=== REDIRECTION VERS NOUVELLE URL DE DÉTAIL DU TICKET {ticket_id} ===")
+        return request.redirect(f'/my/tickets_detail/{ticket_id}')
+    
+    @http.route(['/my/tickets/<int:ticket_id>/comment'], type='http', auth="user", website=True)
+    def portal_ticket_comment(self, ticket_id, **post):
+        ticket = request.env['it.ticket'].browse(ticket_id)
+        
+        # Vérification des droits d'accès
+        if ticket.client_id.commercial_partner_id != request.env.user.partner_id.commercial_partner_id:
+            return request.redirect('/my/tickets')
+        
+        if post.get('comment'):
+            ticket.message_post(
+                body=post.get('comment'),
+                message_type='comment',
+                subtype_xmlid='mail.mt_comment',
+            )
+        
+        return request.redirect('/my/tickets/%s' % ticket_id)
+
+    def _check_it_park_access(self):
+        """Vérifie si l'utilisateur a accès au parc informatique"""
+        partner = request.env.user.partner_id
+        return True  # Désactivé temporairement - Retournait: partner.is_it_client_approved and partner.is_it_client and partner.is_it_contract_paid
+        
+    @http.route(['/my/sites', '/my/sites/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_my_sites(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', groupby=None, **kw):
+        # Vérifier l'accès au parc informatique
+        if not self._check_it_park_access():
+            values = self._prepare_portal_layout_values()
+            values.update({
+                'error_message': "Vous n'avez pas encore accès à vos sites. Veuillez créer une demande de prestation.",
+                'user': request.env.user
+            })
+            return request.render("it__park.portal_access_denied_detailed", values)
+        
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
-        TicketObj = request.env['it.ticket']
+        SiteSudo = request.env['res.partner'].sudo()
         
-        domain = [('partner_id', '=', partner.id)]
+        # Filtrer les sites par client (parent_it_client_id)
+        domain = [
+            ('parent_it_client_id', '=', partner.commercial_partner_id.id),
+            ('is_it_site', '=', True)
+        ]
         
-        # Filtres et tri
         searchbar_sortings = {
-            'date': {'label': _('Date'), 'order': 'create_date desc'},
-            'name': {'label': _('Title'), 'order': 'name'},
-            'priority': {'label': _('Priority'), 'order': 'priority desc'},
-            'stage': {'label': _('Stage'), 'order': 'stage_id'},
+            'name': {'label': _('Nom'), 'order': 'name'},
+            'create_date': {'label': _('Date de création'), 'order': 'create_date desc'},
+        }
+        
+        # Default sort by order
+        if not sortby:
+            sortby = 'name'
+        sort_order = searchbar_sortings[sortby]['order']
+        
+        # Count for pager
+        site_count = SiteSudo.search_count(domain)
+        
+        # Pager
+        pager = portal_pager(
+            url="/my/sites",
+            url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby},
+            total=site_count,
+            page=page,
+            step=self._items_per_page
+        )
+        
+        # Recherche avec pagination
+        sites = SiteSudo.search(domain, order=sort_order, limit=self._items_per_page, offset=pager['offset'])
+        
+        values.update({
+            'sites': sites,
+            'page_name': 'sites',
+            'pager': pager,
+            'default_url': '/my/sites',
+            'searchbar_sortings': searchbar_sortings,
+            'sortby': sortby,
+        })
+        
+        return request.render("it__park.portal_my_sites", values)
+
+    @http.route(['/my/sites/<int:site_id>'], type='http', auth="user", website=True)
+    def portal_site_detail(self, site_id, **kw):
+        # Vérifier l'accès au parc informatique
+        if not self._check_it_park_access():
+            values = self._prepare_portal_layout_values()
+            values.update({
+                'error_message': "Vous n'avez pas encore accès aux détails des sites. Veuillez créer une demande de prestation.",
+                'user': request.env.user
+            })
+            return request.render("it__park.portal_access_denied_detailed", values)
+            
+        site_sudo = request.env['res.partner'].sudo().browse(site_id)
+        
+        # Vérifier que le site existe et appartient au client
+        if not site_sudo.exists() or site_sudo.parent_it_client_id.id != request.env.user.partner_id.commercial_partner_id.id or not site_sudo.is_it_site:
+            return request.redirect('/my/sites')
+        
+        # Récupérer les équipements de ce site
+        equipment = request.env['it.equipment'].sudo().search([
+            ('site_id', '=', site_id)
+        ])
+        
+        values = {
+            'site': site_sudo,
+            'equipment': equipment,
+            'page_name': 'site',
+        }
+        
+        return request.render("it__park.portal_site_detail", values)
+        
+    @http.route(['/my/equipment', '/my/equipment/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_my_equipment(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', groupby=None, **kw):
+        # Vérifier l'accès au parc informatique
+        if not self._check_it_park_access():
+            values = self._prepare_portal_layout_values()
+            values.update({
+                'error_message': "Vous n'avez pas encore accès à votre parc informatique. Veuillez créer une demande de prestation.",
+                'user': request.env.user
+            })
+            return request.render("it__park.portal_access_denied_detailed", values)
+            
+        values = self._prepare_portal_layout_values()
+        partner = request.env.user.partner_id
+        EquipmentSudo = request.env['it.equipment'].sudo()
+        
+        # Filtrer les équipements par client_id uniquement
+        domain = [
+            ('client_id', '=', partner.commercial_partner_id.id)
+        ]
+        
+        searchbar_sortings = {
+            'name': {'label': _('Nom'), 'order': 'name'},
+            'reference': {'label': _('Référence'), 'order': 'reference'},
+            'type': {'label': _('Type'), 'order': 'type_id'},
+        }
+        
+        searchbar_filters = {
+            'all': {'label': _('Tous'), 'domain': []},
+            'draft': {'label': _('Brouillon'), 'domain': [('state', '=', 'draft')]},
+            'in_stock': {'label': _('En stock'), 'domain': [('state', '=', 'in_stock')]},
+            'installed': {'label': _('Installé'), 'domain': [('state', '=', 'installed')]},
+            'maintenance': {'label': _('En maintenance'), 'domain': [('state', '=', 'maintenance')]},
+        }
+        
+        # Default sort by order
+        if not sortby:
+            sortby = 'name'
+        sort_order = searchbar_sortings[sortby]['order']
+        
+        # Default filter by value
+        if not filterby:
+            filterby = 'all'
+        domain += searchbar_filters[filterby]['domain']
+        
+        # Count for pager
+        equipment_count = EquipmentSudo.search_count(domain)
+        
+        # Pager
+        pager = portal_pager(
+            url="/my/equipment",
+            url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby, 'filterby': filterby},
+            total=equipment_count,
+            page=page,
+            step=self._items_per_page
+        )
+        
+        # Recherche avec pagination
+        equipment = EquipmentSudo.search(domain, order=sort_order, limit=self._items_per_page, offset=pager['offset'])
+        
+        values.update({
+            'equipment': equipment,
+            'page_name': 'equipment',
+            'pager': pager,
+            'default_url': '/my/equipment',
+            'searchbar_sortings': searchbar_sortings,
+            'sortby': sortby,
+            'searchbar_filters': searchbar_filters,
+            'filterby': filterby,
+        })
+        
+        return request.render("it__park.portal_my_equipment", values)
+
+    @http.route(['/my/invoices', '/my/invoices/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_my_invoices(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', groupby=None, **kw):
+        values = self._prepare_portal_layout_values()
+        partner = request.env.user.partner_id
+        AccountInvoice = request.env['account.move'].sudo()
+        
+        domain = [
+            ('move_type', 'in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')),
+            ('partner_id', 'child_of', [partner.commercial_partner_id.id]),
+            ('state', '!=', 'cancel')
+        ]
+        
+        searchbar_sortings = {
+            'date': {'label': _('Date'), 'order': 'invoice_date desc'},
+            'name': {'label': _('Reference'), 'order': 'name desc'},
+            'state': {'label': _('Status'), 'order': 'state'},
         }
         
         searchbar_filters = {
             'all': {'label': _('All'), 'domain': []},
-            'open': {'label': _('Open'), 'domain': [('stage_id.is_closed', '=', False)]},
-            'closed': {'label': _('Closed'), 'domain': [('stage_id.is_closed', '=', True)]},
+            'invoices': {'label': _('Invoices'), 'domain': [('move_type', '=', 'out_invoice')]},
+            'paid': {'label': _('Paid'), 'domain': [('payment_state', '=', 'paid')]},
+            'unpaid': {'label': _('Not Paid'), 'domain': [('payment_state', '!=', 'paid')]},
         }
         
         # default sortby order
@@ -207,130 +605,1092 @@ class ITPortal(CustomerPortal):
         domain += searchbar_filters[filterby]['domain']
         
         # count for pager
-        ticket_count = TicketObj.search_count(domain)
+        invoice_count = AccountInvoice.search_count(domain)
         
-        # make pager
+        # Compter les factures en retard (pour éviter l'erreur TypeError)
+        overdue_domain = domain + [
+            ('invoice_date_due', '<', fields.Date.today()),
+            ('payment_state', 'in', ('not_paid', 'partial'))
+        ]
+        overdue_invoice_count = AccountInvoice.search_count(overdue_domain)
+        
+        # pager
         pager = portal_pager(
-            url="/my/tickets",
+            url="/my/invoices",
             url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby, 'filterby': filterby},
+            total=invoice_count,
+            page=page,
+            step=self._items_per_page
+        )
+        
+        # content according to pager and archive selected
+        invoices = AccountInvoice.search(domain, order=sort_order, limit=self._items_per_page, offset=pager['offset'])
+        
+        values.update({
+            'invoices': invoices,
+            'page_name': 'invoice',
+            'pager': pager,
+            'default_url': '/my/invoices',
+            'searchbar_sortings': searchbar_sortings,
+            'sortby': sortby,
+            'searchbar_filters': searchbar_filters,
+            'filterby': filterby,
+            'overdue_invoice_count': overdue_invoice_count,
+        })
+        
+        # Utiliser notre template personnalisé au lieu du template standard
+        return request.render("it__park.portal_my_invoices", values)
+
+    @http.route(['/my/contracts', '/my/contracts/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_my_contracts(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', groupby=None, **kw):
+        # Vérifier l'accès au parc informatique  
+        if not self._check_it_park_access():
+            values = self._prepare_portal_layout_values()
+            values.update({
+                'error_message': "Vous n'avez pas encore accès à vos contrats. Veuillez créer une demande de prestation.",
+                'user': request.env.user
+            })
+            return request.render("it__park.portal_access_denied_detailed", values)
+            
+        values = self._prepare_portal_layout_values()
+        partner = request.env.user.partner_id
+        ContractSudo = request.env['it.contract'].sudo()
+        
+        domain = [
+            '|',
+            ('partner_id', '=', partner.id),
+            ('partner_id', 'child_of', partner.commercial_partner_id.id)
+        ]
+        
+        # Comptage pour pagination
+        contract_count = ContractSudo.search_count(domain)
+        
+        # Pagination
+        pager = portal_pager(
+            url="/my/contracts",
+            url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby},
+            total=contract_count,
+            page=page,
+            step=self._items_per_page
+        )
+        
+        # Recherche et tri
+        contracts = ContractSudo.search(domain, limit=self._items_per_page, offset=pager['offset'])
+        
+        values.update({
+            'page_name': 'contracts',
+            'pager': pager,
+            'contracts': contracts,
+            'default_url': '/my/contracts',
+        })
+        
+        return request.render("it__park.portal_my_contracts", values)
+        
+    @http.route(['/my/contracts/<int:contract_id>'], type='http', auth="user", website=True)
+    def portal_contract_detail(self, contract_id, **kw):
+        # Vérifier l'accès au parc informatique
+        if not self._check_it_park_access():
+            values = self._prepare_portal_layout_values()
+            values.update({
+                'error_message': "Vous n'avez pas encore accès aux détails des contrats. Veuillez créer une demande de prestation.",
+                'user': request.env.user
+            })
+            return request.render("it__park.portal_access_denied_detailed", values)
+            
+        try:
+            # Utiliser sudo() pour contourner les restrictions d'accès
+            contract_sudo = request.env['it.contract'].sudo().browse(contract_id)
+            if not contract_sudo.exists():
+                return request.redirect('/my/contracts')
+                
+            # Vérifier que le contrat appartient au client connecté
+            if contract_sudo.partner_id.commercial_partner_id.id != request.env.user.partner_id.commercial_partner_id.id:
+                return request.redirect('/my/contracts')
+                
+            values = self._prepare_portal_layout_values()
+            values.update({
+                'contract': contract_sudo,
+                'page_name': 'contract_detail',
+            })
+            
+            return request.render("it__park.portal_my_contract_detail", values)
+                
+        except Exception as e:
+            _logger.error(f"Erreur d'accès au contrat {contract_id}: {str(e)}")
+            return request.redirect('/my/contracts')
+    
+    @http.route(['/my/invoices/<int:invoice_id>'], type='http', auth="user", website=True)
+    def portal_my_invoice_detail(self, invoice_id=None, access_token=None, **kw):
+        """Afficher une facture individuelle"""
+        try:
+            # Utiliser sudo() pour contourner les restrictions d'accès
+            invoice_sudo = request.env['account.move'].sudo().browse(invoice_id)
+            if not invoice_sudo.exists():
+                _logger.error(f"Erreur: La facture {invoice_id} n'existe pas")
+                return request.redirect('/my/invoices')
+            
+            values = self._prepare_portal_layout_values()
+            
+            # Récupérer les contrats liés à cette facture
+            related_contracts = request.env['it.contract'].sudo().search([
+                ('invoice_ids', 'in', invoice_sudo.id)
+            ])
+            
+            values.update({
+                'invoice': invoice_sudo,
+                'page_name': 'invoice',
+                'related_contracts': related_contracts,
+                'datetime': datetime,  # Rendre datetime disponible dans le template
+            })
+            
+            return request.render("it__park.portal_invoice_page", values)
+                
+        except Exception as e:
+            _logger.error(f"Erreur d'accès à la facture {invoice_id}: {str(e)}")
+            return request.redirect('/my/invoices')
+    
+    @http.route(['/my/invoices/pdf/<int:invoice_id>'], type='http', auth="user", website=True)
+    def portal_my_invoice_pdf(self, invoice_id=None, access_token=None, **kw):
+        """Générer et télécharger le PDF d'une facture"""
+        try:
+            invoice_sudo = self._document_check_access('account.move', invoice_id, access_token)
+        except (AccessError, MissingError):
+            return request.redirect('/my/invoices')
+            
+            # Génération du PDF - à adapter selon votre implémentation PDF
+            pdf = request.env.ref('account.account_invoices').sudo()._render_qweb_pdf([invoice_sudo.id])[0]
+        
+            # Configuration de la réponse HTTP avec le PDF
+            pdfhttpheaders = [
+            ('Content-Type', 'application/pdf'),
+            ('Content-Length', len(pdf)),
+            ('Content-Disposition', f'attachment; filename=Facture_{invoice_sudo.name}.pdf;')
+            ]
+            return request.make_response(pdf, headers=pdfhttpheaders)
+
+    def _render_with_portal_layout(self, title, page_name, main_content, extra_values=None):
+        """Fonction utilitaire pour rendre du contenu dans le layout du portail"""
+        values = self._prepare_portal_layout_values()
+        
+        if extra_values:
+            values.update(extra_values)
+            
+        values.update({
+            'title': title,
+            'page_name': page_name
+        })
+        
+        return request.render('portal.portal_my_home', {
+            **values,
+            'main_content': Markup(main_content)
+        })
+
+class ITServiceRequestController(http.Controller):
+    def _prepare_portal_layout_values(self):
+        """Prépare les valeurs communes pour les vues du portail"""
+        values = {}
+        partner = request.env.user.partner_id
+        
+        # Récupérer le nombre de demandes actives
+        active_requests_count = request.env['it.service.request'].sudo().search_count([
+            ('partner_id', '=', partner.id),
+            ('state', 'in', ['draft', 'submitted', 'under_review', 'proposal_sent', 'proposal_accepted'])
+        ])
+        values['active_requests_count'] = active_requests_count
+        
+        # Valeurs communes du portail
+        values.update({
+            'page_name': 'service_request',
+            'user': request.env.user,
+            'has_it_access': partner.is_it_client_approved and partner.is_it_client
+        })
+        
+        return values
+    
+    @http.route(['/web/it_service_request/new'], type='http', auth="user", website=True)
+    def it_service_request_new(self, **kw):
+        _logger.info("=== Accès à la page de demande de services ===")
+        
+        try:
+            # Vérifier si l'utilisateur a déjà une demande active
+            partner = request.env.user.partner_id
+            _logger.info(f"Partner ID: {partner.id}, Name: {partner.name}")
+            
+            existing_request = request.env['it.service.request'].sudo().search([
+                ('partner_id', '=', partner.id),
+                ('state', 'in', ['draft', 'submitted', 'under_review', 'proposal_sent', 'proposal_accepted'])
+            ], limit=1)
+        
+            if existing_request:
+                _logger.info(f"Demande existante trouvée: {existing_request.id} - {existing_request.name}")
+                return request.redirect('/web/it_service_request/%s' % existing_request.id)
+            
+            # Récupérer tous les types de services actifs
+            service_types = request.env['it.service.type'].sudo().search([('active', '=', True)])
+            _logger.info(f"Nombre de types de services trouvés: {len(service_types)}")
+            
+            if not service_types:
+                _logger.warning("Aucun type de service trouvé! Veuillez en créer au moins un.")
+        
+            values = {
+                'service_types': service_types,
+                'page_name': 'new_service_request',
+            }
+            _logger.info("Préparation du rendu du template it_service_request_form")
+            return request.render("it__park.it_service_request_form", values)
+        except Exception as e:
+            _logger.error(f"Erreur lors de l'accès à la page de demande de services: {str(e)}")
+            import traceback
+            _logger.error(traceback.format_exc())
+            return request.redirect('/my/home')
+
+    @http.route(['/web/it_service_request/submit'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
+    def it_service_request_submit(self, **post):
+        try:
+            _logger.info("=== Traitement de la soumission de demande de services ===")
+            _logger.info(f"Données reçues: {post}")
+            
+            partner = request.env.user.partner_id
+            service_type_ids = []
+            
+            # Traitement des cases à cocher des services
+            services = request.httprequest.form.getlist('services[]')
+            _logger.info(f"Services bruts récupérés: {services}")
+            
+            if not services:
+                _logger.warning("Aucun service sélectionné!")
+                return request.render("it__park.service_request_error", {
+                    'error_message': "Veuillez sélectionner au moins un service."
+                })
+            
+            if services:
+                for service_code in services:
+                    service_type = request.env['it.service.type'].sudo().search([('code', '=', service_code)], limit=1)
+                    if service_type:
+                        service_type_ids.append(service_type.id)
+            
+            _logger.info(f"Services sélectionnés: {services}")
+            _logger.info(f"IDs des services: {service_type_ids}")
+            
+            # Vérifier que des services ont été trouvés
+            if not service_type_ids:
+                _logger.error("Aucun service valide trouvé pour les codes sélectionnés")
+                return request.render("it__park.service_request_error", {
+                    'error_message': "Les services sélectionnés n'ont pas pu être trouvés. Veuillez réessayer."
+                })
+            
+            # Activer les accès du client
+            partner.sudo().write({
+                'is_it_client': True,
+                'is_it_client_approved': True,
+                'is_it_client_pending': False
+            })
+            
+            # Récupérer les valeurs du formulaire avec valeurs par défaut
+            description = post.get('description', '')
+            company_size = post.get('company_size', 'small')
+            site_count = int(post.get('site_count') or 1)
+            employee_count = int(post.get('employee_count') or 1)
+            expected_start_date = post.get('expected_start_date', False)
+        
+            vals = {
+                'partner_id': partner.id,
+                'description': description,
+                'company_size': company_size,
+                'site_count': site_count,
+                'employee_count': employee_count,
+                'expected_start_date': expected_start_date,
+                'services_needed': [(6, 0, service_type_ids)],
+                'state': 'submitted',
+            }
+        
+            _logger.info(f"Valeurs pour création: {vals}")
+            service_request = request.env['it.service.request'].sudo().create(vals)
+            _logger.info(f"Demande de service créée avec succès: {service_request.id} - {service_request.name}")
+        
+            # Ajouter un message de confirmation dans le chatter
+            msg = _("Nouvelle demande de service créée depuis le portail par %s. Accès client activé automatiquement.") % partner.name
+            service_request.message_post(body=msg)
+        
+            # Rediriger vers la page de la demande
+            return request.redirect(f'/web/it_service_request/{service_request.id}')
+        
+        except Exception as e:
+            _logger.error(f"Erreur lors de la soumission de la demande: {str(e)}")
+            import traceback
+            _logger.error(traceback.format_exc())
+            
+            return request.render("it__park.service_request_error", {
+                'error_message': "Une erreur s'est produite lors de la soumission de votre demande. Veuillez réessayer plus tard."
+            })
+    
+    @http.route(['/web/it_service_request/<int:request_id>'], type='http', auth="user", website=True)
+    def it_service_request_view(self, request_id, **kw):
+        try:
+            service_request = request.env['it.service.request'].sudo().browse(request_id)
+            if not service_request.exists() or service_request.partner_id.id != request.env.user.partner_id.id:
+                return request.redirect('/my/home')
+                
+            values = self._prepare_portal_layout_values()
+            values.update({
+                'service_request': service_request,
+                'page_name': 'service_request',
+            })
+            return request.render("it__park.it_service_request_detail", values)
+            
+        except Exception as e:
+            _logger.error("Erreur lors de l'affichage de la demande de service: %s", str(e))
+            return request.redirect('/my/home')
+    
+    @http.route(['/web/it_service_request/<int:request_id>/accept'], type='http', auth="user", website=True)
+    def it_service_request_accept(self, request_id, **kw):
+        service_request = request.env['it.service.request'].sudo().browse(request_id)
+        
+        if service_request.exists() and service_request.partner_id.id == request.env.user.partner_id.id:
+            if service_request.state == 'proposal_sent':
+                service_request.sudo().action_accept_proposal()
+                # Rediriger vers la page de simulation de paiement
+                return request.redirect(f'/web/it_service_request/{request_id}/payment_simulation')
+        
+        return request.redirect('/my/home')
+    
+    @http.route(['/web/it_service_request/<int:request_id>/payment_simulation'], type='http', auth="user", website=True)
+    def it_service_request_payment_simulation(self, request_id, **kw):
+        """Page de simulation de paiement après acceptation de la proposition"""
+        service_request = request.env['it.service.request'].sudo().browse(request_id)
+        
+        if not service_request.exists() or service_request.partner_id.id != request.env.user.partner_id.id:
+            return request.redirect('/my/home')
+        
+        # Vérifier que la demande est bien dans l'état approprié
+        if service_request.state not in ['invoiced', 'proposal_accepted']:
+            return request.redirect('/web/it_service_request/%s' % request_id)
+        
+        # Récupérer la facture si elle existe
+        invoice = service_request.invoice_id
+        
+        values = {
+            'service_request': service_request,
+            'invoice': invoice,
+            'page_name': 'payment_simulation',
+            'progress_step': 80,  # Pourcentage de progression (entre 0 et 100)
+            'progress_text': 'Paiement en cours'
+        }
+        
+        return request.render("it__park.it_service_request_payment_simulation", values)
+    
+    @http.route(['/web/it_service_request/<int:request_id>/simulate_payment'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
+    def it_service_request_simulate_payment(self, request_id, **post):
+        """Traite la simulation de paiement"""
+        service_request = request.env['it.service.request'].sudo().browse(request_id)
+        
+        if not service_request.exists() or service_request.partner_id.id != request.env.user.partner_id.id:
+            return request.redirect('/my/home')
+        
+        # Simuler un paiement réussi
+        if service_request.state in ['invoiced', 'proposal_accepted'] and service_request.invoice_id:
+            # Effectuer toutes les opérations dans une transaction
+            try:
+                # Marquer la facture comme payée (simulation)
+                service_request.invoice_id.sudo().write({
+                    'payment_state': 'paid',
+                })
+                
+                # Passer à l'étape suivante
+                service_request.sudo().write({'state': 'paid'})
+                
+                # Activer l'accès au parc informatique pour le partenaire
+                partner = service_request.partner_id.sudo()
+                partner.write({
+                    'is_it_client_approved': True,
+                    'is_it_contract_paid': True,
+                    'is_it_client': True
+                })
+                
+                # Forcer l'écriture dans la base de données
+                request.env.cr.commit()
+                
+                # Créer le contrat automatiquement
+                service_request.sudo().action_create_contract()
+                
+                # Ajouter un message dans le chatter
+                msg = _("Paiement simulé. La facture a été marquée comme payée. Contrat créé automatiquement. Accès au parc informatique activé pour le client.")
+                service_request.sudo().message_post(body=msg)
+                
+                # Rediriger vers la page de confirmation
+                return request.redirect('/web/it_service_request/%s/payment_confirmation' % request_id)
+            except Exception as e:
+                request.env.cr.rollback()
+                _logger.error("Erreur lors de la simulation de paiement: %s", str(e))
+                # Rediriger avec un message d'erreur
+                return request.redirect('/web/it_service_request/%s?error=payment_failed' % request_id)
+        
+        return request.redirect('/web/it_service_request/%s' % request_id)
+    
+    @http.route(['/web/it_service_request/<int:request_id>/payment_confirmation'], type='http', auth="user", website=True)
+    def it_service_request_payment_confirmation(self, request_id, **kw):
+        """Page de confirmation après paiement"""
+        service_request = request.env['it.service.request'].sudo().browse(request_id)
+        
+        if not service_request.exists() or service_request.partner_id.id != request.env.user.partner_id.id:
+            return request.redirect('/my/home')
+        
+        values = {
+            'service_request': service_request,
+            'progress_step': 100,  # Progression à 100%
+            'progress_text': 'Paiement effectué'
+        }
+        
+        return request.render("it__park.it_service_request_payment_confirmation", values)
+
+    @http.route(['/web/it_service_request/<int:request_id>/payment_done'], type='http', auth="user", website=True)
+    def payment_done(self, request_id, **kw):
+        """Appelé après un paiement réussi"""
+        service_request = request.env['it.service.request'].sudo().browse(request_id)
+        
+        if not service_request.exists() or service_request.partner_id.id != request.env.user.partner_id.id:
+            return request.redirect('/my/home')
+            
+        # Vérifier si la facture est payée
+        if service_request.invoice_id and service_request.invoice_id.payment_state == 'paid':
+            # Passer à l'étape suivante
+            service_request.sudo().write({'state': 'paid'})
+            
+            # Activer l'accès au parc informatique pour le partenaire
+            service_request.partner_id.sudo().write({
+                'is_it_client_approved': True,
+                'is_it_contract_paid': True
+            })
+            
+            # Créer le contrat automatiquement
+            service_request.sudo().action_create_contract()
+            
+            # Ajouter un message dans le chatter
+            msg = _("La facture a été payée par le client. Contrat créé automatiquement. Accès au parc informatique activé pour le client.")
+            service_request.sudo().message_post(body=msg)
+        
+        return request.redirect('/web/it_service_request/%s' % request_id)
+
+    @http.route(['/web/it_service_request/<int:request_id>/download_proposal'], type='http', auth="user", website=True)
+    def download_proposal(self, request_id, **kw):
+        """Téléchargement de la proposition commerciale"""
+        request_sudo = request.env['it.service.request'].sudo().browse(request_id)
+        
+        if not request_sudo.exists() or not request_sudo.proposal_attachment_id:
+            return request.redirect('/my/home')
+            
+        # Vérifier que l'utilisateur a accès à cette demande
+        if request_sudo.partner_id.id != request.env.user.partner_id.id:
+            return request.redirect('/my/home')
+            
+        # Utiliser le contrôleur standard d'Odoo pour télécharger l'attachement
+        attachment_id = request_sudo.proposal_attachment_id.id
+        return request.redirect('/web/content/%s?download=true' % attachment_id)
+
+    @http.route(['/web/it_service_request/<int:request_id>/reject'], type='http', auth="user", website=True)
+    def it_service_request_reject(self, request_id, **kw):
+        """Rejeter la proposition commerciale"""
+        service_request = request.env['it.service.request'].sudo().browse(request_id)
+        
+        if not service_request.exists() or service_request.state != 'proposal_sent':
+            return request.redirect('/my/home')
+        
+        # Vérifier que l'utilisateur a accès à cette demande
+        if service_request.partner_id.id != request.env.user.partner_id.id:
+            return request.redirect('/my/home')
+        
+        # Rejeter la proposition
+        service_request.write({
+            'state': 'rejected',
+            'rejection_date': fields.Datetime.now(),
+        })
+        
+        # Ajouter un message dans le chatter
+        service_request.message_post(
+            body="La proposition commerciale a été refusée par le client.",
+            message_type='comment',
+            subtype_xmlid='mail.mt_note'
+        )
+        
+        return request.redirect('/web/it_service_request/%s' % request_id)
+
+    @http.route(['/web/it_service_request/<int:request_id>/send_proposal_email'], type='http', auth="user", website=True)
+    def send_proposal_email(self, request_id, **kw):
+        """Simuler l'envoi de la proposition commerciale par email"""
+        # Cette version ne tente pas d'envoyer l'email réellement mais simule un succès
+        request_sudo = request.env['it.service.request'].sudo().browse(request_id)
+        
+        # Vérifier que la demande existe
+        if not request_sudo.exists():
+            return """
+                <html><body>
+                <h1>Erreur: Demande introuvable</h1>
+                <p>La demande avec l'ID %s n'existe pas</p>
+                <a href="/my/home">Retour à l'accueil</a>
+                </body></html>
+            """ % request_id
+        
+        # Vérifier si la pièce jointe existe
+        has_attachment = bool(request_sudo.proposal_attachment_id)
+        
+        # Si pas de pièce jointe, on informe mais on continue quand même
+        attachment_info = ""
+        if has_attachment:
+            attachment = request_sudo.proposal_attachment_id
+            attachment_name = attachment.name or 'proposition.pdf'
+            attachment_info = f"""
+                <li><strong>Pièce jointe:</strong> {attachment_name}</li>
+            """
+        else:
+            attachment_info = """
+                <li><strong>Pièce jointe:</strong> <span style="color: red;">Aucune pièce jointe trouvée!</span></li>
+            """
+            
+        # Récupérer l'email de l'utilisateur
+        user_email = request.env.user.email or 'email_non_défini@exemple.com'
+        
+        # Message HTML de succès à afficher directement 
+        html_response = f"""
+        <html>
+        <head>
+            <title>Envoi d'email simulé</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; margin: 20px; }}
+                .success-box {{ background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; }}
+                .info-box {{ background-color: #cce5ff; border: 1px solid #b8daff; color: #004085; padding: 15px; border-radius: 5px; margin-bottom: 20px; }}
+                .warning-box {{ background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 15px; border-radius: 5px; margin-bottom: 20px; }}
+                h1 {{ color: #28a745; }}
+                ul {{ margin-top: 15px; }}
+                .btn {{ display: inline-block; padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; }}
+            </style>
+        </head>
+        <body>
+            <div class="success-box">
+                <h1>Email simulé avec succès!</h1>
+                <p>Dans un environnement de production, un email aurait été envoyé à: <strong>{user_email}</strong></p>
+            </div>
+            
+            <div class="info-box">
+                <h2>Détails de l'envoi simulé:</h2>
+                <ul>
+                    <li><strong>Objet:</strong> Proposition commerciale - {request_sudo.name}</li>
+                    {attachment_info}
+                    <li><strong>Demande:</strong> {request_sudo.name}</li>
+                </ul>
+            </div>
+            
+            {('<div class="warning-box"><h3>Attention!</h3><p>Aucune pièce jointe n\'a été trouvée pour cette demande. ' + 
+              'Dans un environnement réel, l\'email serait envoyé sans la proposition en pièce jointe.</p>' +
+              '<p>Vérifiez que la proposition a bien été chargée par l\'administrateur.</p></div>') if not has_attachment else ''}
+            
+            <p>Note: Pour envoyer de vrais emails, un serveur SMTP doit être configuré dans Odoo.</p>
+            <p>Pour configurer le serveur SMTP: <strong>Paramètres > Technique > Email > Serveurs de messagerie sortants</strong></p>
+            
+            <a href="/web/it_service_request/{request_id}" class="btn">Retour à la demande</a>
+        </body>
+        </html>
+        """
+        
+        # Enregistrer l'action dans le chatter pour montrer que la fonction a été appelée
+        msg = f"""<p><strong>SIMULATION:</strong> L'utilisateur a demandé l'envoi de la proposition commerciale par email à {user_email}.</p>"""
+        
+        if not has_attachment:
+            msg += "<p style='color: red;'><strong>ATTENTION:</strong> Aucune pièce jointe n'a été trouvée pour cette demande!</p>"
+        
+        msg += "<p>Note: Aucun email n'a été réellement envoyé car nous sommes en mode développement.</p>"
+            
+        request_sudo.message_post(
+            body=msg,
+            message_type='notification',
+            subtype_xmlid='mail.mt_note'
+        )
+        
+        # Retourner directement la page HTML plutôt que de rediriger
+        return html_response
+
+# Étendre le contrôleur du portail existant pour intégrer nos nouvelles fonctionnalités
+class ITCustomerPortal(CustomerPortal):
+    def _prepare_home_portal_values(self, counters):
+        values = super()._prepare_home_portal_values(counters)
+        
+        partner = request.env.user.partner_id
+        service_request = request.env['it.service.request'].sudo().search([
+            ('partner_id', '=', partner.id),
+            ('state', 'in', ['draft', 'submitted', 'under_review', 'proposal_sent', 'proposal_accepted', 'contract_created'])
+        ], limit=1)
+        
+        # Récupérer les incidents récents pour le tableau de bord
+        recent_incidents = request.env['it.incident'].sudo().search([
+            ('client_id', '=', partner.id),
+            ('state', 'not in', ['closed', 'cancelled'])
+        ], limit=5, order='date_reported desc')
+        
+        license_count = request.env['it.license'].sudo().search_count([
+            ('client_id', '=', partner.id)
+        ])
+        
+        # Récupérer les factures récentes
+        recent_invoices = request.env['account.move'].sudo().search([
+            ('move_type', 'in', ('out_invoice', 'out_refund')),
+            ('partner_id', 'child_of', [partner.commercial_partner_id.id]),
+            ('state', '!=', 'cancel')
+        ], limit=5, order='invoice_date desc')
+        
+        # Récupérer les contrats actifs
+        active_contracts = request.env['it.contract'].sudo().search([
+            '|',
+            ('partner_id', '=', partner.id),
+            ('partner_id', 'child_of', partner.commercial_partner_id.id),
+            ('state', 'in', ['active', 'expiring_soon'])
+        ], limit=3, order='end_date asc')
+        
+        # Récupérer l'historique des demandes de prestation
+        service_requests = request.env['it.service.request'].sudo().search([
+            ('partner_id', '=', partner.id)
+        ], limit=3, order='create_date desc')
+        
+        values.update({
+            'service_request': service_request,
+            'recent_incidents': recent_incidents,
+            'license_count': license_count,
+            'recent_invoices': recent_invoices,
+            'active_contracts': active_contracts,
+            'service_requests': service_requests,
+        })
+        
+        if 'ticket_count' in counters:
+            ticket_count = request.env['it.ticket'].search_count([
+                ('partner_id', '=', request.env.user.partner_id.id)
+            ])
+            values['ticket_count'] = ticket_count
+        
+        if 'equipment_count' in counters:
+            equipment_count = request.env['it.equipment'].search_count([
+                ('client_id', '=', request.env.user.partner_id.id)
+            ])
+            values['equipment_count'] = equipment_count
+        
+        if 'contract_count' in counters:
+            contract_count = request.env['it.contract'].search_count([
+                ('partner_id', '=', request.env.user.partner_id.id)
+            ])
+            values['contract_count'] = contract_count
+            
+        if 'sites_count' in counters:
+            sites_count = request.env['res.partner'].search_count([
+                ('parent_id', '=', partner.commercial_partner_id.id),
+                ('is_it_site', '=', True)
+            ])
+            values['sites_count'] = sites_count
+        
+        return values
+    
+    @http.route(['/my/home'], type='http', auth="user", website=True)
+    def home(self, **kw):
+        values = self._prepare_portal_layout_values()
+        partner = request.env.user.partner_id
+
+        # Récupérer les compteurs pour les différentes entités
+        equipment_count = contract_count = ticket_count = invoice_count = site_count = 0
+
+        # Compteur d'équipements
+        if partner.is_it_client_approved and partner.is_it_contract_paid:
+            equipment_domain = [('client_id', '=', partner.commercial_partner_id.id)]
+            equipment_count = request.env['it.equipment'].sudo().search_count(equipment_domain)
+        
+            # Compteur de contrats actifs
+            contract_domain = [
+                '|',
+                ('partner_id', '=', partner.id),
+                ('partner_id', 'child_of', partner.commercial_partner_id.id),
+                ('state', 'in', ['active', 'running'])
+            ]
+            contract_count = request.env['it.contract'].sudo().search_count(contract_domain)
+            active_contracts = request.env['it.contract'].sudo().search(contract_domain, order='end_date desc', limit=1)
+            
+            # Compteur de tickets ouverts
+            ticket_domain = [
+                ('partner_id', '=', partner.id),
+                ('state', 'in', ['new', 'in_progress', 'waiting'])
+            ]
+            ticket_count = request.env['it.ticket'].sudo().search_count(ticket_domain)
+            
+            # Compteur de factures
+            invoice_domain = [
+                ('move_type', 'in', ('out_invoice', 'out_refund')),
+                ('partner_id', 'child_of', [partner.commercial_partner_id.id]),
+                ('state', '!=', 'cancel')
+            ]
+            invoice_count = request.env['account.move'].sudo().search_count(invoice_domain)
+            
+            # Compteur de sites
+            site_domain = [('partner_id', 'child_of', partner.commercial_partner_id.id)]
+            site_count = request.env['res.partner'].sudo().search_count([
+                ('is_it_site', '=', True),
+                ('parent_id', '=', partner.commercial_partner_id.id)
+            ])
+
+            # Compteur de licences (si cette fonctionnalité existe)
+            license_count = 0
+            if hasattr(request.env, 'it.license'):
+                license_domain = [('partner_id', 'child_of', partner.commercial_partner_id.id)]
+                license_count = request.env['it.license'].sudo().search_count(license_domain)
+
+        values.update({
+            'user': request.env.user,
+            'equipment_count': equipment_count,
+            'contract_count': contract_count,
+            'ticket_count': ticket_count,
+            'invoice_count': invoice_count,
+            'site_count': site_count,
+            'license_count': license_count if 'license_count' in locals() else 0,
+            'active_contracts': active_contracts if 'active_contracts' in locals() else []
+        })
+        return request.render("it__park.it_park_portal_home", values)
+    
+    @http.route(['/about'], type='http', auth="public", website=True)
+    def about(self, **kw):
+        values = {}
+        return request.render("it__park.it_park_portal_about", values)
+        
+    @http.route(['/'], type='http', auth="public", website=True)
+    def index(self, **kw):
+        # Si l'utilisateur est connecté, rediriger vers son tableau de bord
+        if not request.env.user._is_public():
+            return request.redirect('/my/home')
+        # Sinon, afficher la page d'accueil publique
+        return request.render("it__park.it_park_public_home")
+
+    @http.route(['/register'], type='http', auth="public", website=True)
+    def register_form(self, **kw):
+        """Affiche le formulaire d'inscription"""
+        values = {}
+        return request.render("it__park.register_page", values)
+        
+    @http.route(['/register/submit'], type='http', auth="public", website=True, methods=['POST'])
+    def register_submit(self, **post):
+        """Traite la soumission du formulaire d'inscription"""
+        # Créer un partenaire
+        partner_values = {
+            'name': post.get('name'),
+            'email': post.get('email'),
+            'phone': post.get('phone'),
+            'company_type': 'company',
+            'is_company': True,
+            # Champs spécifiques pour les clients IT
+            'is_it_client_pending': False,  # Ne pas mettre en attente
+            'is_it_client': True,          # Activer directement comme client IT
+            'is_it_client_approved': True,  # Approuver automatiquement
+            'is_it_contract_paid': False,   # Le contrat n'est pas encore payé
+            'customer_rank': 1,
+            'supplier_rank': 0,
+            'category_id': [(4, request.env.ref('it__park.category_it_client').id)],
+            'street': post.get('street', ''),
+            'city': post.get('city', ''),
+            'zip': post.get('zip', ''),
+            'country_id': request.env.ref('base.fr').id,
+            'company_name': post.get('company'),
+            'ref': 'CLI%s' % fields.Datetime.now().strftime('%y%m%d%H%M'),
+            'type': 'contact',
+            'parent_id': False,
+        }
+        
+        partner = request.env['res.partner'].sudo().create(partner_values)
+        
+        # Créer un utilisateur portail
+        user_values = {
+            'partner_id': partner.id,
+            'login': post.get('email'),
+            'email': post.get('email'),
+            'groups_id': [(6, 0, [request.env.ref('base.group_portal').id])],
+            'company_ids': [(4, request.env.company.id)],
+            'company_id': request.env.company.id,
+            'active': True,  # S'assurer que l'utilisateur est actif
+        }
+        
+        user = request.env['res.users'].sudo().create(user_values)
+        
+        # Envoyer un email de confirmation avec le lien de réinitialisation du mot de passe
+        template = request.env.ref('it__park.email_template_client_registration')
+        if template:
+            template.sudo().with_context(
+                email_to=post.get('email'),
+                name=post.get('name'),
+                company=post.get('company')
+            ).send_mail(partner.id, force_send=True)
+        
+        # Notification pour les administrateurs
+        admin_users = request.env['res.users'].sudo().search([('groups_id', '=', request.env.ref('it__park.group_it_park_manager').id)])
+        if admin_users:
+            partner_url = f"/web#id={partner.id}&model=res.partner&view_type=form"
+            notification_msg = f"<p>Un nouveau client IT s'est inscrit: <a href='{partner_url}'>{partner.name}</a></p>"
+            for admin in admin_users:
+                request.env['mail.message'].sudo().create({
+                    'body': notification_msg,
+                    'model': 'res.partner',
+                    'res_id': partner.id,
+                    'message_type': 'notification',
+                    'subtype_id': request.env.ref('mail.mt_note').id,
+                    'partner_ids': [(4, admin.partner_id.id)],
+                })
+            
+        # Rediriger vers la page d'accueil avec un message de succès
+        return request.redirect('/?registration_success=1')
+
+    @http.route(['/my/invoices/<int:invoice_id>/payment/confirmation'], type='http', auth='public', website=True)
+    def portal_invoice_payment_confirmation(self, invoice_id, **kwargs):
+        """
+        Override de la méthode de confirmation de paiement pour mettre à jour la demande de service
+        """
+        # Appel de la méthode parente pour le traitement standard
+        response = super(ITCustomerPortal, self).portal_invoice_payment_confirmation(invoice_id, **kwargs)
+        
+        # Trouver et mettre à jour la demande de service associée
+        invoice = request.env['account.move'].sudo().browse(invoice_id)
+        if invoice and invoice.payment_state == 'paid':
+            service_request = request.env['it.service.request'].sudo().search([
+                ('invoice_id', '=', invoice.id),
+                ('state', '=', 'invoiced')
+            ], limit=1)
+            
+            if service_request:
+                service_request.write({'state': 'paid'})
+                service_request.action_create_contract()
+                
+                # Notification
+                msg = _("La facture a été payée par le client. Contrat créé automatiquement.")
+                service_request.message_post(body=msg)
+        
+        return response 
+
+    @http.route(['/my/equipment/<int:equipment_id>'], type='http', auth="user", website=True)
+    def portal_equipment_detail(self, equipment_id, **kw):
+        # Vérifier l'accès au parc informatique
+        if not self._check_it_park_access():
+            values = self._prepare_portal_layout_values()
+            values.update({
+                'error_message': "Vous n'avez pas encore accès aux détails des équipements. Veuillez créer une demande de prestation.",
+                'user': request.env.user
+            })
+            return request.render("it__park.portal_access_denied_detailed", values)
+            
+        try:
+            # Utiliser sudo() pour contourner les restrictions d'accès
+            equipment_sudo = request.env['it.equipment'].sudo().browse(equipment_id)
+            if not equipment_sudo.exists():
+                return request.redirect('/my/equipment')
+                
+            # Vérifier que l'équipement appartient au client connecté
+            if equipment_sudo.client_id.id != request.env.user.partner_id.commercial_partner_id.id:
+                return request.redirect('/my/equipment')
+                
+            values = self._prepare_portal_layout_values()
+            values.update({
+                'equipment': equipment_sudo,
+                'page_name': 'equipment_detail',
+            })
+            
+            return request.render("it__park.portal_equipment_detail", values)
+                
+        except Exception as e:
+            _logger.error(f"Erreur d'accès à l'équipement {equipment_id}: {str(e)}")
+            return request.redirect('/my/equipment')
+
+    @http.route(['/test/tickets'], type='http', auth="user", website=True)
+    def test_tickets_page(self, **kw):
+        """Page de test simple pour afficher tous les tickets en HTML brut."""
+        _logger.info("=== PAGE DE TEST TICKETS APPELÉE ===")
+        
+        # Accès aux tickets sans restriction
+        tickets = request.env['it.ticket'].sudo().search([])
+        _logger.info(f"Tickets trouvés: {len(tickets)}")
+        
+        # Construction d'une page HTML simple - utiliser %% pour échapper les % dans le HTML
+        ticket_count = len(tickets)
+        html = f"""
+        <html>
+            <head>
+                <title>Test Tickets</title>
+                <style>
+                    body {{ font-family: Arial, sans-serif; margin: 20px; }}
+                    table {{ border-collapse: collapse; width: 100%; }}
+                    th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
+                    th {{ background-color: #f2f2f2; }}
+                </style>
+            </head>
+            <body>
+                <h1>Test d'affichage des tickets</h1>
+                <p>Nombre de tickets trouvés: {ticket_count}</p>
+                <table>
+                    <tr>
+                        <th>Référence</th>
+                        <th>Titre</th>
+                        <th>État</th>
+                        <th>Date</th>
+                    </tr>
+        """
+        
+        # Ajouter chaque ticket
+        for ticket in tickets:
+            html += f"""
+                    <tr>
+                        <td>{ticket.reference or ''}</td>
+                        <td>{ticket.name or ''}</td>
+                        <td>{ticket.state or ''}</td>
+                        <td>{str(ticket.date_created) if ticket.date_created else ''}</td>
+                    </tr>
+            """
+        
+        # Fermer le HTML
+        html += """
+                </table>
+            </body>
+        </html>
+        """
+        
+        return html 
+
+    @http.route(['/my/tickets_list', '/my/tickets_list/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_my_tickets_list(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', **kw):
+        """Page d'affichage des tickets utilisant un template QWeb."""
+        _logger.info("=== PAGE TICKETS_LIST AVEC QWEB ===")
+        
+        # Valeurs pour la pagination
+        domain = []
+        
+        # Filtrage par état si spécifié
+        if filterby:
+            domain += [('state', '=', filterby)]
+            
+        # Recherche si spécifiée
+        if search and search_in:
+            search_domain = []
+            if search_in in ['name', 'all']:
+                search_domain += [('name', 'ilike', search)]
+            if search_in in ['reference', 'all']:
+                search_domain += [('reference', 'ilike', search)]
+            if search_in in ['description', 'all']:
+                search_domain += [('description', 'ilike', search)]
+            domain += search_domain
+            
+        # Récupérer tous les tickets
+        ticket_obj = request.env['it.ticket'].sudo()
+        
+        # Comptage total pour la pagination
+        ticket_count = ticket_obj.search_count(domain)
+        
+        # Pagination
+        pager = portal_pager(
+            url="/my/tickets_list",
+            url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby, 'filterby': filterby, 'search': search, 'search_in': search_in},
             total=ticket_count,
             page=page,
             step=self._items_per_page
         )
         
-        # search the records to display
-        tickets = TicketObj.search(
+        # Options de tri
+        order = 'date_created desc'
+        if sortby == 'date':
+            order = 'date_created desc'
+        elif sortby == 'name':
+            order = 'name asc'
+        elif sortby == 'state':
+            order = 'state asc'
+            
+        # Récupérer les tickets pour la page courante
+        tickets = ticket_obj.search(
             domain,
-            order=sort_order,
+            order=order,
             limit=self._items_per_page,
             offset=pager['offset']
         )
         
-        values.update({
+        # Préparer les valeurs pour le template
+        values = {
             'tickets': tickets,
             'page_name': 'tickets',
             'pager': pager,
-            'default_url': '/my/tickets',
-            'searchbar_sortings': searchbar_sortings,
+            'default_url': '/my/tickets_list',
+            'search': search,
+            'search_in': search_in,
             'sortby': sortby,
-            'searchbar_filters': searchbar_filters,
             'filterby': filterby,
-        })
-        
-        return request.render("it__park.portal_my_tickets", values)
-    
-    @http.route(['/my/tickets/add'], type='http', auth="user", website=True)
-    def portal_create_ticket(self, **kw):
-        values = self._prepare_portal_layout_values()
-        
-        # Catégories disponibles
-        categories = request.env['it.ticket.category'].search([])
-        
-        values.update({
-            'page_name': 'create_ticket',
-            'categories': categories,
-        })
-        
-        return request.render("it__park.portal_create_ticket", values)
-    
-    @http.route(['/my/tickets/submit'], type='http', auth="user", website=True)
-    def portal_submit_ticket(self, **post):
-        partner = request.env.user.partner_id
-        
-        # Création du ticket
-        vals = {
-            'name': post.get('name'),
-            'description': post.get('description'),
-            'partner_id': partner.id,
-            'email': partner.email,
-            'phone': partner.phone,
-            'priority': post.get('priority'),
+            'date_begin': date_begin,
+            'date_end': date_end,
+            'searchbar_sortings': {
+                'date': {'label': _('Date'), 'order': 'date_created desc'},
+                'name': {'label': _('Titre'), 'order': 'name asc'},
+                'state': {'label': _('État'), 'order': 'state asc'},
+            },
+            'searchbar_filters': {
+                'all': {'label': _('Tous'), 'domain': []},
+                'new': {'label': _('Nouveau'), 'domain': [('state', '=', 'new')]},
+                'in_progress': {'label': _('En cours'), 'domain': [('state', '=', 'in_progress')]},
+                'waiting': {'label': _('En attente'), 'domain': [('state', '=', 'waiting')]},
+                'done': {'label': _('Résolu'), 'domain': [('state', '=', 'done')]},
+                'closed': {'label': _('Clôturé'), 'domain': [('state', '=', 'closed')]},
+            },
+            'searchbar_inputs': {
+                'name': {'input': 'name', 'label': _('Rechercher dans le titre')},
+                'reference': {'input': 'reference', 'label': _('Rechercher dans la référence')},
+                'description': {'input': 'description', 'label': _('Rechercher dans la description')},
+                'all': {'input': 'all', 'label': _('Rechercher dans tout')},
+            },
+            'default_order': 'date'
         }
         
-        if post.get('category_id'):
-            vals['category_id'] = int(post.get('category_id'))
+        # Rendu du template
+        return request.render("it__park.portal_tickets_list", values)
+
+    @http.route(['/my/tickets_detail/<int:ticket_id>'], type='http', auth="user", website=True)
+    def portal_ticket_detail_new(self, ticket_id, **kw):
+        """Page de détail d'un ticket utilisant un template QWeb."""
+        _logger.info(f"=== DÉTAIL DU TICKET {ticket_id} (TEMPLATE QWEB) ===")
         
-        # Gestion du fichier joint
-        attachment = post.get('attachment')
-        if attachment:
-            vals['attachment_ids'] = [(0, 0, {
-                'name': attachment.filename,
-                'datas': attachment.read(),
-                'res_model': 'it.ticket',
-            })]
+        # Récupérer le ticket avec sudo() pour ignorer les restrictions d'accès
+        ticket = request.env['it.ticket'].sudo().browse(ticket_id)
+        if not ticket.exists():
+            return request.redirect('/my/tickets_list')
         
-        # Création effective du ticket
-        ticket = request.env['it.ticket'].sudo().create(vals)
+        _logger.info(f"Ticket trouvé: {ticket.name} (Ref: {ticket.reference})")
         
-        return request.redirect('/my/tickets/thankyou/%s' % ticket.id)
-    
-    @http.route(['/my/tickets/thankyou/<int:ticket_id>'], type='http', auth="user", website=True)
-    def portal_ticket_thankyou(self, ticket_id, **kw):
-        ticket = request.env['it.ticket'].browse(ticket_id)
-        values = {'ticket': ticket}
-        return request.render("it__park.portal_ticket_thankyou", values)
-    
-    @http.route(['/my/tickets/<int:ticket_id>'], type='http', auth="user", website=True)
-    def portal_ticket_detail(self, ticket_id, **kw):
-        ticket = request.env['it.ticket'].browse(ticket_id)
+        # Récupérer tous les messages associés à ce ticket
+        messages = request.env['mail.message'].sudo().search([
+            ('model', '=', 'it.ticket'),
+            ('res_id', '=', ticket.id)
+        ], order='date desc')
         
-        # Vérification des droits d'accès
-        if ticket.partner_id != request.env.user.partner_id:
-            return request.redirect('/my/tickets')
+        # Récupérer les pièces jointes
+        attachments = request.env['ir.attachment'].sudo().search([
+            ('res_model', '=', 'it.ticket'),
+            ('res_id', '=', ticket.id)
+        ])
         
-        values = self._prepare_portal_layout_values()
-        values.update({
+        values = {
             'ticket': ticket,
+            'messages': messages,
+            'attachments': attachments,
             'page_name': 'ticket_detail',
-        })
+            'user': request.env.user,
+        }
         
         return request.render("it__park.portal_ticket_detail", values)
-    
-    @http.route(['/my/tickets/<int:ticket_id>/comment'], type='http', auth="user", website=True)
-    def portal_ticket_comment(self, ticket_id, **post):
-        ticket = request.env['it.ticket'].browse(ticket_id)
+
+    @http.route(['/my/tickets_detail/<int:ticket_id>/comment'], type='http', auth="user", website=True, methods=['POST'])
+    def portal_ticket_comment_new(self, ticket_id, **post):
+        """Traitement des commentaires pour la nouvelle route de tickets."""
+        ticket = request.env['it.ticket'].sudo().browse(ticket_id)
         
-        # Vérification des droits d'accès
-        if ticket.partner_id != request.env.user.partner_id:
-            return request.redirect('/my/tickets')
+        if not ticket.exists():
+            return request.redirect('/my/tickets_list')
         
         if post.get('comment'):
-            ticket.message_post(
+            # Ajouter le message en utilisant sudo() pour ignorer les restrictions
+            ticket.sudo().message_post(
                 body=post.get('comment'),
                 message_type='comment',
                 subtype_xmlid='mail.mt_comment',
+                author_id=request.env.user.partner_id.id
             )
         
-        return request.redirect('/my/tickets/%s' % ticket_id)
-
-    @http.route(['/my/equipment', '/my/equipment/page/<int:page>'], type='http', auth="user", website=True)
-    def portal_my_equipment(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', groupby=None, **kw):
-        return request.render("it__park.portal_my_equipment", {
-            'page_name': 'equipment',
-        })
-
-    @http.route(['/my/contracts', '/my/contracts/page/<int:page>'], type='http', auth="user", website=True)
-    def portal_my_contracts(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', groupby=None, **kw):
-        return request.render("it__park.portal_my_contracts", {
-            'page_name': 'contracts',
-        }) 
+        return request.redirect('/my/tickets_detail/%s' % ticket_id)

@@ -23,8 +23,7 @@
         <field name="name">Tickets IT</field>
         <field name="res_model">it.ticket</field>
         <field name="view_mode">list,form</field>
-        <field name="domain">[('is_it_ticket', '=', True)]</field>
-        <field name="context">{'default_is_it_ticket': True}</field>
+        <field name="context">{}</field>
     </record>
     
     <record id="action_it_incidents" model="ir.actions.act_window">
@@ -48,9 +47,20 @@
     <record id="action_it_clients" model="ir.actions.act_window">
         <field name="name">Clients IT</field>
         <field name="res_model">res.partner</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('is_it_client', '=', True)]</field>
-        <field name="context">{'default_is_it_client': True}</field>
+        <field name="context">{'default_is_it_client': True, 'default_is_company': True}</field>
+        <field name="views">[(ref('view_it_client_kanban'), 'kanban'),
+                           (ref('view_it_client_tree'), 'list'),
+                           (ref('view_it_client_form'), 'form')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer un nouveau client IT
+            </p>
+            <p>
+                Les clients IT sont les entreprises pour lesquelles vous gérez le parc informatique.
+            </p>
+        </field>
     </record>
     
     <record id="action_it_sites" model="ir.actions.act_window">
@@ -126,68 +136,78 @@
               sequence="100"
               groups="it__park.group_it_park_user"/>
     
-    <!-- Section Actifs -->
+    <!-- Section Actifs - désactivée car remplacée par nouveau menu -->
     <menuitem id="menu_it_assets" 
               name="Actifs" 
               parent="menu_it_park_root" 
               sequence="10"
+              active="false"
               groups="it__park.group_it_park_user"/>
-    
-    <!-- Sous-menus Actifs -->
+              
+    <!-- Sous-menus Actifs - désactivés car remplacés par nouveaux menus -->
     <menuitem id="menu_it_equipment" 
               name="Équipements" 
               parent="menu_it_assets" 
               action="action_it_equipment"
+              active="false"
               sequence="10"/>
-              
-    <menuitem id="menu_it_software" 
+    
+    <menuitem id="menu_it_software_unique" 
               name="Logiciels" 
               parent="menu_it_assets" 
               action="action_it_software"
+              active="false"
               sequence="20"/>
-              
-    <menuitem id="menu_it_licenses" 
+    
+    <menuitem id="menu_it_license_unique" 
               name="Licences" 
               parent="menu_it_assets" 
               action="action_it_license"
+              active="false"
               sequence="30"/>
               
-    <menuitem id="menu_it_contracts" 
+    <menuitem id="menu_it_contract_unique" 
               name="Contrats" 
               parent="menu_it_assets" 
               action="action_it_contract"
+              active="false"
               sequence="40"/>
               
-    <!-- Section Support -->
+    <!-- Section Support - désactivée car remplacée par nouveau menu -->
     <menuitem id="menu_it_support" 
               name="Support IT" 
               parent="menu_it_park_root" 
               sequence="20"
+              active="false"
               groups="it__park.group_it_park_user"/>
     
-    <!-- Sous-menus Support -->
+    <!-- Sous-menus Support - désactivés car remplacés par nouveaux menus -->
     <menuitem id="menu_it_tickets"
               name="Tickets IT"
               parent="menu_it_support"
               action="action_it_tickets_support"
+              active="false"
               sequence="10"/>
     
     <menuitem id="menu_helpdesk_tickets"
               name="Tickets Helpdesk"
               parent="menu_it_support"
               action="action_helpdesk_tickets_it"
+              active="false"
               sequence="15"/>
         
-    <menuitem id="menu_it_incidents"
+    <menuitem id="menu_it_incidents_unique"
               name="Incidents"
               parent="menu_it_support"
               action="action_it_incidents"
+              active="false"
               sequence="20"/>
               
-    <menuitem id="menu_it_interventions"
+    <menuitem id="menu_it_interventions_unique"
               name="Interventions"
               parent="menu_it_support"
               action="action_it_interventions"
+              active="false"
               sequence="30"/>
     
     <!-- Section Configuration -->
@@ -245,7 +265,7 @@
     <menuitem id="menu_it_contacts" 
               name="Contacts" 
               parent="menu_it_park_root" 
-              sequence="80"
+              sequence="30"
               groups="it__park.group_it_park_user"/>
               
     <menuitem id="menu_it_clients" 
@@ -264,5 +284,12 @@
               name="Fournisseurs IT" 
               parent="menu_it_contacts" 
               action="action_it_suppliers"
-              sequence="30"/>
+        sequence="30"/>
+
+    <!-- Section Commercial -->
+    <menuitem id="menu_it_sales_root" 
+              name="Commercial" 
+              parent="menu_it_park_root" 
+              sequence="30"
+              groups="it__park.group_it_park_user"/>
 </odoo> 

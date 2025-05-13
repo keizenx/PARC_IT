@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Catégorie pour les clients IT -->
+    <record id="category_it_client" model="res.partner.category">
+        <field name="name">Client IT</field>
+        <field name="color" eval="2"/>  <!-- Bleu -->
+        <field name="active" eval="True"/>
+    </record>
+</odoo> 

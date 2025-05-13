@@ -100,9 +100,9 @@ class ITContract(models.Model):
     #                               domain=[('type', '=', 'service')])
     
     # Liens vers les factures générées (commenté car account.move n'existe pas)
-    # invoice_ids = fields.Many2many('account.move', 
-    #                              'it_contract_invoice_rel', 'contract_id', 'invoice_id',
-    #                              string='Factures', copy=False)
+    invoice_ids = fields.Many2many('account.move', 
+                                 'it_contract_invoice_rel', 'contract_id', 'invoice_id',
+                                 string='Factures', copy=False)
     invoice_count = fields.Integer(compute='_compute_invoice_count', string='Nombre de factures')
     
     # Champs liés aux livraisons (commentés car stock.picking n'existe pas dans le registre)
@@ -114,11 +114,10 @@ class ITContract(models.Model):
         for record in self:
             record.equipment_count = len(record.equipment_ids)
     
-    @api.depends()
+    @api.depends('invoice_ids')
     def _compute_invoice_count(self):
         for record in self:
-            # record.invoice_count = len(record.invoice_ids)
-            record.invoice_count = 0  # Valeur par défaut car invoice_ids est commenté
+            record.invoice_count = len(record.invoice_ids)
     
     @api.depends()
     def _compute_stock_picking_count(self):
@@ -290,23 +289,74 @@ class ITContract(models.Model):
     
     @api.model
     def _cron_check_contracts_expiration(self):
-        """Cron pour vérifier les contrats qui expirent bientôt"""
+        """Vérifier chaque jour les contrats qui arrivent à expiration"""
         today = fields.Date.today()
-        reminder_date = today + timedelta(days=30)  # Par défaut, 30 jours avant expiration
         
-        # Rechercher les contrats actifs qui expirent bientôt
-        contracts = self.search([
+        # Contrats actifs arrivant à expiration
+        soon_expired_contracts = self.search([
             ('state', '=', 'active'),
-            ('end_date', '<=', reminder_date),
+            ('end_date', '!=', False),
+            ('end_date', '<=', today + timedelta(days=30)),
             ('end_date', '>=', today)
         ])
         
-        for contract in contracts:
-            # Changer l'état
-            contract.write({'state': 'expiring_soon'})
+        for contract in soon_expired_contracts:
+            if contract.state != 'expiring_soon':
+                contract.write({'state': 'expiring_soon'})
+                # Notifier les personnes concernées
+                contract.message_post(
+                    body=_("Ce contrat arrive à expiration le %s.") % format(contract.end_date),
+                    subject=_("Contrat arrivant à expiration"),
+                    message_type='notification'
+                )
+                
+        # Contrats expirés mais toujours actifs
+        expired_contracts = self.search([
+            ('state', 'in', ['active', 'expiring_soon']),
+            ('end_date', '!=', False),
+            ('end_date', '<', today)
+        ])
+        
+        for contract in expired_contracts:
+            contract.write({'state': 'expired'})
+            contract.message_post(
+                body=_("Ce contrat a expiré le %s.") % format(contract.end_date),
+                subject=_("Contrat expiré"),
+                message_type='notification'
+            )
             
-            # Notifier les responsables par email
-            if contract.renewal_reminder:
-                template = self.env.ref('it__park.mail_template_contract_expiring_soon', raise_if_not_found=False)
-                if template:
-                    template.send_mail(contract.id, force_send=True) 
+        return True
+        
+    @api.model
+    def _init_missing_tables(self):
+        """Initialise les tables de relation manquantes pour les contrats"""
+        self.env.cr.execute("""
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_name = 'it_contract_invoice_rel'
+            )
+        """)
+        table_exists = self.env.cr.fetchone()[0]
+        
+        if not table_exists:
+            _logger.info("Création de la table de relation it_contract_invoice_rel")
+            self.env.cr.execute("""
+                CREATE TABLE it_contract_invoice_rel (
+                    contract_id INTEGER NOT NULL,
+                    invoice_id INTEGER NOT NULL,
+                    PRIMARY KEY (contract_id, invoice_id)
+                )
+            """)
+            
+        return True
+    
+    def action_view_contract_detail(self):
+        """Afficher les détails du contrat dans le portail"""
+        self.ensure_one()
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        contract_url = f"{base_url}/my/contracts/{self.id}"
+        return {
+            'type': 'ir.actions.act_url',
+            'url': contract_url,
+            'target': 'self',
+        } 

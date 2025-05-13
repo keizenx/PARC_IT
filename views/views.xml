@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Ce fichier est un fichier générique pour les vues -->
+        <!-- Toutes les vues principales sont dans des fichiers dédiés -->
+        <!-- Ce fichier est référencé dans le __manifest__.py mais était manquant -->
+    </data>
+</odoo> 

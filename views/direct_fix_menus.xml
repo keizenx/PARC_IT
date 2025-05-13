@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Solution la plus radicale : désactiver directement les menus par ID -->
+    
+    <!-- Désactiver les menus dupliqués de Logiciels -->
+    <record id="menu_logiciels_fix_1" model="ir.ui.menu">
+        <field name="id" eval="482"/>
+        <field name="active" eval="False"/>
+    </record>
+    
+    <!-- Désactiver les menus dupliqués de Licences -->
+    <record id="menu_licences_fix_1" model="ir.ui.menu">
+        <field name="id" eval="483"/>
+        <field name="active" eval="False"/>
+    </record>
+    
+    <!-- Désactiver les menus dupliqués de Contrats -->
+    <record id="menu_contrats_fix_1" model="ir.ui.menu">
+        <field name="id" eval="484"/>
+        <field name="active" eval="False"/>
+    </record>
+    
+    <!-- Désactiver les menus dupliqués d'Incidents -->
+    <record id="menu_incidents_fix_1" model="ir.ui.menu">
+        <field name="id" eval="487"/>
+        <field name="active" eval="False"/>
+    </record>
+    
+    <!-- Désactiver les menus dupliqués d'Interventions -->
+    <record id="menu_interventions_fix_1" model="ir.ui.menu">
+        <field name="id" eval="488"/>
+        <field name="active" eval="False"/>
+    </record>
+
+    <!-- Forcer le rafraîchissement du cache des menus -->
+    <function model="ir.ui.menu" name="clear_caches" eval="[]"/>
+</odoo> 

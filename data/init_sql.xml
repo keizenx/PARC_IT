@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Création de la table de relation entre it.contract et account.move si elle n'existe pas -->
+        <function model="it.contract" name="_init_missing_tables"/>
+
+        <!-- Requête SQL pour désactiver les menus dupliqués - exécutée à chaque mise à jour du module -->
+        <record id="disable_duplicate_menus_sql" model="ir.config_parameter">
+            <field name="key">disable_duplicate_menus_sql</field>
+            <field name="value">
+-- 1. D'abord, identifier tous les menus dupliqués par nom
+CREATE TEMP TABLE IF NOT EXISTS duplicate_menu_info AS
+SELECT 
+    name, 
+    array_agg(id ORDER BY id) AS menu_ids,
+    array_length(array_agg(id), 1) AS count
+FROM ir_ui_menu
+WHERE active = TRUE
+AND name IN ('Logiciels', 'Licences', 'Contrats', 'Incidents', 'Interventions', 'Tickets IT', 'Tickets Helpdesk')
+GROUP BY name
+HAVING COUNT(*) > 1;
+
+-- 2. Générer les commandes UPDATE pour désactiver tous les menus après le premier
+DO $$
+DECLARE
+    menu_record RECORD;
+    menu_id INTEGER;
+    i INTEGER;
+BEGIN
+    FOR menu_record IN SELECT * FROM duplicate_menu_info LOOP
+        RAISE NOTICE 'Traitement des menus dupliqués pour le nom: %', menu_record.name;
+        
+        -- Boucler sur tous les IDs de menus sauf le premier
+        FOR i IN 2..menu_record.count LOOP
+            menu_id := menu_record.menu_ids[i];
+            RAISE NOTICE 'Désactivation du menu ID: %', menu_id;
+            
+            -- Désactiver le menu dupliqué
+            UPDATE ir_ui_menu SET active = FALSE WHERE id = menu_id;
+            
+            -- Supprimer également les entrées dans la table de relation
+            DELETE FROM ir_ui_menu_group_rel WHERE menu_id = menu_id;
+        END LOOP;
+    END LOOP;
+END $$;
+
+-- 3. Vider le cache des menus
+DELETE FROM ir_ui_menu_group_rel WHERE menu_id NOT IN (SELECT id FROM ir_ui_menu WHERE active = TRUE);
+
+-- 4. Supprimer la table temporaire
+DROP TABLE IF EXISTS duplicate_menu_info;
+            </field>
+        </record>
+
+        <!-- Exécuter la requête SQL -->
+        <function model="ir.config_parameter" name="init_disable_duplicate_menus">
+            <value eval="[]"/>
+            <value name="code">
+model = env['ir.config_parameter']
+sql_query = model.get_param('disable_duplicate_menus_sql')
+if sql_query:
+    env.cr.execute(sql_query)
+# Vider le cache des menus
+env['ir.ui.menu'].clear_caches()
+            </value>
+        </function>
+
+    </data>
+</odoo> 

@@ -325,6 +325,7 @@
               name="Incidents"
               parent="menu_it_support"
               action="action_it_incident"
+              active="false"
               sequence="10"/>
 
     <!-- Action pour filtrer les interventions liées à un incident spécifique -->

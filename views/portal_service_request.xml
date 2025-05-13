@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_service_request_form" name="Service Request Form">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h3 class="mb-0">Demande de prestation IT</h3>
+                            </div>
+                            <div class="card-body">
+                                <form action="/submit/service-request" method="post" class="js_service_request_form">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    
+                                    <div class="form-group mb-3">
+                                        <label for="company_name" class="form-label">Nom de l'entreprise</label>
+                                        <input type="text" class="form-control" name="company_name" required="required"/>
+                                    </div>
+                                    
+                                    <div class="form-group mb-3">
+                                        <label for="email" class="form-label">Email professionnel</label>
+                                        <input type="email" class="form-control" name="email" required="required"/>
+                                    </div>
+                                    
+                                    <div class="form-group mb-3">
+                                        <label for="phone" class="form-label">Téléphone</label>
+                                        <input type="tel" class="form-control" name="phone"/>
+                                    </div>
+                                    
+                                    <div class="form-group mb-3">
+                                        <label for="employee_count" class="form-label">Nombre d'employés</label>
+                                        <input type="number" class="form-control" name="employee_count" min="1" required="required"/>
+                                    </div>
+                                    
+                                    <div class="form-group mb-3">
+                                        <label for="expected_start_date" class="form-label">Date de début souhaitée</label>
+                                        <input type="date" class="form-control" name="expected_start_date"/>
+                                    </div>
+                                    
+                                    <div class="form-group mb-3">
+                                        <label for="description" class="form-label">Description de vos besoins</label>
+                                        <textarea class="form-control" name="description" rows="5" required="required"></textarea>
+                                    </div>
+                                    
+                                    <div class="alert alert-info" role="alert">
+                                        <i class="fa fa-info-circle me-2"></i>
+                                        En soumettant cette demande, vous serez contacté par notre équipe commerciale pour étudier vos besoins et vous proposer une solution adaptée.
+                                    </div>
+                                    
+                                    <div class="text-end">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-paper-plane me-2"></i>Envoyer la demande
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_my_service_requests" name="My Service Requests">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Mes demandes de prestation</t>
+            </t>
+            <t t-if="not service_requests">
+                <div class="alert alert-info text-center" role="alert">
+                    <p class="mb-0">Vous n'avez pas encore de demande de prestation.</p>
+                    <a href="/service-request/new" class="btn btn-primary mt-3">
+                        <i class="fa fa-plus me-2"></i>Nouvelle demande
+                    </a>
+                </div>
+            </t>
+            <t t-if="service_requests">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-6">
+                                <h3 class="mb-0">Mes demandes</h3>
+                            </div>
+                            <div class="col-6 text-end">
+                                <a href="/service-request/new" class="btn btn-primary">
+                                    <i class="fa fa-plus me-2"></i>Nouvelle demande
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Référence</th>
+                                        <th>Date</th>
+                                        <th>État</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="service_requests" t-as="request">
+                                        <tr>
+                                            <td><t t-esc="request.name"/></td>
+                                            <td><t t-esc="request.create_date" t-options='{"widget": "date"}'/></td>
+                                            <td>
+                                                <span t-attf-class="badge bg-#{request.state == 'approved' and 'success' or request.state == 'rejected' and 'danger' or 'info'}">
+                                                    <t t-esc="request.state"/>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a t-attf-href="/my/service-request/#{request.id}" class="btn btn-sm btn-secondary">
+                                                    <i class="fa fa-eye"></i> Voir
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo> 
