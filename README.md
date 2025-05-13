@@ -1,10 +1,32 @@
 # Gestion de Parc Informatique (IT Park Management)
 
-Module Odoo pour la gestion complète de parc informatique avec portail client intégré.
+Module Odoo 18.0 pour la gestion complète de parc informatique avec portail client intégré.
 
 ## Captures d'écran
 
-Plusieurs captures d'écran sont disponibles dans le dossier `assets/` montrant l'interface utilisateur et les fonctionnalités.
+### Interface principale
+![Interface principale](assets/Screenshot%202025-05-13%20053148.png)
+
+### Gestion des équipements
+![Gestion des équipements](assets/Screenshot%202025-05-13%20053227.png)
+
+### Portail client
+![Portail client](assets/Screenshot%202025-05-13%20053244.png)
+
+### Tickets de support
+![Tickets de support](assets/Screenshot%202025-05-13%20053255.png)
+
+### Tableaux de bord
+![Tableaux de bord](assets/Screenshot%202025-05-13%20053334.png)
+
+### Vue des interventions
+![Vue des interventions](assets/Screenshot%202025-05-13%20053348.png)
+
+### Formulaire de demande
+![Formulaire de demande](assets/Screenshot%202025-05-13%20053402.png)
+
+### Détails d'équipement
+![Détails d'équipement](assets/Screenshot%202025-05-13%20053419.png)
 
 ## Fonctionnalités
 
@@ -33,6 +55,7 @@ Plusieurs captures d'écran sont disponibles dans le dossier `assets/` montrant 
 3. Recherchez "Gestion de Parc Informatique" et installez le module
 
 ## Structure du module
+
 
 ```
 it__park/
