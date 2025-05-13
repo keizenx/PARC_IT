@@ -1,0 +1,107 @@
+# Gestion de Parc Informatique (IT Park Management)
+
+Module Odoo pour la gestion complète de parc informatique avec portail client intégré.
+
+## Captures d'écran
+
+Plusieurs captures d'écran sont disponibles dans le dossier `assets/` montrant l'interface utilisateur et les fonctionnalités.
+
+## Fonctionnalités
+
+- **Gestion d'équipements informatiques** : Inventaire complet du matériel informatique
+- **Gestion des logiciels et licences** : Suivi des logiciels et de leurs licences
+- **Gestion des contrats** : Suivi des contrats avec alertes d'échéance
+- **Gestion des incidents** : Tickets de support et incidents
+- **Gestion des interventions** : Planification et suivi d'interventions
+- **Portail client** : Interface utilisateur pour les clients externes
+- **Tableau de bord** : Visualisation des métriques clés
+- **Accords de niveau de service (SLA)** : Définition et suivi des SLA
+
+## Prérequis
+
+- Odoo 18.0
+- Modules dépendants:
+  - Base, Mail, Portal, Website
+  - Contacts, Product, Stock
+  - Account, Helpdesk
+  - Rating, Auth Signup
+
+## Installation
+
+1. Clonez ce dépôt dans le dossier custom_addons de votre instance Odoo
+2. Activez le mode développeur et mettez à jour la liste des applications
+3. Recherchez "Gestion de Parc Informatique" et installez le module
+
+## Structure du module
+
+```
+it__park/
+├── assets/                      # Captures d'écran du module
+├── controllers/                 # Points d'entrée web et API REST
+│   ├── api.py                   # API REST
+│   ├── main.py                  # Contrôleur principal
+│   ├── portal.py                # Gestion du portail client
+│   └── website_controllers.py   # Contrôleurs pour site web
+├── data/                        # Données de configuration
+│   ├── ir_sequence_data.xml     # Séquences d'identification
+│   ├── it_park_email_templates.xml # Templates emails
+│   ├── it_service_type_data.xml # Types de services prédéfinis
+│   └── it_ticket_category_data.xml # Catégories de tickets
+├── models/                      # Modèles de données
+│   ├── hr_employee.py           # Extension employés
+│   ├── it_contract.py           # Gestion des contrats
+│   ├── it_dashboard.py          # Tableau de bord
+│   ├── it_equipment.py          # Équipements informatiques
+│   ├── it_incident.py           # Gestion des incidents
+│   ├── it_intervention.py       # Interventions techniques
+│   ├── it_license.py            # Licences logicielles
+│   ├── it_service_request.py    # Demandes de service
+│   ├── it_sla.py                # Accords de niveau de service
+│   ├── it_software.py           # Logiciels
+│   └── it_ticket.py             # Tickets de support
+├── security/                    # Sécurité et droits d'accès
+│   ├── ir.model.access.csv      # Droits d'accès aux modèles
+│   ├── it_security.xml          # Règles de sécurité
+│   └── it_park_portal_rules.xml # Règles pour le portail
+├── static/                      # Ressources statiques
+│   └── src/
+│       ├── css/                 # Feuilles de style
+│       ├── js/                  # Scripts JavaScript
+│       └── scss/                # Styles SCSS
+├── utils/                       # Utilitaires
+│   └── url_utils.py             # Fonctions de manipulation d'URL
+├── views/                       # Vues et templates
+│   ├── it_contract_views.xml    # Vues des contrats
+│   ├── it_equipment_views.xml   # Vues des équipements
+│   ├── it_incident_views.xml    # Vues des incidents
+│   ├── it_intervention_views.xml # Vues des interventions
+│   ├── it_park_portal_templates.xml # Templates du portail
+│   ├── it_ticket_views.xml      # Vues des tickets
+│   └── portal_templates.xml     # Templates généraux du portail
+└── wizards/                     # Assistants pour actions complexes
+    ├── assign_equipment_wizard.py # Assistant d'attribution
+    ├── it_incident_resolve_wizard.py # Résolution d'incident
+    └── it_portal_user_wizard.py # Création d'utilisateur portail
+```
+
+## Scripts de correction
+
+Le module contient plusieurs scripts de correction qui ont été utilisés pour résoudre des problèmes spécifiques:
+
+- `fix_portal_access.py` : Corrige les problèmes d'accès au portail client
+- `fix_portal_tickets_domain.py` : Corrige les domaines de filtrage des tickets
+- `fix_import_datetime.py` : Ajoute les imports manquants du module datetime
+- `fix_xml_error.py` : Corrige les erreurs de syntaxe XML dans les templates
+- `run_diagnostics.py` : Diagnostic et identification des problèmes
+
+## Corrections récentes
+
+- Correction des routes du portail client (/my/tickets/create → /my/tickets/add)
+- Amélioration de l'affichage des détails d'équipements et factures
+- Correction de l'affichage des détails des contrats
+- Ajout de boutons d'action manquants dans les listes
+- Correction d'erreurs XML dans les templates du portail
+
+## Licence
+
+LGPL-3 

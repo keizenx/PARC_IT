@@ -348,7 +348,7 @@ class ITContract(models.Model):
                 )
             """)
             
-        return True
+        return True 
     
     def action_view_contract_detail(self):
         """Afficher les détails du contrat dans le portail"""
