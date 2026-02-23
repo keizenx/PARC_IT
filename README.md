@@ -50,15 +50,58 @@ Module Odoo 18.0 pour la gestion complète de parc informatique avec portail cli
 
 ## Installation
 
-1. Clonez ce dépôt dans le dossier custom_addons de votre instance Odoo
-2. Activez le mode développeur et mettez à jour la liste des applications
-3. Recherchez "Gestion de Parc Informatique" et installez le module
+### 1) Récupérer le module
+
+Clonez le dépôt dans votre dossier `custom_addons`.
+
+```bash
+cd /chemin/vers/odoo/custom_addons
+git clone https://github.com/keizenx/PARC_IT.git
+```
+
+Exemple Windows (PowerShell):
+
+```powershell
+cd E:\odoo-18.0+e.20250206\odoo\custom_addons
+git clone https://github.com/keizenx/PARC_IT.git
+```
+
+### 2) Vérifier la configuration Odoo
+
+Dans `odoo.conf`, vérifiez que `addons_path` contient bien les addons standards et `custom_addons`:
+
+```ini
+addons_path = E:\odoo-18.0+e.20250206\odoo\addons,E:\odoo-18.0+e.20250206\odoo\custom_addons
+```
+
+### 3) Redémarrer Odoo
+
+Redémarrez le service Odoo pour prendre en compte le nouveau module.
+
+### 4) Mettre à jour la liste des modules
+
+- Interface: `Apps` -> `Update Apps List`
+- Ou en ligne de commande:
+
+```bash
+odoo-bin -c /chemin/vers/odoo.conf -d <nom_base> -u PARC_IT
+```
+
+Exemple:
+
+```powershell
+.\venv\Scripts\python.exe odoo-bin -c odoo.conf -d odoo_new -u PARC_IT
+```
+
+### 5) Installer le module
+
+Dans `Apps`, recherchez **Gestion de Parc Informatique** puis cliquez sur **Install**.
 
 ## Structure du module
 
 
 ```
-it__park/
+PARC_IT/
 ├── assets/                      # Captures d'écran du module
 ├── controllers/                 # Points d'entrée web et API REST
 │   ├── api.py                   # API REST
