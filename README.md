@@ -2,7 +2,7 @@
 [![Stars](https://img.shields.io/github/stars/keizenx/PARC_IT?style=social)](https://github.com/keizenx/PARC_IT/stargazers)
 [![Forks](https://img.shields.io/github/forks/keizenx/PARC_IT?style=social)](https://github.com/keizenx/PARC_IT/network/members)
 [![Issues](https://img.shields.io/github/issues/keizenx/PARC_IT)](https://github.com/keizenx/PARC_IT/issues)
-[![Twitter Follow](https://img.shields.io/twitter/follow/keizenx?style=social)](https://x.com/keizenx)
+[![Twitter Follow](https://img.shields.io/twitter/follow/keizenx?style=social)](https://x.com/keizensberg)
 
 # PARC_IT: Gestion de Parc Informatique pour Odoo 18
 
