@@ -1,4 +1,4 @@
-odoo.define('it__park.ticket_notifications', function (require) {
+odoo.define('PARC_IT.ticket_notifications', function (require) {
     "use strict";
 
     var core = require('web.core');
@@ -7,7 +7,7 @@ odoo.define('it__park.ticket_notifications', function (require) {
     var bus = require('bus.bus').bus;
 
     // Variables globales
-    var notification_sound = new Audio('/it__park/static/src/sounds/chime-alert-demo-309545.mp3');
+    var notification_sound = new Audio('/PARC_IT/static/src/sounds/chime-alert-demo-309545.mp3');
     var last_notification_id = 0;
     var notifications = [];
     var is_admin = false;
@@ -58,7 +58,7 @@ odoo.define('it__park.ticket_notifications', function (require) {
                 if (Notification && Notification.permission === "granted") {
                     var n = new Notification("Nouveau ticket IT", {
                         body: "Ticket #" + message.reference + " - " + message.title + " créé par " + message.client_name,
-                        icon: "/it__park/static/description/icon.png"
+                        icon: "/PARC_IT/static/description/icon.png"
                     });
 
                     // Rediriger vers le ticket quand on clique

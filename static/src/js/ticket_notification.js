@@ -33,7 +33,7 @@ export const ticketNotificationService = {
         
         function isITAdmin() {
             // Vérifier si l'utilisateur a le droit admin pour IT
-            return session.user_has_group('it__park.group_it_park_manager');
+            return session.user_has_group('PARC_IT.group_it_park_manager');
         }
         
         function handleNewTicket(data) {
@@ -61,7 +61,7 @@ export const ticketNotificationService = {
                 if (browser.Notification.permission === 'granted') {
                     const notif = new browser.Notification(title, {
                         body: message,
-                        icon: '/it__park/static/src/img/ticket_icon.png',
+                        icon: '/PARC_IT/static/src/img/ticket_icon.png',
                     });
                     
                     // Rediriger vers le ticket lors du clic sur la notification
@@ -92,7 +92,7 @@ export const ticketNotificationService = {
         function playSound() {
             // Jouer un son de notification
             if (!audio) {
-                audio = new Audio('/it__park/static/src/sounds/notification.mp3');
+                audio = new Audio('/PARC_IT/static/src/sounds/notification.mp3');
             }
             audio.play().catch(function (error) {
                 console.error('Erreur lors de la lecture du son:', error);
@@ -103,7 +103,7 @@ export const ticketNotificationService = {
 
 registry.category('services').add('ticketNotification', ticketNotificationService);
 
-odoo.define('it__park.ticket_notification', function (require) {
+odoo.define('PARC_IT.ticket_notification', function (require) {
     'use strict';
     
     var core = require('web.core');
@@ -134,7 +134,7 @@ odoo.define('it__park.ticket_notification', function (require) {
             }
             
             // Vérifier si l'utilisateur est administrateur
-            session.user_has_group('it__park.group_it_admin').then(function (is_admin) {
+            session.user_has_group('PARC_IT.group_it_admin').then(function (is_admin) {
                 if (!is_admin) {
                     return; // Ne pas afficher la notification si l'utilisateur n'est pas administrateur
                 }
@@ -158,11 +158,11 @@ odoo.define('it__park.ticket_notification', function (require) {
             // Créer une notification
             var notification = new Notification("Nouveau ticket IT", {
                 body: message.client_name + ": " + message.title,
-                icon: "/it__park/static/src/img/ticket_icon.png"
+                icon: "/PARC_IT/static/src/img/ticket_icon.png"
             });
             
             // Jouer un son d'alerte
-            var audio = new Audio('/it__park/static/src/sounds/notification.mp3');
+            var audio = new Audio('/PARC_IT/static/src/sounds/notification.mp3');
             audio.play();
             
             // Gérer le clic sur la notification

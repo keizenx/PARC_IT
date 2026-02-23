@@ -8,13 +8,13 @@
             <form string="Demande de prestation">
                 <header>
                     <button name="action_submit" string="Soumettre" type="object" invisible="state != 'draft'" class="oe_highlight"/>
-                    <button name="action_review" string="Analyser" type="object" invisible="state != 'submitted'" class="oe_highlight" groups="it__park.group_it_park_manager"/>
-                    <button name="action_send_proposal" string="Envoyer proposition" type="object" invisible="state != 'under_review'" class="oe_highlight" groups="it__park.group_it_park_manager"/>
-                    <button name="action_accept_proposal" string="Proposition acceptée" type="object" invisible="state != 'proposal_sent'" groups="it__park.group_it_park_manager"/>
-                    <button name="action_mark_as_paid" string="Marquer comme payée" type="object" invisible="state != 'invoiced'" class="oe_highlight" groups="it__park.group_it_park_manager"/>
-                    <button name="action_create_contract" string="Créer contrat" type="object" invisible="state != 'paid'" class="oe_highlight" groups="it__park.group_it_park_manager"/>
-                    <button name="action_activate" string="Activer" type="object" invisible="state != 'contract_created'" class="oe_highlight" groups="it__park.group_it_park_manager"/>
-                    <button name="action_reject" string="Rejeter" type="object" invisible="state not in ('submitted', 'under_review')" groups="it__park.group_it_park_manager"/>
+                    <button name="action_review" string="Analyser" type="object" invisible="state != 'submitted'" class="oe_highlight" groups="PARC_IT.group_it_park_manager"/>
+                    <button name="action_send_proposal" string="Envoyer proposition" type="object" invisible="state != 'under_review'" class="oe_highlight" groups="PARC_IT.group_it_park_manager"/>
+                    <button name="action_accept_proposal" string="Proposition acceptée" type="object" invisible="state != 'proposal_sent'" groups="PARC_IT.group_it_park_manager"/>
+                    <button name="action_mark_as_paid" string="Marquer comme payée" type="object" invisible="state != 'invoiced'" class="oe_highlight" groups="PARC_IT.group_it_park_manager"/>
+                    <button name="action_create_contract" string="Créer contrat" type="object" invisible="state != 'paid'" class="oe_highlight" groups="PARC_IT.group_it_park_manager"/>
+                    <button name="action_activate" string="Activer" type="object" invisible="state != 'contract_created'" class="oe_highlight" groups="PARC_IT.group_it_park_manager"/>
+                    <button name="action_reject" string="Rejeter" type="object" invisible="state not in ('submitted', 'under_review')" groups="PARC_IT.group_it_park_manager"/>
                     <button name="action_cancel" string="Annuler" type="object" invisible="state in ('rejected', 'cancelled')"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,under_review,proposal_sent,proposal_accepted,invoiced,paid,contract_created,active"/>
                 </header>

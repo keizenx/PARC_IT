@@ -1,4 +1,4 @@
-odoo.define('it__park.signup', function (require) {
+odoo.define('PARC_IT.signup', function (require) {
     'use strict';
 
     var publicWidget = require('web.public.widget');

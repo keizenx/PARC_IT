@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 /**
- * Ce fichier est le point d'entrée pour les composants JavaScript du module it__park.
+ * Ce fichier est le point d'entrée pour les composants JavaScript du module PARC_IT.
  * Il importe et réexporte tous les composants pour s'assurer qu'ils sont correctement 
  * chargés et disponibles dans l'application.
  */

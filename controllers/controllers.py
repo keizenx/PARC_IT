@@ -3,20 +3,20 @@
 
 
 # class ItPark(http.Controller):
-#     @http.route('/it__park/it__park', auth='public', csrf=True)
+#     @http.route('/PARC_IT/it__park', auth='public', csrf=True)
 #     def index(self, **kwargs):
 #         return "Hello, world"
 
-#     @http.route('/it__park/it__park/objects', auth='public', csrf=True)
+#     @http.route('/PARC_IT/it__park/objects', auth='public', csrf=True)
 #     def list(self, **kwargs):
-#         return http.request.render('it__park.listing', {
-#             'root': '/it__park/it__park',
-#             'objects': http.request.env['it__park.it__park'].search([]),
+#         return http.request.render('PARC_IT.listing', {
+#             'root': '/PARC_IT/it__park',
+#             'objects': http.request.env['PARC_IT.it__park'].search([]),
 #         })
 
-#     @http.route('/it__park/it__park/objects/<model("it__park.it__park", csrf=True):obj>', auth='public')
+#     @http.route('/PARC_IT/it__park/objects/<model("PARC_IT.it__park", csrf=True):obj>', auth='public')
 #     def object(self, obj, **kw):
-#         return http.request.render('it__park.object', {
+#         return http.request.render('PARC_IT.object', {
 #             'object': obj
 #         })
 

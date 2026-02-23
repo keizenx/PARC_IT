@@ -109,6 +109,25 @@ class ResPartner(models.Model):
             partner.service_request_count = self.env['it.service.request'].search_count([
                 ('partner_id', '=', partner.id)
             ])
+
+    @api.depends('service_request_count')
+    def _compute_service_request_status(self):
+        for partner in self:
+            requests = self.env['it.service.request'].search(
+                [('partner_id', '=', partner.id)],
+                order='create_date desc'
+            )
+            active_requests = requests.filtered(lambda r: r.state not in ('cancelled', 'cancel', 'done'))
+            partner.active_service_request_id = active_requests[:1].id if active_requests else False
+            partner.has_active_service_request = bool(active_requests)
+            partner.has_proposal = any(
+                r.state in ('proposal_sent', 'proposal_accepted', 'invoiced', 'paid')
+                for r in requests
+            )
+            partner.has_accepted_proposal = any(
+                r.state in ('proposal_accepted', 'invoiced', 'paid')
+                for r in requests
+            )
     
     @api.depends('it_site_ids')
     def _compute_it_site_count(self):
@@ -184,28 +203,28 @@ class ResPartner(models.Model):
     
     def action_view_equipment(self):
         self.ensure_one()
-        action = self.env["ir.actions.actions"]._for_xml_id("it__park.action_it_equipment_client")
+        action = self.env["ir.actions.actions"]._for_xml_id("PARC_IT.action_it_equipment_client")
         action['domain'] = [('client_id', '=', self.id)]
         action['context'] = {'default_client_id': self.id}
         return action
         
     def action_view_licenses(self):
         self.ensure_one()
-        action = self.env["ir.actions.actions"]._for_xml_id("it__park.action_it_license_client")
+        action = self.env["ir.actions.actions"]._for_xml_id("PARC_IT.action_it_license_client")
         action['domain'] = [('client_id', '=', self.id)]
         action['context'] = {'default_client_id': self.id}
         return action
         
     def action_view_incidents(self):
         self.ensure_one()
-        action = self.env["ir.actions.actions"]._for_xml_id("it__park.action_it_incident_client")
+        action = self.env["ir.actions.actions"]._for_xml_id("PARC_IT.action_it_incident_client")
         action['domain'] = [('client_id', '=', self.id)]
         action['context'] = {'default_client_id': self.id}
         return action
         
     def action_view_it_invoices(self):
         self.ensure_one()
-        action = self.env["ir.actions.actions"]._for_xml_id("it__park.action_it_client_invoices")
+        action = self.env["ir.actions.actions"]._for_xml_id("PARC_IT.action_it_client_invoices")
         
         # Définir le domaine en fonction du type de partenaire
         if self.is_it_client and self.it_site_ids:
@@ -236,7 +255,7 @@ class ResPartner(models.Model):
         if not self.is_it_client:
             return False
             
-        action = self.env["ir.actions.actions"]._for_xml_id("it__park.action_it_client_sites")
+        action = self.env["ir.actions.actions"]._for_xml_id("PARC_IT.action_it_client_sites")
         action['domain'] = [('parent_it_client_id', '=', self.id), ('is_it_site', '=', True)]
         action['context'] = {
             'default_parent_it_client_id': self.id,
@@ -250,7 +269,7 @@ class ResPartner(models.Model):
         """Voir les contrats associés à ce client ou site client"""
         self.ensure_one()
         
-        action = self.env["ir.actions.actions"]._for_xml_id("it__park.action_it_contract")
+        action = self.env["ir.actions.actions"]._for_xml_id("PARC_IT.action_it_contract")
         
         # Définir le domaine en fonction du type de partenaire
         if self.is_it_client and self.it_site_ids:
@@ -273,8 +292,8 @@ class ResPartner(models.Model):
         if not self.is_it_site:
             return False
             
-        action = self.env["ir.actions.actions"]._for_xml_id("it__park.action_it_equipment")
-        action['views'] = [(self.env.ref('it__park.view_it_equipment_form').id, 'form')]
+        action = self.env["ir.actions.actions"]._for_xml_id("PARC_IT.action_it_equipment")
+        action['views'] = [(self.env.ref('PARC_IT.view_it_equipment_form').id, 'form')]
         action['target'] = 'new'
         action['context'] = {
             'default_client_id': self.id,
@@ -288,7 +307,7 @@ class ResPartner(models.Model):
     @api.model
     def action_it_clients_only(self):
         """Action pour afficher uniquement les clients créés depuis le module it__park"""
-        action = self.env.ref('it__park.action_it_clients').read()[0]
+        action = self.env.ref('PARC_IT.action_it_clients').read()[0]
         # Garantir que tous les clients IT sont visibles (actifs + en attente)
         action['domain'] = ['|', 
                            ('is_it_client', '=', True),
@@ -301,7 +320,7 @@ class ResPartner(models.Model):
     @api.model
     def action_it_suppliers_only(self):
         """Action pour afficher uniquement les fournisseurs créés depuis le module it__park"""
-        action = self.env.ref('it__park.action_it_suppliers').read()[0]
+        action = self.env.ref('PARC_IT.action_it_suppliers').read()[0]
         # Garantir que seuls les fournisseurs créés par ce module sont visibles
         # mais permettre la création de nouveaux fournisseurs
         action['domain'] = [('is_it_supplier', '=', True), ('is_company', '=', True)]
@@ -376,7 +395,7 @@ class ResPartner(models.Model):
 
     def action_view_tickets(self):
         self.ensure_one()
-        action = self.env["ir.actions.actions"]._for_xml_id("it__park.action_it_ticket")
+        action = self.env["ir.actions.actions"]._for_xml_id("PARC_IT.action_it_ticket")
         
         # Définir le domaine en fonction du type de partenaire
         if self.is_it_client and self.it_site_ids:
@@ -562,7 +581,7 @@ class ResPartner(models.Model):
         self.write({'email_validation_url': validation_url})
         
         # Récupérer le template
-        template = self.env.ref('it__park.email_template_it_registration_validation')
+        template = self.env.ref('PARC_IT.email_template_it_registration_validation')
         if not template:
             _logger.error("Template de validation d'email non trouvé")
             return False

@@ -2,7 +2,7 @@
 <odoo>
     <!-- Vue de recherche commune pour tous les contacts IT -->
     <record id="view_it_partner_filter" model="ir.ui.view">
-        <field name="name">it__park.partner.search</field>
+        <field name="name">PARC_IT.partner.search</field>
         <field name="model">res.partner</field>
         <field name="priority">20</field>
         <field name="arch" type="xml">
@@ -664,21 +664,21 @@
         <field name="sequence" eval="1"/>
         <field name="view_mode">kanban</field>
         <field name="view_id" ref="view_it_clients_kanban"/>
-        <field name="act_window_id" ref="it__park.action_it_clients"/>
+        <field name="act_window_id" ref="PARC_IT.action_it_clients"/>
     </record>
 
     <record id="action_it_clients_list" model="ir.actions.act_window.view">
         <field name="sequence" eval="2"/>
         <field name="view_mode">list</field>
         <field name="view_id" ref="view_it_client_tree"/>
-        <field name="act_window_id" ref="it__park.action_it_clients"/>
+        <field name="act_window_id" ref="PARC_IT.action_it_clients"/>
     </record>
 
     <record id="action_it_clients_form" model="ir.actions.act_window.view">
         <field name="sequence" eval="3"/>
         <field name="view_mode">form</field>
         <field name="view_id" ref="view_it_client_form"/>
-        <field name="act_window_id" ref="it__park.action_it_clients"/>
+        <field name="act_window_id" ref="PARC_IT.action_it_clients"/>
     </record>
 
     <!-- Modifions les actions pour utiliser nos vues -->
@@ -843,11 +843,11 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">kanban,list,form</field>
-        <field name="domain">['|', '|', '|', 
-            ('is_it_client', '=', True), 
-            ('is_it_supplier', '=', True), 
+        <field name="domain">['|', '|', '|',
+            ('is_it_client', '=', True),
+            ('is_it_supplier', '=', True),
             ('is_it_site', '=', True),
-            ('&amp;', ('parent_id.is_it_client', '=', True), ('is_company', '=', False))]</field>
+            '&amp;', ('parent_id.is_it_client', '=', True), ('is_company', '=', False)]</field>
         <field name="context">{
             'search_default_filter_it': 1,
             'res_partner_search_mode': 'customer',

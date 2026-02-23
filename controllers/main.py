@@ -14,7 +14,7 @@ class ITMainController(http.Controller):
     
     @http.route('/contact', type='http', auth="public", website=True)
     def contact(self, **kw):
-        return request.render("it__park.contact_us_page", {})
+        return request.render("PARC_IT.contact_us_page", {})
 
 class ITSignup(AuthSignupHome):
     @http.route('/it/inscription', type='http', auth='public', website=True)
@@ -30,7 +30,7 @@ class ITSignup(AuthSignupHome):
             except Exception as e:
                 qcontext['error'] = str(e)
         
-        response = request.render('it__park.it_signup_form', qcontext)
+        response = request.render('PARC_IT.it_signup_form', qcontext)
         response.headers['X-Frame-Options'] = 'DENY'
         return response 
 
@@ -44,7 +44,7 @@ class ITNotificationController(http.Controller):
             user = request.env.user
             
             # Vérifier si l'utilisateur est membre du groupe administrateur IT
-            admin_group = request.env.ref('it__park.group_it_admin', raise_if_not_found=False)
+            admin_group = request.env.ref('PARC_IT.group_it_admin', raise_if_not_found=False)
             if admin_group and user in admin_group.users:
                 is_admin = True
             

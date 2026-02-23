@@ -1,7 +1,7 @@
 <odoo>
     <template id="it_support_new_ticket" name="Nouveau ticket IT">
         <t t-call="website.layout">
-            <t t-call="it__park.portal_menu"/>
+            <t t-call="PARC_IT.portal_menu"/>
             <div class="container">
                 <h1>Créer un nouveau ticket</h1>
                 <form method="post" action="/it-support/submit-ticket" enctype="multipart/form-data">
@@ -93,12 +93,12 @@
                 </ul>
             </div>
         </div>
-        <t t-call="it__park.portal_expiry_notifications"/>
+        <t t-call="PARC_IT.portal_expiry_notifications"/>
     </template>
 
     <template id="it_support_ticket_list" name="Liste des tickets IT">
         <t t-call="website.layout">
-            <t t-call="it__park.portal_menu"/>
+            <t t-call="PARC_IT.portal_menu"/>
             <div class="container">
                 <h1>Mes tickets</h1>
                 
@@ -179,7 +179,7 @@
 
     <template id="it_support_ticket_detail" name="Détail du ticket IT">
         <t t-call="website.layout">
-            <t t-call="it__park.portal_menu"/>
+            <t t-call="PARC_IT.portal_menu"/>
             <div class="container">
                 <div class="d-flex align-items-center mb-4">
                     <h1 class="mb-0">Ticket #<t t-esc="ticket.reference"/></h1>
@@ -340,7 +340,7 @@
 
     <template id="it_support_asset_list" name="Mon parc informatique">
         <t t-call="website.layout">
-            <t t-call="it__park.portal_menu"/>
+            <t t-call="PARC_IT.portal_menu"/>
             <div class="container">
                 <h1>Mon parc informatique</h1>
                 
@@ -413,7 +413,7 @@
 
     <template id="it_support_asset_detail" name="Détail équipement IT">
         <t t-call="website.layout">
-            <t t-call="it__park.portal_menu"/>
+            <t t-call="PARC_IT.portal_menu"/>
             <div class="container">
                 <h1>Détail de l'équipement</h1>
                 <t t-if="asset">
@@ -452,7 +452,7 @@
 
     <template id="it_support_contract_list" name="Mes contrats">
         <t t-call="website.layout">
-            <t t-call="it__park.portal_menu"/>
+            <t t-call="PARC_IT.portal_menu"/>
             <div class="container">
                 <h1>Mes contrats</h1>
                 
@@ -525,7 +525,7 @@
 
     <template id="it_support_invoice_list" name="Mes factures">
         <t t-call="website.layout">
-            <t t-call="it__park.portal_menu"/>
+            <t t-call="PARC_IT.portal_menu"/>
             <div class="container">
                 <h1>Mes factures</h1>
                 

@@ -53,7 +53,7 @@
     <!-- Menu pour accéder au wizard -->
     <menuitem id="menu_it_portal_user_wizard"
               name="Créer utilisateur portail"
-              parent="it__park.menu_it_config"
+              parent="PARC_IT.menu_it_config"
               action="action_it_portal_user_wizard"
               sequence="95"/>
 </odoo> 

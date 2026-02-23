@@ -1,4 +1,4 @@
-odoo.define('it__park.client_dashboard', function (require) {
+odoo.define('PARC_IT.client_dashboard', function (require) {
     'use strict';
 
     var publicWidget = require('web.public.widget');

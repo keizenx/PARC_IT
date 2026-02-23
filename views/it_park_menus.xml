@@ -134,7 +134,7 @@
               name="Parc IT" 
               web_icon="it__park,static/description/icon.png" 
               sequence="100"
-              groups="it__park.group_it_park_user"/>
+              groups="PARC_IT.group_it_park_user"/>
     
     <!-- Section Actifs - désactivée car remplacée par nouveau menu -->
     <menuitem id="menu_it_assets" 
@@ -142,7 +142,7 @@
               parent="menu_it_park_root" 
               sequence="10"
               active="false"
-              groups="it__park.group_it_park_user"/>
+              groups="PARC_IT.group_it_park_user"/>
               
     <!-- Sous-menus Actifs - désactivés car remplacés par nouveaux menus -->
     <menuitem id="menu_it_equipment" 
@@ -179,7 +179,7 @@
               parent="menu_it_park_root" 
               sequence="20"
               active="false"
-              groups="it__park.group_it_park_user"/>
+              groups="PARC_IT.group_it_park_user"/>
     
     <!-- Sous-menus Support - désactivés car remplacés par nouveaux menus -->
     <menuitem id="menu_it_tickets"
@@ -215,7 +215,7 @@
               name="Configuration" 
               parent="menu_it_park_root" 
               sequence="100"
-              groups="it__park.group_it_park_manager"/>
+              groups="PARC_IT.group_it_park_manager"/>
     
     <!-- Sous-menus Configuration -->
     <menuitem id="menu_it_equipment_type" 
@@ -253,7 +253,7 @@
               name="Reporting" 
               parent="menu_it_park_root" 
               sequence="90"
-              groups="it__park.group_it_park_user"/>
+              groups="PARC_IT.group_it_park_user"/>
     
     <menuitem id="menu_it_dashboards" 
               name="Tableaux de bord" 
@@ -266,7 +266,7 @@
               name="Contacts" 
               parent="menu_it_park_root" 
               sequence="30"
-              groups="it__park.group_it_park_user"/>
+              groups="PARC_IT.group_it_park_user"/>
               
     <menuitem id="menu_it_clients" 
               name="Clients IT" 
@@ -291,5 +291,5 @@
               name="Commercial" 
               parent="menu_it_park_root" 
               sequence="30"
-              groups="it__park.group_it_park_user"/>
+              groups="PARC_IT.group_it_park_user"/>
 </odoo> 

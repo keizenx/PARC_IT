@@ -47,7 +47,7 @@
             <field name="name">Client IT: accès complet pour les utilisateurs internes</field>
             <field name="model_id" ref="base.model_res_partner"/>
             <field name="domain_force">[(1, '=', 1)]</field>
-            <field name="groups" eval="[(4, ref('it__park.group_it_park_user'))]"/>
+            <field name="groups" eval="[(4, ref('PARC_IT.group_it_park_user'))]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="True"/>
@@ -59,7 +59,7 @@
             <field name="name">Voir tous les clients IT</field>
             <field name="model_id" ref="base.model_res_partner"/>
             <field name="domain_force">[('is_it_client', '=', True)]</field>
-            <field name="groups" eval="[(4, ref('it__park.group_it_park_user'))]"/>
+            <field name="groups" eval="[(4, ref('PARC_IT.group_it_park_user'))]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="True"/>

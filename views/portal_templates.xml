@@ -446,8 +446,8 @@
     <!-- Ce template est obsolète dans Odoo 18 car les assets sont maintenant définis dans __manifest__.py
     <template id="assets_frontend" inherit_id="web.assets_frontend" name="IT Progress Assets">
         <xpath expr="." position="inside">
-            <link rel="stylesheet" type="text/scss" href="/it__park/static/src/scss/progress.scss"/>
-            <script type="text/javascript" src="/it__park/static/src/js/progress.js"/>
+            <link rel="stylesheet" type="text/scss" href="/PARC_IT/static/src/scss/progress.scss"/>
+            <script type="text/javascript" src="/PARC_IT/static/src/js/progress.js"/>
         </xpath>
     </template>
     -->
@@ -672,7 +672,7 @@
 
     <!-- Template pour la redirection vers les détails du contrat -->
     <template id="portal_contract_detail" name="Contract Detail">
-        <t t-call="it__park.portal_my_contract_detail"/>
+        <t t-call="PARC_IT.portal_my_contract_detail"/>
     </template>
 
     <!-- Template pour les accès refusés au parc informatique -->

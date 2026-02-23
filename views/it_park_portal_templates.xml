@@ -632,7 +632,7 @@
 
     <!-- Template pour la redirection vers les détails du contrat -->
     <template id="portal_contract_detail" name="Contract Detail">
-        <t t-call="it__park.portal_my_contract_detail"/>
+        <t t-call="PARC_IT.portal_my_contract_detail"/>
     </template>
 
     <!-- Template pour les accès refusés au parc informatique -->

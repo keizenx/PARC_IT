@@ -56,7 +56,7 @@
     
     <menuitem id="menu_it_helpdesk_config" 
               name="Configuration du support"
-              parent="it__park.menu_it_config"
+              parent="PARC_IT.menu_it_config"
               action="action_it_helpdesk_config"
               sequence="60"
               groups="base.group_system"/>

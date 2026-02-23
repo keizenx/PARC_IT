@@ -8,59 +8,59 @@
     <!-- Actifs: Section principale -->
     <menuitem id="menu_it_assets_new"
               name="Actifs IT" 
-              parent="it__park.menu_it_park_root" 
+              parent="PARC_IT.menu_it_park_root" 
               sequence="10"
-              groups="it__park.group_it_park_user"/>
+              groups="PARC_IT.group_it_park_user"/>
               
     <!-- Sous-menus Actifs avec IDs complètement nouveaux -->
     <menuitem id="menu_it_equipment_new" 
               name="Équipements" 
               parent="menu_it_assets_new" 
-              action="it__park.action_it_equipment"
+              action="PARC_IT.action_it_equipment"
               sequence="10"/>
     
     <menuitem id="menu_it_software_new" 
               name="Logiciels" 
               parent="menu_it_assets_new" 
-              action="it__park.action_it_software"
+              action="PARC_IT.action_it_software"
               sequence="20"/>
     
     <menuitem id="menu_it_licenses_new" 
               name="Licences" 
               parent="menu_it_assets_new" 
-              action="it__park.action_it_license"
+              action="PARC_IT.action_it_license"
               sequence="30"/>
               
     <menuitem id="menu_it_contracts_new" 
               name="Contrats" 
               parent="menu_it_assets_new" 
-              action="it__park.action_it_contract"
+              action="PARC_IT.action_it_contract"
               sequence="40"/>
               
     <!-- Support: Section principale -->
     <menuitem id="menu_it_support_new" 
               name="Support" 
-              parent="it__park.menu_it_park_root" 
+              parent="PARC_IT.menu_it_park_root" 
               sequence="20"
-              groups="it__park.group_it_park_user"/>
+              groups="PARC_IT.group_it_park_user"/>
     
     <!-- Sous-menus Support avec IDs complètement nouveaux -->
     <menuitem id="menu_it_tickets_new"
               name="Tickets IT"
               parent="menu_it_support_new"
-              action="it__park.action_it_tickets_support"
+              action="PARC_IT.action_it_tickets_support"
               sequence="10"/>
     
     <menuitem id="menu_it_incidents_new"
               name="Incidents"
               parent="menu_it_support_new"
-              action="it__park.action_it_incidents"
+              action="PARC_IT.action_it_incidents"
               sequence="20"/>
               
     <menuitem id="menu_it_interventions_new"
               name="Interventions"
               parent="menu_it_support_new"
-              action="it__park.action_it_interventions"
+              action="PARC_IT.action_it_interventions"
               sequence="30"/>
 
     <!-- La balise function de rafraîchissement du cache est supprimée car elle cause une erreur -->

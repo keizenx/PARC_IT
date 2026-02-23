@@ -16,7 +16,7 @@ class ITSupportWebsite(http.Controller):
     @http.route(['/it-support'], type='http', auth="user", website=True, csrf=True)
     def it_support_home(self, **kwargs):
         """Page d'accueil du support technique"""
-        return request.render("it__park.it_support_home")
+        return request.render("PARC_IT.it_support_home")
     
     @http.route(['/it-support/new-ticket'], type='http', auth="user", website=True, methods=['GET'], csrf=True)
     def it_support_new_ticket(self, **kwargs):
@@ -43,7 +43,7 @@ class ITSupportWebsite(http.Controller):
             'page_name': 'new_ticket',
         }
         
-        return request.render("it__park.it_support_new_ticket", values)
+        return request.render("PARC_IT.it_support_new_ticket", values)
     
     @http.route(['/it-support/submit-ticket'], type='http', auth="user", website=True, methods=['POST'], csrf=True)
     def it_support_submit_ticket(self, **kwargs):
@@ -141,7 +141,7 @@ class ITSupportWebsite(http.Controller):
         # incident.send_realtime_notification()
         
         # Rediriger vers la page de confirmation
-        return request.render("it__park.it_support_ticket_submitted", {
+        return request.render("PARC_IT.it_support_ticket_submitted", {
             'ticket_reference': incident.reference,
             'ticket_id': incident.id,
         })
@@ -222,7 +222,7 @@ class ITSupportWebsite(http.Controller):
             'page_name': 'my_tickets',
         }
         
-        return request.render("it__park.it_support_ticket_list", values)
+        return request.render("PARC_IT.it_support_ticket_list", values)
     
     @http.route(['/my/tickets/<int:ticket_id>'], type='http', auth="user", website=True, csrf=True)
     def my_ticket_detail(self, ticket_id, **kwargs):
@@ -257,7 +257,7 @@ class ITSupportWebsite(http.Controller):
             'page_name': 'ticket_detail',
         }
         
-        return request.render("it__park.it_support_ticket_detail", values)
+        return request.render("PARC_IT.it_support_ticket_detail", values)
     
     @http.route(['/it-support/ticket-status'], type='json', auth="user", website=True, csrf=True)
     def get_ticket_status(self, ticket_id, **kwargs):
@@ -346,7 +346,7 @@ class ITSupportWebsite(http.Controller):
             'page_title': 'Gestion de parc informatique',
             'page_subtitle': 'Solution complète pour gérer vos équipements IT'
         }
-        return request.render('it__park.it_park_homepage_simple', values)
+        return request.render('PARC_IT.it_park_homepage_simple', values)
         
     @http.route(['/my/create-incident'], type='http', auth="user", website=True)
     def create_incident(self, **kw):
@@ -357,14 +357,14 @@ class ITSupportWebsite(http.Controller):
     @http.route(['/services-it'], type='http', auth="public", website=True)
     def services_it(self, **kw):
         """Page présentant les services IT offerts"""
-        return request.render("it__park.services_it", {
+        return request.render("PARC_IT.services_it", {
             'page_name': 'services_it',
         })
         
     @http.route(['/services-it/catalogue'], type='http', auth="public", website=True)
     def services_it_catalogue(self, **kw):
         """Catalogue détaillé des services IT offerts"""
-        return request.render("it__park.services_it_catalogue", {
+        return request.render("PARC_IT.services_it_catalogue", {
             'page_name': 'services_it_catalogue',
         })
 
@@ -376,7 +376,7 @@ class WebsiteIT(Website):
         
     @http.route(['/it/inscription'], type='http', auth="public", website=True)
     def it_registration(self, **post):
-        return request.render('it__park.it_registration_simple', {})
+        return request.render('PARC_IT.it_registration_simple', {})
 
     @http.route(['/it/validate-email'], type='http', auth="public", website=True)
     def validate_email(self, **post):
@@ -386,8 +386,8 @@ class WebsiteIT(Website):
         
         _logger.info(f"Tentative de validation d'email - Token: {token}, Partner ID: {partner_id}")
         
-        error_template = 'it__park.email_validation_error'
-        success_template = 'it__park.email_validation_success'
+        error_template = 'PARC_IT.email_validation_error'
+        success_template = 'PARC_IT.email_validation_success'
         
         if not token or not partner_id:
             _logger.warning("Validation d'email échouée: token ou partner_id manquant")
@@ -603,7 +603,7 @@ class WebsiteIT(Website):
         
         if not post.get('name') or not post.get('email'):
             _logger.warning("Formulaire d'inscription incomplet: nom ou email manquant")
-            return request.render('it__park.it_registration_error', {
+            return request.render('PARC_IT.it_registration_error', {
                 'error_message': 'Le nom de l\'entreprise et l\'email sont obligatoires.'
             })
             
@@ -614,13 +614,13 @@ class WebsiteIT(Website):
         if password and confirm_password:
             if password != confirm_password:
                 _logger.warning("Les mots de passe ne correspondent pas")
-                return request.render('it__park.it_registration_error', {
+                return request.render('PARC_IT.it_registration_error', {
                     'error_message': 'Les mots de passe ne correspondent pas.'
                 })
             
             if len(password) < 8:
                 _logger.warning("Mot de passe trop court")
-                return request.render('it__park.it_registration_error', {
+                return request.render('PARC_IT.it_registration_error', {
                     'error_message': 'Le mot de passe doit contenir au moins 8 caractères.'
                 })
 
@@ -735,16 +735,21 @@ class WebsiteIT(Website):
 
                     # Envoyer l'email de validation
                     try:
+                        default_from = request.env['ir.config_parameter'].sudo().get_param('mail.default.from')
                         mail_values = {
                             'subject': 'IT Park - Confirmez votre adresse email',
                             'body_html': self._get_validation_email_template(partner.name, validation_url),
                             'email_to': partner.email,
-                            'email_from': request.env.company.email or 'noreply@example.com',
+                            'email_from': default_from or request.env.company.email or 'noreply@example.com',
                             'auto_delete': True,
                         }
                         
                         # Vérifier la configuration SMTP
-                        mail_server = request.env['ir.mail_server'].sudo().search([], limit=1)
+                        mail_server = request.env['ir.mail_server'].sudo().search(
+                            [('active', '=', True), ('smtp_host', '!=', False)],
+                            order='sequence, id',
+                            limit=1,
+                        )
                         if not mail_server:
                             _logger.warning("Aucun serveur SMTP n'est configuré dans le système. Tentative d'envoi sans serveur spécifique.")
                             
@@ -777,11 +782,11 @@ class WebsiteIT(Website):
                     _logger.error(f"Erreur lors de la création/mise à jour de l'utilisateur: {str(e)}", exc_info=True)
                     confirmation_values['error_message'] = str(e)
 
-            return request.render('it__park.it_registration_confirmation', confirmation_values)
+            return request.render('PARC_IT.it_registration_confirmation', confirmation_values)
 
         except Exception as e:
             _logger.error(f"Erreur lors de l'inscription: {str(e)}", exc_info=True)
-            return request.render('it__park.it_registration_error', {
+            return request.render('PARC_IT.it_registration_error', {
                 'error_message': str(e)
         })
 
@@ -792,11 +797,15 @@ class WebsiteIT(Website):
             IrConfigParameter = request.env['ir.config_parameter'].sudo()
             base_url = IrConfigParameter.get_param('web.base.url')
             
-            # Générer un token d'invitation (valide 6 jours comme indiqué dans l'exemple)
-            invitation_token = user.sudo()._create_signup_token()
-            
-            # URL d'invitation avec token
-            signup_url = f"{base_url}/web/signup?token={invitation_token}"
+            # Odoo 18: générer le token via le partenaire
+            partner = partner.sudo()
+            partner.signup_prepare(signup_type='signup')
+            signup_url = partner.with_context(
+                signup_force_type_in_url='signup',
+                create_user=True,
+            )._get_signup_url_for_action().get(partner.id)
+            if not signup_url:
+                signup_url = f"{base_url}/web/signup"
             
             # Préparer l'email
             subject = f"Welcome to Odoo"
@@ -869,13 +878,17 @@ class WebsiteIT(Website):
             }
             
             # Récupérer les serveurs de messagerie configurés dans Odoo
-            mail_server = request.env['ir.mail_server'].sudo().search([], limit=1)
+            mail_server = request.env['ir.mail_server'].sudo().search(
+                [('active', '=', True), ('smtp_host', '!=', False)],
+                order='sequence, id',
+                limit=1,
+            )
             
             # Si un serveur est trouvé, créer et envoyer l'email
             if mail_server:
                 mail = request.env['mail.mail'].sudo().create(mail_values)
                 mail.mail_server_id = mail_server.id
-                mail.send(raise_exception=False)
+                mail.send(raise_exception=True)
                 _logger.info(f"Email d'invitation Odoo envoyé à {partner.email}")
                 return True
             else:

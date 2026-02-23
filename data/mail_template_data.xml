@@ -205,7 +205,7 @@
     <!-- Email template pour re-envoyer une proposition commerciale -->
     <record id="email_template_service_proposal_resend" model="mail.template">
       <field name="name">IT Park: Proposition Commerciale</field>
-      <field name="model_id" ref="it__park.model_it_service_request"/>
+      <field name="model_id" ref="PARC_IT.model_it_service_request"/>
       <field name="subject">Proposition commerciale - <t t-out="object.name"/></field>
       <field name="email_from">
         <t t-out="object.company_id.email or user.email_formatted"/>

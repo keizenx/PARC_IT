@@ -277,7 +277,7 @@ if not dashboard:
     </record>
     
     <!-- Exécuter l'action au démarrage -->
-    <function model="ir.actions.server" name="run" eval="[ref('it__park.create_default_dashboard')]"/>
+    <function model="ir.actions.server" name="run" eval="[ref('PARC_IT.create_default_dashboard')]"/>
 
     <!-- Menu du tableau de bord -->
     <!-- Ce menu est placé ici pour s'assurer que l'action est chargée avant le menu -->

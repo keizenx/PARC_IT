@@ -3,7 +3,7 @@
     <!-- Création du menu de configuration manquant -->
     <menuitem id="menu_it_park_configuration" 
               name="Configuration des Services" 
-              parent="it__park.menu_it_config" 
+              parent="PARC_IT.menu_it_config" 
               sequence="80"
-              groups="it__park.group_it_park_manager"/>
+              groups="PARC_IT.group_it_park_manager"/>
 </odoo> 

@@ -113,7 +113,7 @@
     <!-- Menu Item -->
     <menuitem id="menu_it_service_type"
               name="Service Types"
-              parent="it__park.menu_it_park_configuration"
+              parent="PARC_IT.menu_it_park_configuration"
               action="action_it_service_type"
               sequence="20"/>
 </odoo> 

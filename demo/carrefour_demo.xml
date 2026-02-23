@@ -84,7 +84,7 @@
         <record id="contract_carrefour" model="it.contract">
             <field name="name">Contrat Infogérance Carrefour Région Île-de-France</field>
             <field name="partner_id" ref="partner_carrefour"/>
-            <field name="contract_type_id" ref="it__park.contract_type_maintenance"/>
+            <field name="contract_type_id" ref="PARC_IT.contract_type_maintenance"/>
             <field name="date_start" eval="(DateTime.today()).strftime('%Y-%m-%d')"/>
             <field name="date_end" eval="(DateTime.today() + relativedelta(years=2)).strftime('%Y-%m-%d')"/>
             <field name="recurring_interval">1</field>
@@ -163,7 +163,7 @@
             <field name="client_id" ref="partner_carrefour"/>
             <field name="site_id" ref="partner_carrefour_evry"/>
             <field name="equipment_id" ref="equipment_pos_evry1"/>
-            <field name="priority_id" ref="it__park.incident_priority_high"/>
+            <field name="priority_id" ref="PARC_IT.incident_priority_high"/>
             <field name="description">La caisse POS-EVRY-01 se bloque aléatoirement pendant les transactions.
 Écran qui se fige, obligeant à redémarrer la caisse.
 Problème survenu 3 fois ce matin, perturbant fortement l'activité.</field>

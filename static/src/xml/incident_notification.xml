@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    <t t-name="it__park.IncidentCounter" owl="1">
+    <t t-name="PARC_IT.IncidentCounter" owl="1">
         <div class="o_incident_counter" t-on-click="openList">
             <span class="badge rounded-pill text-bg-danger" t-if="state.count > 0">
                 <t t-esc="state.count"/>
@@ -8,7 +8,7 @@
         </div>
     </t>
 
-    <t t-name="it__park.IncidentNotification" owl="1">
+    <t t-name="PARC_IT.IncidentNotification" owl="1">
         <div class="o_incident_notification p-2">
             <div class="notification-header d-flex justify-content-between align-items-center mb-2">
                 <h5 class="mb-0">

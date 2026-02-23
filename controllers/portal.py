@@ -96,7 +96,7 @@ class ITPortal(CustomerPortal):
                 'error_message': "Vous n'avez pas encore accès pour signaler des incidents. Veuillez créer une demande de prestation.",
                 'user': request.env.user
             })
-            return request.render("it__park.portal_access_denied_detailed", values)
+            return request.render("PARC_IT.portal_access_denied_detailed", values)
             
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
@@ -160,7 +160,7 @@ class ITPortal(CustomerPortal):
             'searchbar_filters': searchbar_filters,
             'filterby': filterby,
         })
-        return request.render("it__park.portal_my_incidents", values)
+        return request.render("PARC_IT.portal_my_incidents", values)
 
     @http.route(['/my/incidents/<int:incident_id>'], type='http', auth="user", website=True)
     def portal_incident_detail(self, incident_id, **kw):
@@ -171,7 +171,7 @@ class ITPortal(CustomerPortal):
                 'error_message': "Vous n'avez pas encore accès aux détails des incidents. Veuillez créer une demande de prestation.",
                 'user': request.env.user
             })
-            return request.render("it__park.portal_access_denied_detailed", values)
+            return request.render("PARC_IT.portal_access_denied_detailed", values)
             
         try:
             incident_sudo = self._document_check_access('it.incident', incident_id)
@@ -182,7 +182,7 @@ class ITPortal(CustomerPortal):
             'incident': incident_sudo,
             'page_name': 'incident',
         }
-        return request.render("it__park.portal_incident_detail", values)
+        return request.render("PARC_IT.portal_incident_detail", values)
     
     @http.route(['/my/incidents/new'], type='http', auth="user", website=True)
     def portal_create_incident(self, **kw):
@@ -198,7 +198,7 @@ class ITPortal(CustomerPortal):
             'equipment': equipment,
         })
         
-        return request.render("it__park.portal_create_incident", values)
+        return request.render("PARC_IT.portal_create_incident", values)
 
     @http.route(['/my/incidents/submit'], type='http', auth="user", website=True, methods=['POST'], csrf=True)
     def portal_submit_incident(self, **post):
@@ -305,7 +305,7 @@ class ITPortal(CustomerPortal):
             'equipment': equipment,
         })
         
-        return request.render("it__park.portal_create_ticket", values)
+        return request.render("PARC_IT.portal_create_ticket", values)
     
     @http.route(['/my/tickets/create'], type='http', auth="user", website=True)
     def portal_create_ticket_redirect(self, **kw):
@@ -380,7 +380,7 @@ class ITPortal(CustomerPortal):
     def portal_ticket_thankyou(self, ticket_id, **kw):
         ticket = request.env['it.ticket'].browse(ticket_id)
         values = {'ticket': ticket}
-        return request.render("it__park.portal_ticket_thankyou", values)
+        return request.render("PARC_IT.portal_ticket_thankyou", values)
     
     @http.route(['/my/tickets/<int:ticket_id>'], type='http', auth="user", website=True)
     def portal_ticket_detail(self, ticket_id, **kw):
@@ -419,7 +419,7 @@ class ITPortal(CustomerPortal):
                 'error_message': "Vous n'avez pas encore accès à vos sites. Veuillez créer une demande de prestation.",
                 'user': request.env.user
             })
-            return request.render("it__park.portal_access_denied_detailed", values)
+            return request.render("PARC_IT.portal_access_denied_detailed", values)
         
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
@@ -465,7 +465,7 @@ class ITPortal(CustomerPortal):
             'sortby': sortby,
         })
         
-        return request.render("it__park.portal_my_sites", values)
+        return request.render("PARC_IT.portal_my_sites", values)
 
     @http.route(['/my/sites/<int:site_id>'], type='http', auth="user", website=True)
     def portal_site_detail(self, site_id, **kw):
@@ -476,7 +476,7 @@ class ITPortal(CustomerPortal):
                 'error_message': "Vous n'avez pas encore accès aux détails des sites. Veuillez créer une demande de prestation.",
                 'user': request.env.user
             })
-            return request.render("it__park.portal_access_denied_detailed", values)
+            return request.render("PARC_IT.portal_access_denied_detailed", values)
             
         site_sudo = request.env['res.partner'].sudo().browse(site_id)
         
@@ -495,7 +495,7 @@ class ITPortal(CustomerPortal):
             'page_name': 'site',
         }
         
-        return request.render("it__park.portal_site_detail", values)
+        return request.render("PARC_IT.portal_site_detail", values)
         
     @http.route(['/my/equipment', '/my/equipment/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_equipment(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', groupby=None, **kw):
@@ -506,7 +506,7 @@ class ITPortal(CustomerPortal):
                 'error_message': "Vous n'avez pas encore accès à votre parc informatique. Veuillez créer une demande de prestation.",
                 'user': request.env.user
             })
-            return request.render("it__park.portal_access_denied_detailed", values)
+            return request.render("PARC_IT.portal_access_denied_detailed", values)
             
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
@@ -567,7 +567,7 @@ class ITPortal(CustomerPortal):
             'filterby': filterby,
         })
         
-        return request.render("it__park.portal_my_equipment", values)
+        return request.render("PARC_IT.portal_my_equipment", values)
 
     @http.route(['/my/invoices', '/my/invoices/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_invoices(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', groupby=None, **kw):
@@ -639,7 +639,7 @@ class ITPortal(CustomerPortal):
         })
         
         # Utiliser notre template personnalisé au lieu du template standard
-        return request.render("it__park.portal_my_invoices", values)
+        return request.render("PARC_IT.portal_my_invoices", values)
 
     @http.route(['/my/contracts', '/my/contracts/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_contracts(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', groupby=None, **kw):
@@ -650,7 +650,7 @@ class ITPortal(CustomerPortal):
                 'error_message': "Vous n'avez pas encore accès à vos contrats. Veuillez créer une demande de prestation.",
                 'user': request.env.user
             })
-            return request.render("it__park.portal_access_denied_detailed", values)
+            return request.render("PARC_IT.portal_access_denied_detailed", values)
             
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
@@ -684,7 +684,7 @@ class ITPortal(CustomerPortal):
             'default_url': '/my/contracts',
         })
         
-        return request.render("it__park.portal_my_contracts", values)
+        return request.render("PARC_IT.portal_my_contracts", values)
         
     @http.route(['/my/contracts/<int:contract_id>'], type='http', auth="user", website=True)
     def portal_contract_detail(self, contract_id, **kw):
@@ -695,7 +695,7 @@ class ITPortal(CustomerPortal):
                 'error_message': "Vous n'avez pas encore accès aux détails des contrats. Veuillez créer une demande de prestation.",
                 'user': request.env.user
             })
-            return request.render("it__park.portal_access_denied_detailed", values)
+            return request.render("PARC_IT.portal_access_denied_detailed", values)
             
         try:
             # Utiliser sudo() pour contourner les restrictions d'accès
@@ -713,7 +713,7 @@ class ITPortal(CustomerPortal):
                 'page_name': 'contract_detail',
             })
             
-            return request.render("it__park.portal_my_contract_detail", values)
+            return request.render("PARC_IT.portal_my_contract_detail", values)
                 
         except Exception as e:
             _logger.error(f"Erreur d'accès au contrat {contract_id}: {str(e)}")
@@ -743,7 +743,7 @@ class ITPortal(CustomerPortal):
                 'datetime': datetime,  # Rendre datetime disponible dans le template
             })
             
-            return request.render("it__park.portal_invoice_page", values)
+            return request.render("PARC_IT.portal_invoice_page", values)
                 
         except Exception as e:
             _logger.error(f"Erreur d'accès à la facture {invoice_id}: {str(e)}")
@@ -837,7 +837,7 @@ class ITServiceRequestController(http.Controller):
                 'page_name': 'new_service_request',
             }
             _logger.info("Préparation du rendu du template it_service_request_form")
-            return request.render("it__park.it_service_request_form", values)
+            return request.render("PARC_IT.it_service_request_form", values)
         except Exception as e:
             _logger.error(f"Erreur lors de l'accès à la page de demande de services: {str(e)}")
             import traceback
@@ -859,7 +859,7 @@ class ITServiceRequestController(http.Controller):
             
             if not services:
                 _logger.warning("Aucun service sélectionné!")
-                return request.render("it__park.service_request_error", {
+                return request.render("PARC_IT.service_request_error", {
                     'error_message': "Veuillez sélectionner au moins un service."
                 })
             
@@ -875,7 +875,7 @@ class ITServiceRequestController(http.Controller):
             # Vérifier que des services ont été trouvés
             if not service_type_ids:
                 _logger.error("Aucun service valide trouvé pour les codes sélectionnés")
-                return request.render("it__park.service_request_error", {
+                return request.render("PARC_IT.service_request_error", {
                     'error_message': "Les services sélectionnés n'ont pas pu être trouvés. Veuillez réessayer."
                 })
             
@@ -920,7 +920,7 @@ class ITServiceRequestController(http.Controller):
             import traceback
             _logger.error(traceback.format_exc())
             
-            return request.render("it__park.service_request_error", {
+            return request.render("PARC_IT.service_request_error", {
                 'error_message': "Une erreur s'est produite lors de la soumission de votre demande. Veuillez réessayer plus tard."
             })
     
@@ -936,7 +936,7 @@ class ITServiceRequestController(http.Controller):
                 'service_request': service_request,
                 'page_name': 'service_request',
             })
-            return request.render("it__park.it_service_request_detail", values)
+            return request.render("PARC_IT.it_service_request_detail", values)
             
         except Exception as e:
             _logger.error("Erreur lors de l'affichage de la demande de service: %s", str(e))
@@ -977,7 +977,7 @@ class ITServiceRequestController(http.Controller):
             'progress_text': 'Paiement en cours'
         }
         
-        return request.render("it__park.it_service_request_payment_simulation", values)
+        return request.render("PARC_IT.it_service_request_payment_simulation", values)
     
     @http.route(['/web/it_service_request/<int:request_id>/simulate_payment'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def it_service_request_simulate_payment(self, request_id, **post):
@@ -1041,7 +1041,7 @@ class ITServiceRequestController(http.Controller):
             'progress_text': 'Paiement effectué'
         }
         
-        return request.render("it__park.it_service_request_payment_confirmation", values)
+        return request.render("PARC_IT.it_service_request_payment_confirmation", values)
 
     @http.route(['/web/it_service_request/<int:request_id>/payment_done'], type='http', auth="user", website=True)
     def payment_done(self, request_id, **kw):
@@ -1287,6 +1287,11 @@ class ITCustomerPortal(CustomerPortal):
     
     @http.route(['/my/home'], type='http', auth="user", website=True)
     def home(self, **kw):
+        # Internal users (admin/employees) should land in the backend,
+        # not in the customer portal home.
+        if not request.env.user.share:
+            return request.redirect('/web')
+
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
 
@@ -1346,12 +1351,12 @@ class ITCustomerPortal(CustomerPortal):
             'license_count': license_count if 'license_count' in locals() else 0,
             'active_contracts': active_contracts if 'active_contracts' in locals() else []
         })
-        return request.render("it__park.it_park_portal_home", values)
+        return request.render("PARC_IT.it_park_portal_home", values)
     
     @http.route(['/about'], type='http', auth="public", website=True)
     def about(self, **kw):
         values = {}
-        return request.render("it__park.it_park_portal_about", values)
+        return request.render("PARC_IT.it_park_portal_about", values)
         
     @http.route(['/'], type='http', auth="public", website=True)
     def index(self, **kw):
@@ -1359,13 +1364,13 @@ class ITCustomerPortal(CustomerPortal):
         if not request.env.user._is_public():
             return request.redirect('/my/home')
         # Sinon, afficher la page d'accueil publique
-        return request.render("it__park.it_park_public_home")
+        return request.render("PARC_IT.it_park_public_home")
 
     @http.route(['/register'], type='http', auth="public", website=True)
     def register_form(self, **kw):
         """Affiche le formulaire d'inscription"""
         values = {}
-        return request.render("it__park.register_page", values)
+        return request.render("PARC_IT.register_page", values)
         
     @http.route(['/register/submit'], type='http', auth="public", website=True, methods=['POST'])
     def register_submit(self, **post):
@@ -1384,7 +1389,7 @@ class ITCustomerPortal(CustomerPortal):
             'is_it_contract_paid': False,   # Le contrat n'est pas encore payé
             'customer_rank': 1,
             'supplier_rank': 0,
-            'category_id': [(4, request.env.ref('it__park.category_it_client').id)],
+            'category_id': [(4, request.env.ref('PARC_IT.category_it_client').id)],
             'street': post.get('street', ''),
             'city': post.get('city', ''),
             'zip': post.get('zip', ''),
@@ -1411,7 +1416,7 @@ class ITCustomerPortal(CustomerPortal):
         user = request.env['res.users'].sudo().create(user_values)
         
         # Envoyer un email de confirmation avec le lien de réinitialisation du mot de passe
-        template = request.env.ref('it__park.email_template_client_registration')
+        template = request.env.ref('PARC_IT.email_template_client_registration')
         if template:
             template.sudo().with_context(
                 email_to=post.get('email'),
@@ -1420,7 +1425,7 @@ class ITCustomerPortal(CustomerPortal):
             ).send_mail(partner.id, force_send=True)
         
         # Notification pour les administrateurs
-        admin_users = request.env['res.users'].sudo().search([('groups_id', '=', request.env.ref('it__park.group_it_park_manager').id)])
+        admin_users = request.env['res.users'].sudo().search([('groups_id', '=', request.env.ref('PARC_IT.group_it_park_manager').id)])
         if admin_users:
             partner_url = f"/web#id={partner.id}&model=res.partner&view_type=form"
             notification_msg = f"<p>Un nouveau client IT s'est inscrit: <a href='{partner_url}'>{partner.name}</a></p>"
@@ -1472,7 +1477,7 @@ class ITCustomerPortal(CustomerPortal):
                 'error_message': "Vous n'avez pas encore accès aux détails des équipements. Veuillez créer une demande de prestation.",
                 'user': request.env.user
             })
-            return request.render("it__park.portal_access_denied_detailed", values)
+            return request.render("PARC_IT.portal_access_denied_detailed", values)
             
         try:
             # Utiliser sudo() pour contourner les restrictions d'accès
@@ -1490,7 +1495,7 @@ class ITCustomerPortal(CustomerPortal):
                 'page_name': 'equipment_detail',
             })
             
-            return request.render("it__park.portal_equipment_detail", values)
+            return request.render("PARC_IT.portal_equipment_detail", values)
                 
         except Exception as e:
             _logger.error(f"Erreur d'accès à l'équipement {equipment_id}: {str(e)}")
@@ -1640,7 +1645,7 @@ class ITCustomerPortal(CustomerPortal):
         }
         
         # Rendu du template
-        return request.render("it__park.portal_tickets_list", values)
+        return request.render("PARC_IT.portal_tickets_list", values)
 
     @http.route(['/my/tickets_detail/<int:ticket_id>'], type='http', auth="user", website=True)
     def portal_ticket_detail_new(self, ticket_id, **kw):
@@ -1674,7 +1679,7 @@ class ITCustomerPortal(CustomerPortal):
             'user': request.env.user,
         }
         
-        return request.render("it__park.portal_ticket_detail", values)
+        return request.render("PARC_IT.portal_ticket_detail", values)
 
     @http.route(['/my/tickets_detail/<int:ticket_id>/comment'], type='http', auth="user", website=True, methods=['POST'])
     def portal_ticket_comment_new(self, ticket_id, **post):

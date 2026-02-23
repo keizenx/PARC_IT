@@ -56,8 +56,12 @@ class ResCompany(models.Model):
         """Assistant pour configurer l'intégration Helpdesk"""
         self.ensure_one()
         
-        # Vérifier si le module helpdesk est installé
-        if not self.env.module_installed('helpdesk'):
+        # Vérifier si le module helpdesk est installé (compat Odoo 18)
+        helpdesk_installed = bool(self.env['ir.module.module'].sudo().search_count([
+            ('name', '=', 'helpdesk'),
+            ('state', '=', 'installed'),
+        ]))
+        if not helpdesk_installed:
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',

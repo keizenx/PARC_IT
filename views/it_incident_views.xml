@@ -231,7 +231,7 @@
                         <group>
                             <field name="date_reported"/>
                             <field name="tech_id" options="{'no_create': False, 'no_open': False}" 
-                                   context="{'default_is_it_technician': True, 'form_view_ref': 'it__park.view_it_technician_form'}"/>
+                                   context="{'default_is_it_technician': True, 'form_view_ref': 'PARC_IT.view_it_technician_form'}"/>
                             <field name="date_assigned" readonly="1"/>
                             <field name="date_start" readonly="1"/>
                             <field name="date_end" readonly="1"/>

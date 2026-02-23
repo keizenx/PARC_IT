@@ -74,7 +74,7 @@ class ITLicense(models.Model):
     supplier_id = fields.Many2one('res.partner', string='Fournisseur',
                                  domain="[('is_it_supplier', '=', True)]", 
                                  tracking=True,
-                                 context={'create_action': 'it__park.action_it_suppliers'},
+                                 context={'create_action': 'PARC_IT.action_it_suppliers'},
                                  help="Sélectionnez uniquement un fournisseur IT")
     
     equipment_ids = fields.Many2many('it.equipment', string='Équipements associés')

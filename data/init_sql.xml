@@ -53,18 +53,5 @@ DROP TABLE IF EXISTS duplicate_menu_info;
             </field>
         </record>
 
-        <!-- Exécuter la requête SQL -->
-        <function model="ir.config_parameter" name="init_disable_duplicate_menus">
-            <value eval="[]"/>
-            <value name="code">
-model = env['ir.config_parameter']
-sql_query = model.get_param('disable_duplicate_menus_sql')
-if sql_query:
-    env.cr.execute(sql_query)
-# Vider le cache des menus
-env['ir.ui.menu'].clear_caches()
-            </value>
-        </function>
-
     </data>
 </odoo> 

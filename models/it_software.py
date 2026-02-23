@@ -14,7 +14,7 @@ class ITSoftware(models.Model):
     editor_id = fields.Many2one('res.partner', string='Éditeur', 
                               domain=[('is_it_editor', '=', True)], 
                               tracking=True,
-                              context={'create_action': 'it__park.action_it_editors'},
+                              context={'create_action': 'PARC_IT.action_it_editors'},
                               help="Sélectionnez l'éditeur du logiciel")
     
     category = fields.Selection([

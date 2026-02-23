@@ -141,7 +141,7 @@ class ITServiceRequest(models.Model):
         )
         
         # Envoyer un email au client
-        template = self.env.ref('it__park.email_template_service_proposal', raise_if_not_found=False)
+        template = self.env.ref('PARC_IT.email_template_service_proposal', raise_if_not_found=False)
         if template:
             template.send_mail(
                 self.id,

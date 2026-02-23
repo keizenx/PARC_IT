@@ -1,4 +1,4 @@
-odoo.define('it__park.progress', function (require) {
+odoo.define('PARC_IT.progress', function (require) {
     'use strict';
 
     var publicWidget = require('web.public.widget');

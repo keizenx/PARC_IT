@@ -4,8 +4,8 @@
 
 
 # class it__park(models.Model):
-#     _name = 'it__park.it__park'
-#     _description = 'it__park.it__park'
+#     _name = 'PARC_IT.it__park'
+#     _description = 'PARC_IT.it__park'
 
 #     name = fields.Char()
 #     value = fields.Integer()

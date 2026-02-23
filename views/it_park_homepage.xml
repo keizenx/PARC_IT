@@ -4,9 +4,9 @@
     <record id="it_park_homepage" model="ir.ui.view">
         <field name="name">IT Park Homepage</field>
         <field name="type">qweb</field>
-        <field name="key">it__park.it_park_homepage</field>
+        <field name="key">PARC_IT.it_park_homepage</field>
         <field name="arch" type="xml">
-            <t t-name="it__park.it_park_homepage">
+            <t t-name="PARC_IT.it_park_homepage">
                 <t t-call="website.layout">
                     <div class="container-fluid">
                         <!-- Banner Section -->

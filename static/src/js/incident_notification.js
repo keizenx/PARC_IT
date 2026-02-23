@@ -44,7 +44,7 @@ export class IncidentNotificationManager extends Component {
 
             // Créer l'élément audio pour les notifications sonores
             this.audioElement = document.createElement('audio');
-            this.audioElement.src = '/it__park/static/src/sounds/chime-alert-demo-309545.mp3';
+            this.audioElement.src = '/PARC_IT/static/src/sounds/chime-alert-demo-309545.mp3';
             this.audioElement.setAttribute('preload', 'auto');
             document.body.appendChild(this.audioElement);
         });

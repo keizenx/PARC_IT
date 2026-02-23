@@ -162,7 +162,7 @@ class ITTicket(models.Model):
         # Trouver les administrateurs IT
         admin_users = []
         try:
-            admin_group = self.env.ref('it__park.group_it_admin', raise_if_not_found=False)
+            admin_group = self.env.ref('PARC_IT.group_it_admin', raise_if_not_found=False)
             if admin_group:
                 admin_users = admin_group.users
         except Exception as e:
