@@ -35,12 +35,13 @@ class ITPortalUserWizard(models.TransientModel):
     def _onchange_existing_partner(self):
         if self.existing_partner_id:
             self.create_new_contact = False
-            self.name = self.existing_partner_id.name
-            self.email = self.existing_partner_id.email
-            self.phone = self.existing_partner_id.phone
-            self.is_company = self.existing_partner_id.is_company
-            if self.existing_partner_id.parent_id:
-                self.company_name = self.existing_partner_id.parent_id.name
+            partner = self.existing_partner_id
+            self.name = partner.name or partner.email
+            self.email = partner.email
+            self.phone = partner.phone
+            self.is_company = partner.is_company
+            if partner.parent_id:
+                self.company_name = partner.parent_id.name
     
     def _generate_password(self, length=10):
         """Génère un mot de passe aléatoire avec lettres, chiffres et caractères spéciaux"""
@@ -52,6 +53,8 @@ class ITPortalUserWizard(models.TransientModel):
         
         if not self.email:
             raise ValidationError(_("L'email est obligatoire pour créer un utilisateur du portail."))
+        if not self.name:
+            self.name = self.email
         
         # Vérifier si l'utilisateur existe déjà
         existing_user = self.env['res.users'].sudo().search([('login', '=', self.email)], limit=1)
@@ -92,6 +95,8 @@ class ITPortalUserWizard(models.TransientModel):
                 partner = self.env['res.partner'].sudo().create(partner_vals)
         else:
             partner = self.existing_partner_id
+            if partner and not partner.name:
+                partner.sudo().write({'name': self.name})
         
         # Générer ou utiliser le mot de passe fourni
         password = self.password
