@@ -3,7 +3,7 @@ from odoo import models, fields, api
 class ResUsers(models.Model):
     _inherit = 'res.users'
     
-    employee_id = fields.Many2one(
+    it_employee_id = fields.Many2one(
         'it.employee',
         string='Employé IT',
         help="Employé IT associé à cet utilisateur"
@@ -19,17 +19,17 @@ class ResUsers(models.Model):
     
     notes = fields.Text(
         string='Notes',
-        related='employee_id.notes',
+        related='it_employee_id.notes',
         help="Notes et commentaires sur ce technicien",
     )
     
-    @api.depends('employee_id')
+    @api.depends('it_employee_id')
     def _compute_it_technician(self):
         """Calcule si l'utilisateur est un technicien IT en fonction de son employé IT associé"""
         for user in self:
-            if user.employee_id:
+            if user.it_employee_id:
                 # Recherche directe plutôt que d'utiliser la dépendance
-                user.it_technician = user.employee_id.it_technician if user.employee_id else False
+                user.it_technician = user.it_employee_id.it_technician if user.it_employee_id else False
             else:
                 user.it_technician = False
     
@@ -40,9 +40,9 @@ class ResUsers(models.Model):
         if (operator == '=' and value) or (operator == '!=' and not value):
             # Cherche les utilisateurs dont l'employé est technicien IT
             employees = self.env['it.employee'].search([('it_technician', '=', True)])
-            return [('employee_id', 'in', employees.ids)]
+            return [('it_employee_id', 'in', employees.ids)]
         else:
             # Cherche les utilisateurs dont l'employé n'est pas technicien IT
             employees = self.env['it.employee'].search([('it_technician', '=', False)])
-            users_without_employee = self.search([('employee_id', '=', False)])
-            return ['|', ('employee_id', 'in', employees.ids), ('id', 'in', users_without_employee.ids)] 
+            users_without_employee = self.search([('it_employee_id', '=', False)])
+            return ['|', ('it_employee_id', 'in', employees.ids), ('id', 'in', users_without_employee.ids)] 

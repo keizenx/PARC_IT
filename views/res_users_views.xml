@@ -8,7 +8,7 @@
             <list>
                 <field name="name"/>
                 <field name="login"/>
-                <field name="employee_id"/>
+                <field name="it_employee_id"/>
                 <field name="it_technician"/>
             </list>
         </field>

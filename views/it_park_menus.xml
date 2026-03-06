@@ -112,14 +112,14 @@
     <record id="action_it_equipment" model="ir.actions.act_window">
         <field name="name">Équipements</field>
         <field name="res_model">it.equipment</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
     </record>
     
     <!-- Action pour les tickets helpdesk liés aux incidents IT -->
     <record id="action_helpdesk_tickets_it" model="ir.actions.act_window">
         <field name="name">Tickets Helpdesk IT</field>
         <field name="res_model">helpdesk.ticket</field>
-        <field name="view_mode">kanban,tree,form,activity</field>
+        <field name="view_mode">kanban,list,form,activity</field>
         <field name="domain">[('team_id.is_it_team', '=', True)]</field>
         <field name="context">{'search_default_team_id': True, 'display_it_fields': True}</field>
         <field name="help" type="html">
